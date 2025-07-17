@@ -148,7 +148,6 @@ function DigitalTwinsList() {
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Badge variant="outline">{twin.roleTemplate.category}</Badge>
-                  <Badge variant="outline">{twin.roleTemplate.subCategory}</Badge>
                   <Badge variant="outline">Level {twin.level}</Badge>
                 </div>
 

@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          errors: error.errors.map(e => ({
+          errors: error.issues.map(e => ({
             field: e.path.join('.'),
             message: e.message,
           })),

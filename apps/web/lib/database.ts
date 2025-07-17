@@ -34,7 +34,6 @@ export class OrganizationService {
           digitalTwins: {
             include: {
               roleTemplate: true,
-              assignedTo: true,
               signals: true,
               certifications: true,
             },
@@ -79,7 +78,6 @@ export class RoleTemplateService {
         where: { organizationId },
         orderBy: [
           { category: 'asc' },
-          { subCategory: 'asc' },
           { title: 'asc' },
         ],
       });
@@ -126,7 +124,6 @@ export class DigitalTwinService {
         include: {
           organization: true,
           roleTemplate: true,
-          assignedTo: true,
           signals: true,
           certifications: true,
         },
@@ -147,7 +144,6 @@ export class DigitalTwinService {
         include: {
           organization: true,
           roleTemplate: true,
-          assignedTo: true,
           signals: {
             orderBy: { createdAt: 'desc' },
           },
@@ -171,7 +167,6 @@ export class DigitalTwinService {
         where: { organizationId },
         include: {
           roleTemplate: true,
-          assignedTo: true,
           signals: true,
           certifications: true,
         },
@@ -202,7 +197,6 @@ export class DigitalTwinService {
         include: {
           organization: true,
           roleTemplate: true,
-          assignedTo: true,
           signals: true,
           certifications: true,
         },
@@ -299,59 +293,7 @@ export class CertificationService {
   }
 }
 
-export class HumanService {
-  /**
-   * Create or update a human
-   */
-  static async upsert(data: {
-    name: string;
-    email: string;
-    did?: string;
-  }) {
-    try {
-      return await prisma.human.upsert({
-        where: { email: data.email },
-        update: data,
-        create: data,
-        include: {
-          digitalTwins: {
-            include: {
-              organization: true,
-              roleTemplate: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      console.error('Error upserting human:', error);
-      throw new Error('Failed to upsert human');
-    }
-  }
 
-  /**
-   * Get human by email
-   */
-  static async getByEmail(email: string) {
-    try {
-      return await prisma.human.findUnique({
-        where: { email },
-        include: {
-          digitalTwins: {
-            include: {
-              organization: true,
-              roleTemplate: true,
-              signals: true,
-              certifications: true,
-            },
-          },
-        },
-      });
-    } catch (error) {
-      console.error('Error fetching human:', error);
-      throw new Error('Failed to fetch human');
-    }
-  }
-}
 
 // =============================================================================
 // UTILITY FUNCTIONS
