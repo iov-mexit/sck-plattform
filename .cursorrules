@@ -1,0 +1,73 @@
+# SCK (Secure Code KnAIght) - Cursor Rules
+
+## 🚫 STRICT FILE TYPE RULES
+
+### NEVER CREATE BOTH FILE TYPES
+- **NEVER** create both `.ts` and `.js` files for the same module
+- **NEVER** create both `.tsx` and `.jsx` files for the same component/page
+- **NEVER** create both `.ts` and `.js` files for the same route
+- **ONLY** use TypeScript files (`.ts`, `.tsx`) for all source code
+
+### FILE TYPE ENFORCEMENT
+- **Pages/Routes**: Only `.tsx` files in `app/` directory
+- **API Routes**: Only `.ts` files in `app/api/` directory  
+- **Components**: Only `.tsx` files in `components/` directory
+- **Utilities**: Only `.ts` files in `lib/` directory
+- **Types**: Only `.ts` files in `types/` directory
+
+### BEFORE CREATING ANY FILE
+1. **Check if a `.ts`/`.tsx` version already exists**
+2. **If a `.js`/`.jsx` version exists, DELETE IT FIRST**
+3. **Only create `.ts`/`.tsx` files**
+4. **Never create `.js`/`.jsx` files for source code**
+
+### DUPLICATE PREVENTION
+- **Before editing**: Check for existing `.js`/`.jsx` duplicates
+- **Before creating**: Ensure no `.js`/`.jsx` version exists
+- **After creating**: Verify only `.ts`/`.tsx` files exist
+- **If duplicates found**: Delete `.js`/`.jsx` files immediately
+
+### ERROR PREVENTION
+- **Next.js App Router**: Only `.tsx` for pages, `.ts` for API routes
+- **Components**: Only `.tsx` files
+- **Utilities**: Only `.ts` files
+- **Types**: Only `.ts` files
+
+## 🔒 ENFORCEMENT
+- **This rule is MANDATORY** - no exceptions
+- **Always check for duplicates** before creating files
+- **Always delete `.js`/`.jsx` duplicates** when found
+- **Only use TypeScript** for all source code
+
+## 📁 CORRECT FILE STRUCTURE
+```
+apps/web/
+├── app/
+│   ├── page.tsx                    # ✅ CORRECT
+│   ├── layout.tsx                  # ✅ CORRECT  
+│   ├── api/
+│   │   └── v1/
+│   │       └── digital-twins/
+│   │           └── route.ts        # ✅ CORRECT
+│   └── dashboard/
+│       └── page.tsx                # ✅ CORRECT
+├── components/
+│   └── ui/
+│       ├── button.tsx              # ✅ CORRECT
+│       └── card.tsx                # ✅ CORRECT
+└── lib/
+    ├── utils.ts                    # ✅ CORRECT
+    └── validation.ts               # ✅ CORRECT
+```
+
+## ❌ FORBIDDEN
+- `page.jsx` + `page.tsx` ❌
+- `route.js` + `route.ts` ❌  
+- `button.jsx` + `button.tsx` ❌
+- `utils.js` + `utils.ts` ❌
+
+## ✅ ALLOWED
+- `page.tsx` ✅
+- `route.ts` ✅
+- `button.tsx` ✅
+- `utils.ts` ✅ 

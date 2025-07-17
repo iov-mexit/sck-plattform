@@ -1,0 +1,399 @@
+# SCK Smart Contracts - Development Rules
+
+## 🎯 SMART CONTRACT ARCHITECTURE
+
+### Security-First Design
+- **Defense in Depth**: Multiple layers of security controls
+- **Principle of Least Privilege**: Minimal required permissions
+- **Fail-Safe Defaults**: Secure by default configurations
+- **Complete Mediation**: All access must be authorized
+- **Open Design**: Security through transparency
+
+### Contract Architecture
+- **Upgradeable Contracts**: Use OpenZeppelin upgradeable patterns
+- **Proxy Pattern**: Separate logic from storage
+- **Diamond Pattern**: For complex multi-faceted contracts
+- **Factory Pattern**: For creating multiple instances
+- **Registry Pattern**: For managing contract addresses
+
+### Gas Optimization
+- **Batch Operations**: Combine multiple operations
+- **Storage Packing**: Optimize storage layout
+- **Event Usage**: Use events instead of storage for logs
+- **External Calls**: Minimize external contract calls
+- **Loop Optimization**: Avoid unbounded loops
+
+## 🔒 SECURITY IMPLEMENTATION
+
+### Access Control
+```solidity
+// ✅ Good: Comprehensive access control with roles
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+
+contract DigitalTwinNFT is AccessControl, Pausable {
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+    
+    constructor() {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, msg.sender);
+    }
+    
+    modifier onlyMinter() {
+        require(hasRole(MINTER_ROLE, msg.sender), "Caller is not a minter");
+        _;
+    }
+    
+    modifier onlyAdmin() {
+        require(hasRole(ADMIN_ROLE, msg.sender), "Caller is not an admin");
+        _;
+    }
+}
+```
+
+### Reentrancy Protection
+```solidity
+// ✅ Good: ReentrancyGuard and checks-effects-interactions pattern
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract SecureContract is ReentrancyGuard {
+    mapping(address => uint256) private balances;
+    
+    function withdraw(uint256 amount) external nonReentrant {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        
+        // Checks
+        require(amount > 0, "Amount must be positive");
+        
+        // Effects
+        balances[msg.sender] -= amount;
+        
+        // Interactions
+        (bool success, ) = msg.sender.call{value: amount}("");
+        require(success, "Transfer failed");
+        
+        emit Withdrawal(msg.sender, amount);
+    }
+}
+```
+
+### Input Validation
+```solidity
+// ✅ Good: Comprehensive input validation
+contract ValidatedContract {
+    uint256 public constant MAX_SUPPLY = 10000;
+    uint256 public constant MIN_PRICE = 0.01 ether;
+    
+    function mint(uint256 quantity, uint256 price) external payable {
+        // Input validation
+        require(quantity > 0, "Quantity must be positive");
+        require(quantity <= 10, "Max 10 per transaction");
+        require(price >= MIN_PRICE, "Price too low");
+        require(msg.value == price * quantity, "Incorrect payment");
+        
+        // State validation
+        require(totalSupply() + quantity <= MAX_SUPPLY, "Exceeds max supply");
+        
+        // Business logic
+        _mint(msg.sender, quantity);
+    }
+}
+```
+
+## 🧪 TESTING REQUIREMENTS
+
+### Unit Testing
+- **Hardhat** + **Chai** for testing framework
+- **Coverage**: 95%+ line coverage required
+- **Edge Cases**: Test all boundary conditions
+- **Gas Testing**: Measure gas usage for optimization
+- **Fuzzing**: Use Echidna or Foundry for property-based testing
+
+### Integration Testing
+- **Fork Testing**: Test against mainnet state
+- **Multi-Contract Testing**: Test contract interactions
+- **Upgrade Testing**: Test upgrade scenarios
+- **Gas Testing**: Measure gas costs in different scenarios
+- **Stress Testing**: High-load scenarios
+
+### Security Testing
+- **Slither**: Static analysis for vulnerabilities
+- **Mythril**: Symbolic execution analysis
+- **Echidna**: Fuzzing for security properties
+- **Manual Review**: Expert security audit
+- **Formal Verification**: Where applicable
+
+## 📁 CONTRACT STRUCTURE
+
+```
+contracts/
+├── core/
+│   ├── DigitalTwinNFT.sol
+│   ├── DigitalTwinRegistry.sol
+│   └── AccessControl.sol
+├── governance/
+│   ├── DAO.sol
+│   ├── Voting.sol
+│   └── Treasury.sol
+├── identity/
+│   ├── DIDRegistry.sol
+│   ├── CredentialVerifier.sol
+│   └── ZKPVerifier.sol
+├── payments/
+│   ├── PaymentProcessor.sol
+│   ├── ILPConnector.sol
+│   └── FeeCollector.sol
+├── interfaces/
+│   ├── IDigitalTwin.sol
+│   ├── IIdentity.sol
+│   └── IPayment.sol
+└── libraries/
+    ├── DigitalTwinLib.sol
+    ├── IdentityLib.sol
+    └── PaymentLib.sol
+```
+
+## 🚀 DEVELOPMENT WORKFLOW
+
+### Development Environment
+- **Hardhat** for development and testing
+- **Foundry** for advanced testing and fuzzing
+- **TypeChain** for TypeScript bindings
+- **OpenZeppelin** for secure base contracts
+- **Solhint** for code quality
+
+### Deployment Strategy
+- **Multi-Stage**: Testnet → Staging → Mainnet
+- **Proxy Deployment**: Upgradeable contracts
+- **Verification**: Contract source verification
+- **Monitoring**: Gas usage and event monitoring
+- **Emergency Procedures**: Pause and upgrade mechanisms
+
+### Documentation
+- **NatSpec**: Comprehensive function documentation
+- **README**: Setup and usage instructions
+- **Architecture**: System design documentation
+- **Security**: Security considerations and audits
+- **Deployment**: Step-by-step deployment guide
+
+## 🔧 SPECIFIC GUIDELINES
+
+### Contract Development
+```solidity
+// ✅ Good: Comprehensive contract with security features
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/security/Pausable.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+/**
+ * @title DigitalTwinNFT
+ * @dev ERC721 token representing digital twins with access control
+ * @custom:security-contact security@sck.com
+ */
+contract DigitalTwinNFT is ERC721, AccessControl, Pausable, ReentrancyGuard {
+    using Counters for Counters.Counter;
+    
+    // Events
+    event DigitalTwinCreated(uint256 indexed tokenId, address indexed owner, string metadata);
+    event MetadataUpdated(uint256 indexed tokenId, string newMetadata);
+    
+    // State variables
+    Counters.Counter private _tokenIds;
+    mapping(uint256 => string) private _metadata;
+    
+    // Roles
+    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant METADATA_ROLE = keccak256("METADATA_ROLE");
+    
+    // Modifiers
+    modifier onlyTokenOwner(uint256 tokenId) {
+        require(ownerOf(tokenId) == msg.sender, "Not token owner");
+        _;
+    }
+    
+    modifier tokenExists(uint256 tokenId) {
+        require(_exists(tokenId), "Token does not exist");
+        _;
+    }
+    
+    constructor() ERC721("Digital Twin NFT", "DTWIN") {
+        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(METADATA_ROLE, msg.sender);
+    }
+    
+    /**
+     * @dev Creates a new digital twin NFT
+     * @param to Address to mint the token to
+     * @param metadata Initial metadata for the digital twin
+     */
+    function mintDigitalTwin(
+        address to,
+        string memory metadata
+    ) external onlyRole(MINTER_ROLE) whenNotPaused nonReentrant returns (uint256) {
+        require(to != address(0), "Invalid recipient");
+        require(bytes(metadata).length > 0, "Metadata cannot be empty");
+        
+        _tokenIds.increment();
+        uint256 newTokenId = _tokenIds.current();
+        
+        _safeMint(to, newTokenId);
+        _metadata[newTokenId] = metadata;
+        
+        emit DigitalTwinCreated(newTokenId, to, metadata);
+        
+        return newTokenId;
+    }
+    
+    /**
+     * @dev Updates metadata for a digital twin
+     * @param tokenId ID of the token to update
+     * @param newMetadata New metadata string
+     */
+    function updateMetadata(
+        uint256 tokenId,
+        string memory newMetadata
+    ) external onlyRole(METADATA_ROLE) tokenExists(tokenId) whenNotPaused {
+        require(bytes(newMetadata).length > 0, "Metadata cannot be empty");
+        
+        _metadata[tokenId] = newMetadata;
+        emit MetadataUpdated(tokenId, newMetadata);
+    }
+    
+    /**
+     * @dev Returns metadata for a digital twin
+     * @param tokenId ID of the token
+     */
+    function getMetadata(uint256 tokenId) external view tokenExists(tokenId) returns (string memory) {
+        return _metadata[tokenId];
+    }
+    
+    /**
+     * @dev Pauses all token transfers
+     */
+    function pause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _pause();
+    }
+    
+    /**
+     * @dev Unpauses all token transfers
+     */
+    function unpause() external onlyRole(DEFAULT_ADMIN_ROLE) {
+        _unpause();
+    }
+    
+    // Required overrides
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    ) internal virtual override(ERC721) whenNotPaused {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+    }
+    
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        virtual
+        override(ERC721, AccessControl)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+}
+```
+
+### Testing Patterns
+```solidity
+// ✅ Good: Comprehensive test with edge cases
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+import "forge-std/Test.sol";
+import "../contracts/DigitalTwinNFT.sol";
+
+contract DigitalTwinNFTTest is Test {
+    DigitalTwinNFT public nft;
+    address public owner = address(this);
+    address public user = address(0x1);
+    address public minter = address(0x2);
+    
+    event DigitalTwinCreated(uint256 indexed tokenId, address indexed owner, string metadata);
+    
+    function setUp() public {
+        nft = new DigitalTwinNFT();
+        nft.grantRole(nft.MINTER_ROLE(), minter);
+    }
+    
+    function testMintDigitalTwin() public {
+        vm.startPrank(minter);
+        
+        uint256 tokenId = nft.mintDigitalTwin(user, "Test Metadata");
+        
+        assertEq(nft.ownerOf(tokenId), user);
+        assertEq(nft.getMetadata(tokenId), "Test Metadata");
+        
+        vm.stopPrank();
+    }
+    
+    function testMintDigitalTwinRevertsIfNotMinter() public {
+        vm.startPrank(user);
+        
+        vm.expectRevert("AccessControl: account 0x0000000000000000000000000000000000000001 is missing role 0x9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6");
+        nft.mintDigitalTwin(user, "Test Metadata");
+        
+        vm.stopPrank();
+    }
+    
+    function testMintDigitalTwinRevertsIfPaused() public {
+        nft.pause();
+        
+        vm.startPrank(minter);
+        vm.expectRevert("Pausable: paused");
+        nft.mintDigitalTwin(user, "Test Metadata");
+        vm.stopPrank();
+    }
+    
+    function testUpdateMetadata() public {
+        // First mint a token
+        vm.prank(minter);
+        uint256 tokenId = nft.mintDigitalTwin(user, "Initial Metadata");
+        
+        // Update metadata
+        vm.prank(minter);
+        nft.updateMetadata(tokenId, "Updated Metadata");
+        
+        assertEq(nft.getMetadata(tokenId), "Updated Metadata");
+    }
+    
+    function testUpdateMetadataRevertsIfNotAuthorized() public {
+        vm.prank(minter);
+        uint256 tokenId = nft.mintDigitalTwin(user, "Initial Metadata");
+        
+        vm.prank(user);
+        vm.expectRevert("AccessControl: account 0x0000000000000000000000000000000000000001 is missing role 0x4a9f2df0fed2c77648de5860a4cc508cd0818c85b8b8a1ab4ceeef8d981c8956a6");
+        nft.updateMetadata(tokenId, "Updated Metadata");
+    }
+}
+```
+
+## 🎯 IMMEDIATE PRIORITIES
+
+1. **Core Contracts**: Deploy DigitalTwinNFT and Registry
+2. **Access Control**: Implement comprehensive role management
+3. **Security Audit**: Complete security review and fixes
+4. **Testing**: Achieve 95%+ test coverage
+5. **Documentation**: Complete NatSpec documentation
+6. **Deployment**: Deploy to testnets (Sepolia, Mumbai)
+7. **Verification**: Verify contracts on block explorers
+8. **Monitoring**: Set up contract monitoring
+
+Remember: **Security is paramount in smart contracts.** A single vulnerability can lead to complete loss of funds. 

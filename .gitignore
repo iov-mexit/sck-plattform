@@ -1,0 +1,22 @@
+node_modules
+# Keep environment variables out of version control
+.env
+
+/generated/prisma
+
+# Ignore compiled JavaScript files to prevent duplicates
+**/dist/**/*.js
+**/dist/**/*.js.map
+**/*.js.map
+
+# Ignore build artifacts
+.next/
+.turbo/
+
+# Prevent .js/.jsx files in source directories (TypeScript only)
+apps/web/app/**/*.js
+apps/web/app/**/*.jsx
+apps/web/components/**/*.js
+apps/web/components/**/*.jsx
+apps/web/lib/**/*.js
+apps/web/lib/**/*.jsx

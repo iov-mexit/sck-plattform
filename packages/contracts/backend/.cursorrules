@@ -1,0 +1,589 @@
+# SCK Backend API - Development Rules
+
+## 🎯 BACKEND ARCHITECTURE
+
+### API Design Principles
+  - ** RESTful Design **: Follow REST conventions with proper HTTP methods
+    - ** GraphQL Support **: For complex data queries and real - time updates
+      - ** API Versioning **: Use semantic versioning in URLs(`/api/v1/`)
+        - ** Rate Limiting **: Implement per - user and per - endpoint limits
+          - ** Caching Strategy **: Redis for session data, CDN for static assets
+            - ** API Contracts **: Use Zod schemas for request & response validation
+              - ** OpenAPI Spec **: Maintain comprehensive API documentation
+                - ** Backward Compatibility **: Support at least 2 API versions
+
+### Security Architecture
+  - ** Zero Trust **: Verify every request, trust no one
+    - ** Defense in Depth **: Multiple security layers
+      - ** Principle of Least Privilege **: Minimal required permissions
+        - ** Secure by Default **: All features secure by default
+- ** Privacy by Design **: Data protection built -in
+
+### Database Design
+  - ** PostgreSQL **: Primary database with encryption
+  - ** Redis **: Caching and session storage
+    - ** Connection Pooling **: Optimize database connections
+      - ** Migrations **: Version - controlled schema changes
+        - ** Backup Strategy **: Automated backups with encryption
+
+## 🔒 SECURITY IMPLEMENTATION
+
+### Authentication & Authorization
+  ```typescript
+// ✅ Good: Comprehensive auth middleware with DID verification
+import { Request, Response, NextFunction } from 'express';
+import { verifyDIDToken, validateCredential } from '../lib/auth';
+import { rateLimit } from 'express-rate-limit';
+
+interface AuthenticatedRequest extends Request {
+  user?: {
+    did: string;
+    credentials: VerifiableCredential[];
+    permissions: string[];
+  };
+}
+
+export const authMiddleware = async (
+  req: AuthenticatedRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      return res.status(401).json({ error: 'No token provided' });
+    }
+    
+    // Verify DID token
+    const verifiedDID = await verifyDIDToken(token);
+    if (!verifiedDID) {
+      return res.status(401).json({ error: 'Invalid token' });
+    }
+    
+    // Validate credentials
+    const credentials = await validateCredential(verifiedDID);
+    
+    // Check permissions
+    const permissions = await getUserPermissions(verifiedDID);
+    
+    req.user = {
+      did: verifiedDID,
+      credentials,
+      permissions
+    };
+    
+    next();
+  } catch (error) {
+    console.error('Auth middleware error:', error);
+    res.status(500).json({ error: 'Authentication failed' });
+  }
+};
+
+export const requirePermission = (permission: string) => {
+  return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    if (!req.user?.permissions.includes(permission)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    next();
+  };
+};
+```
+
+### Input Validation & Sanitization
+  ```typescript
+// ✅ Good: Comprehensive input validation with Zod
+import { z } from 'zod';
+import { sanitizeHtml } from 'sanitize-html';
+
+const CreateDigitalTwinSchema = z.object({
+  name: z.string()
+    .min(1, 'Name is required')
+    .max(100, 'Name too long')
+    .transform(val => sanitizeHtml(val)),
+  description: z.string()
+    .max(1000, 'Description too long')
+    .optional()
+    .transform(val => val ? sanitizeHtml(val) : undefined),
+  metadata: z.record(z.unknown())
+    .optional()
+    .refine(data => {
+      if (!data) return true;
+      const size = JSON.stringify(data).length;
+      return size <= 10000; // 10KB limit
+    }, 'Metadata too large'),
+  blockchain: z.enum(['ethereum', 'polygon', 'flare']),
+  network: z.enum(['mainnet', 'testnet']),
+});
+
+export const validateDigitalTwinInput = (data: unknown) => {
+  return CreateDigitalTwinSchema.parse(data);
+};
+```
+
+### Data Encryption
+  ```typescript
+// ✅ Good: Client-side encryption for sensitive data
+import { encrypt, decrypt } from '../lib/encryption';
+
+export class SecureDataService {
+  private readonly encryptionKey: string;
+  
+  constructor() {
+    this.encryptionKey = process.env.ENCRYPTION_KEY!;
+    if (!this.encryptionKey) {
+      throw new Error('Encryption key not configured');
+    }
+  }
+  
+  async encryptSensitiveData(data: Record<string, unknown>): Promise<string> {
+    const jsonData = JSON.stringify(data);
+    return await encrypt(jsonData, this.encryptionKey);
+  }
+  
+  async decryptSensitiveData(encryptedData: string): Promise<Record<string, unknown>> {
+    const decrypted = await decrypt(encryptedData, this.encryptionKey);
+    return JSON.parse(decrypted);
+  }
+  
+  async storeEncryptedData(userId: string, data: Record<string, unknown>): Promise<void> {
+    const encrypted = await this.encryptSensitiveData(data);
+    
+    await db.query(
+      'INSERT INTO encrypted_user_data (user_id, encrypted_data) VALUES ($1, $2)',
+      [userId, encrypted]
+    );
+  }
+}
+```
+
+## 🧪 TESTING STRATEGY
+
+### Unit Testing
+  ```typescript
+// ✅ Good: Comprehensive unit tests with mocking
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { DigitalTwinService } from '../services/digital-twin.service';
+import { mockDatabase, mockEncryption } from './mocks';
+
+describe('DigitalTwinService', () => {
+  let service: DigitalTwinService;
+  let mockDb: ReturnType<typeof mockDatabase>;
+  let mockEncrypt: ReturnType<typeof mockEncryption>;
+  
+  beforeEach(() => {
+    mockDb = mockDatabase();
+    mockEncrypt = mockEncryption();
+    service = new DigitalTwinService(mockDb, mockEncrypt);
+  });
+  
+  it('should create digital twin with valid data', async () => {
+    const input = {
+      name: 'Test Twin',
+      description: 'Test Description',
+      metadata: { key: 'value' }
+    };
+    
+    const result = await service.createDigitalTwin('user123', input);
+    
+    expect(result).toMatchObject({
+      id: expect.any(String),
+      name: input.name,
+      owner: 'user123',
+      createdAt: expect.any(Date)
+    });
+    
+    expect(mockDb.query).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT INTO digital_twins'),
+      expect.arrayContaining([input.name, 'user123'])
+    );
+  });
+  
+  it('should reject invalid input data', async () => {
+    const invalidInput = {
+      name: '', // Invalid: empty name
+      description: 'a'.repeat(1001) // Invalid: too long
+    };
+    
+    await expect(
+      service.createDigitalTwin('user123', invalidInput)
+    ).rejects.toThrow('Validation failed');
+  });
+  
+  it('should handle database errors gracefully', async () => {
+    mockDb.query.mockRejectedValue(new Error('Database connection failed'));
+    
+    await expect(
+      service.createDigitalTwin('user123', { name: 'Test' })
+    ).rejects.toThrow('Failed to create digital twin');
+  });
+});
+```
+
+### Integration Testing
+  ```typescript
+// ✅ Good: Integration tests with test database
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { createTestDatabase, destroyTestDatabase } from './test-utils';
+import { app } from '../app';
+import request from 'supertest';
+
+describe('Digital Twin API', () => {
+  let testDb: any;
+  let authToken: string;
+  
+  beforeAll(async () => {
+    testDb = await createTestDatabase();
+    authToken = await generateTestToken();
+  });
+  
+  afterAll(async () => {
+    await destroyTestDatabase(testDb);
+  });
+  
+  it('should create digital twin via API', async () => {
+    const response = await request(app)
+      .post('/api/v1/digital-twins')
+      .set('Authorization', `Bearer ${ authToken } `)
+      .send({
+        name: 'API Test Twin',
+        description: 'Created via API',
+        metadata: { source: 'api-test' }
+      })
+      .expect(201);
+    
+    expect(response.body).toMatchObject({
+      id: expect.any(String),
+      name: 'API Test Twin',
+      owner: expect.any(String),
+      createdAt: expect.any(String)
+    });
+  });
+  
+  it('should reject unauthorized requests', async () => {
+    await request(app)
+      .post('/api/v1/digital-twins')
+      .send({ name: 'Unauthorized Twin' })
+      .expect(401);
+  });
+  
+  it('should validate input data', async () => {
+    const response = await request(app)
+      .post('/api/v1/digital-twins')
+      .set('Authorization', `Bearer ${ authToken } `)
+      .send({
+        name: '', // Invalid: empty name
+        description: 'a'.repeat(1001) // Invalid: too long
+      })
+      .expect(400);
+    
+    expect(response.body.errors).toContainEqual(
+      expect.objectContaining({
+        field: 'name',
+        message: 'Name is required'
+      })
+    );
+  });
+});
+```
+
+## 📁 API STRUCTURE
+
+  ```
+src/
+├── controllers/
+│   ├── auth.controller.ts
+│   ├── digital-twin.controller.ts
+│   ├── identity.controller.ts
+│   └── payment.controller.ts
+├── services/
+│   ├── auth.service.ts
+│   ├── digital-twin.service.ts
+│   ├── identity.service.ts
+│   └── payment.service.ts
+├── middleware/
+│   ├── auth.middleware.ts
+│   ├── validation.middleware.ts
+│   ├── rate-limit.middleware.ts
+│   └── error-handler.middleware.ts
+├── lib/
+│   ├── auth/
+│   │   ├── did-verifier.ts
+│   │   ├── credential-validator.ts
+│   │   └── permission-checker.ts
+│   ├── encryption/
+│   │   ├── client-encryption.ts
+│   │   └── key-management.ts
+│   ├── database/
+│   │   ├── connection.ts
+│   │   ├── migrations.ts
+│   │   └── queries.ts
+│   └── blockchain/
+│       ├── contract-interaction.ts
+│       └── transaction-monitor.ts
+├── routes/
+│   ├── auth.routes.ts
+│   ├── digital-twin.routes.ts
+│   ├── identity.routes.ts
+│   └── payment.routes.ts
+├── types/
+│   ├── auth.types.ts
+│   ├── digital-twin.types.ts
+│   └── api.types.ts
+└── utils/
+    ├── validation.ts
+    ├── encryption.ts
+    └── logging.ts
+```
+
+## 🚀 DEVELOPMENT WORKFLOW
+
+### Code Quality
+  - ** ESLint ** with TypeScript rules
+    - ** Prettier ** for consistent formatting
+      - ** Husky ** for pre - commit hooks
+        - ** TypeScript ** strict mode enabled
+          - ** Import sorting ** with `@trivago/prettier-plugin-sort-imports`
+
+### API Documentation
+  - ** OpenAPI / Swagger ** for API documentation
+    - ** JSDoc ** for function documentation
+- ** Postman Collections ** for testing
+      - ** API Versioning ** strategy
+      - ** Changelog ** for breaking changes
+
+### Monitoring & Logging
+  ```typescript
+// ✅ Good: Structured logging with correlation IDs
+import { createLogger, format, transports } from 'winston';
+import { v4 as uuidv4 } from 'uuid';
+
+const logger = createLogger({
+  format: format.combine(
+    format.timestamp(),
+    format.errors({ stack: true }),
+    format.json()
+  ),
+  defaultMeta: { service: 'sck-api' },
+  transports: [
+    new transports.Console(),
+    new transports.File({ filename: 'logs/error.log', level: 'error' }),
+    new transports.File({ filename: 'logs/combined.log' })
+  ]
+});
+
+export const logRequest = (req: Request, res: Response, next: NextFunction) => {
+  const correlationId = req.headers['x-correlation-id'] as string || uuidv4();
+  req.correlationId = correlationId;
+  
+  logger.info('Incoming request', {
+    correlationId,
+    method: req.method,
+    url: req.url,
+    userAgent: req.get('User-Agent'),
+    ip: req.ip
+  });
+  
+  next();
+};
+
+export const logResponse = (req: Request, res: Response, next: NextFunction) => {
+  const start = Date.now();
+  
+  res.on('finish', () => {
+    const duration = Date.now() - start;
+    
+    logger.info('Request completed', {
+      correlationId: req.correlationId,
+      method: req.method,
+      url: req.url,
+      statusCode: res.statusCode,
+      duration
+    });
+  });
+  
+  next();
+};
+```
+
+### Observability & Telemetry
+  - ** Distributed Tracing **: Use correlation IDs across services
+    - ** Custom Metrics **: Track API response times, error rates, user actions
+      - ** Web3 Monitoring **: Monitor transaction success rates, gas costs, contract interactions
+        - ** Error Tracking **: Send errors to Sentry with user context
+          - ** Performance Monitoring **: Track database query performance, API latency
+            - ** Business Metrics **: Monitor user engagement, feature adoption rates
+
+## 🎯 IMMEDIATE PRIORITIES
+
+1. ** Authentication System **: Implement DID - based auth with verifiable credentials
+2. ** Digital Twin API **: CRUD operations with encryption
+3. ** Identity Management **: DID registration and credential verification
+4. ** Payment Integration **: ILP connector and payment processing
+5. ** Database Setup **: PostgreSQL with migrations and encryption
+6. ** Security Middleware **: Rate limiting, input validation, CORS
+7. ** Testing **: Unit and integration test coverage
+8. ** Documentation **: OpenAPI specs and deployment guides
+
+## 🔧 SPECIFIC GUIDELINES
+
+### Route Development
+  ```typescript
+// ✅ Good: Comprehensive route with validation, auth, and error handling
+import { Router } from 'express';
+import { z } from 'zod';
+import { authMiddleware, requirePermission } from '../middleware/auth.middleware';
+import { validateInput } from '../middleware/validation.middleware';
+import { DigitalTwinService } from '../services/digital-twin.service';
+import { asyncHandler } from '../utils/async-handler';
+
+const router = Router();
+const digitalTwinService = new DigitalTwinService();
+
+const CreateDigitalTwinSchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(1000).optional(),
+  metadata: z.record(z.unknown()).optional(),
+  blockchain: z.enum(['ethereum', 'polygon', 'flare']),
+  network: z.enum(['mainnet', 'testnet'])
+});
+
+router.post(
+  '/digital-twins',
+  authMiddleware,
+  requirePermission('digital-twin:create'),
+  validateInput(CreateDigitalTwinSchema),
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { user } = req;
+    const validatedData = req.body;
+    
+    const digitalTwin = await digitalTwinService.createDigitalTwin(
+      user!.did,
+      validatedData
+    );
+    
+    res.status(201).json({
+      success: true,
+      data: digitalTwin
+    });
+  })
+);
+
+router.get(
+  '/digital-twins/:id',
+  authMiddleware,
+  requirePermission('digital-twin:read'),
+  asyncHandler(async (req: AuthenticatedRequest, res: Response) => {
+    const { id } = req.params;
+    const { user } = req;
+    
+    const digitalTwin = await digitalTwinService.getDigitalTwin(id, user!.did);
+    
+    if (!digitalTwin) {
+      return res.status(404).json({
+        success: false,
+        error: 'Digital twin not found'
+      });
+    }
+    
+    res.json({
+      success: true,
+      data: digitalTwin
+    });
+  })
+);
+
+export default router;
+```
+
+### Service Development
+  ```typescript
+// ✅ Good: Service with proper error handling and validation
+export class DigitalTwinService {
+  constructor(
+    private db: Database,
+    private encryption: EncryptionService,
+    private blockchain: BlockchainService
+  ) {}
+  
+  async createDigitalTwin(
+    ownerDid: string,
+    data: CreateDigitalTwinInput
+  ): Promise<DigitalTwin> {
+    // Validate input
+    const validatedData = CreateDigitalTwinSchema.parse(data);
+    
+    // Check permissions
+    await this.validateUserPermissions(ownerDid, 'digital-twin:create');
+    
+    // Encrypt sensitive data
+    const encryptedMetadata = await this.encryption.encryptSensitiveData(
+      validatedData.metadata || {}
+    );
+    
+    // Create in database
+    const dbResult = await this.db.query(
+      `INSERT INTO digital_twins(owner_did, name, description, encrypted_metadata, blockchain, network)
+VALUES($1, $2, $3, $4, $5, $6)
+RETURNING * `,
+      [
+        ownerDid,
+        validatedData.name,
+        validatedData.description,
+        encryptedMetadata,
+        validatedData.blockchain,
+        validatedData.network
+      ]
+    );
+    
+    const digitalTwin = dbResult.rows[0];
+    
+    // Create on blockchain
+    try {
+      const blockchainResult = await this.blockchain.createDigitalTwin(
+        digitalTwin.id,
+        ownerDid,
+        validatedData
+      );
+      
+      // Update with blockchain data
+      await this.db.query(
+        'UPDATE digital_twins SET blockchain_id = $1, transaction_hash = $2 WHERE id = $3',
+        [blockchainResult.id, blockchainResult.txHash, digitalTwin.id]
+      );
+      
+      digitalTwin.blockchain_id = blockchainResult.id;
+      digitalTwin.transaction_hash = blockchainResult.txHash;
+    } catch (error) {
+      // Log blockchain error but don't fail the request
+      console.error('Blockchain creation failed:', error);
+    }
+    
+    return this.mapToDigitalTwin(digitalTwin);
+  }
+  
+  private async validateUserPermissions(did: string, permission: string): Promise<void> {
+    const hasPermission = await this.checkUserPermission(did, permission);
+    if (!hasPermission) {
+      throw new Error(`User ${ did } lacks permission: ${ permission } `);
+    }
+  }
+  
+  private mapToDigitalTwin(dbRow: any): DigitalTwin {
+    return {
+      id: dbRow.id,
+      name: dbRow.name,
+      description: dbRow.description,
+      owner: dbRow.owner_did,
+      blockchainId: dbRow.blockchain_id,
+      transactionHash: dbRow.transaction_hash,
+      blockchain: dbRow.blockchain,
+      network: dbRow.network,
+      createdAt: dbRow.created_at,
+      updatedAt: dbRow.updated_at
+    };
+  }
+}
+```
+
+Remember: ** Security is not optional.** Every API endpoint must be secure, validated, and tested. 
