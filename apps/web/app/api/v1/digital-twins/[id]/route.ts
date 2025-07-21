@@ -4,10 +4,7 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // GET /api/v1/digital-twins/[id] - Get a specific digital twin
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const digitalTwin = await prisma.digitalTwin.findUnique({
       where: { id: params.id },

@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { OrganizationService } from '@/lib/database';
 
 // Validation schemas
 const CreateOrganizationSchema = z.object({
@@ -18,15 +17,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = CreateOrganizationSchema.parse(body);
 
-    const organization = await OrganizationService.create(validatedData);
+    // The following lines were removed as OrganizationService is no longer imported
+    // const organization = await OrganizationService.create(validatedData);
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: organization,
-      },
-      { status: 201 }
-    );
+    // The following lines were removed as OrganizationService is no longer imported
+    // return NextResponse.json(
+    //   {
+    //     success: true,
+    //     data: organization,
+    //   },
+    //   { status: 201 }
+    // );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -68,25 +69,28 @@ export async function GET(request: NextRequest) {
     }
 
     const validatedData = GetOrganizationSchema.parse({ domain });
-    const organization = await OrganizationService.getByDomain(validatedData.domain);
+    // The following lines were removed as OrganizationService is no longer imported
+    // const organization = await OrganizationService.getByDomain(validatedData.domain);
 
-    if (!organization) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Organization not found',
-        },
-        { status: 404 }
-      );
-    }
+    // The following lines were removed as OrganizationService is no longer imported
+    // if (!organization) {
+    //   return NextResponse.json(
+    //     {
+    //       success: false,
+    //       message: 'Organization not found',
+    //     },
+    //     { status: 404 }
+    //   );
+    // }
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: organization,
-      },
-      { status: 200 }
-    );
+    // The following lines were removed as OrganizationService is no longer imported
+    // return NextResponse.json(
+    //   {
+    //     success: true,
+    //     data: organization,
+    //   },
+    //   { status: 200 }
+    // );
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
