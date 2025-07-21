@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 // GET /api/v1/digital-twins/[id] - Get a specific digital twin
 export async function GET(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
   try {
     const digitalTwin = await prisma.digitalTwin.findUnique({
-      where: { id: context.params.id },
+      where: { id },
       include: {
         organization: {
           select: {
@@ -98,13 +99,14 @@ export async function GET(request: NextRequest, context: { params: { id: string 
 
 // PATCH /api/v1/digital-twins/[id] - Update a digital twin
 export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
   try {
     const body = await request.json();
     const { name, description, trustScore, status, isEligibleForMint } = body;
 
     // Check if digital twin exists
     const existingTwin = await prisma.digitalTwin.findUnique({
-      where: { id: context.params.id },
+      where: { id },
     });
 
     if (!existingTwin) {
@@ -116,7 +118,7 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
 
     // Update the digital twin
     const updatedTwin = await prisma.digitalTwin.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         ...(name && { name }),
         ...(description && { description }),
@@ -136,7 +138,7 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
       data: {
         action: 'update',
         entity: 'digital_twin',
-        entityId: context.params.id,
+        entityId: id,
         metadata: {
           updatedFields: Object.keys(body),
         },
@@ -158,10 +160,11 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
 
 // DELETE /api/v1/digital-twins/[id] - Delete a digital twin (soft delete)
 export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+  const id = context.params.id;
   try {
     // Check if digital twin exists
     const existingTwin = await prisma.digitalTwin.findUnique({
-      where: { id: context.params.id },
+      where: { id },
     });
 
     if (!existingTwin) {
@@ -173,7 +176,7 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
 
     // Soft delete by setting status to 'deleted'
     const deletedTwin = await prisma.digitalTwin.update({
-      where: { id: context.params.id },
+      where: { id },
       data: {
         status: 'deleted',
       },
@@ -184,7 +187,7 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
       data: {
         action: 'delete',
         entity: 'digital_twin',
-        entityId: context.params.id,
+        entityId: id,
         metadata: {
           previousStatus: existingTwin.status,
         },
