@@ -4,8 +4,8 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // GET /api/v1/digital-twins/[id] - Get a specific digital twin
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id;
+export async function GET(request, context) {
+  const id = context.params.id;
   try {
     const digitalTwin = await prisma.digitalTwin.findUnique({
       where: { id },
@@ -98,10 +98,10 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
 }
 
 // PATCH /api/v1/digital-twins/[id] - Update a digital twin
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id;
+export async function PATCH(request, context) {
+  const id = context.params.id;
   try {
-    const body = await req.json();
+    const body = await request.json();
     const { name, description, trustScore, status, isEligibleForMint } = body;
 
     // Check if digital twin exists
@@ -159,8 +159,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
 }
 
 // DELETE /api/v1/digital-twins/[id] - Delete a digital twin (soft delete)
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const id = params.id;
+export async function DELETE(request, context) {
+  const id = context.params.id;
   try {
     // Check if digital twin exists
     const existingTwin = await prisma.digitalTwin.findUnique({
