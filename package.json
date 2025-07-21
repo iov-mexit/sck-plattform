@@ -43,6 +43,7 @@
   "dependencies": {
     "@prisma/client": "^6.12.0",
     "chalk": "^5.4.1",
+    "next": "^14.2.3",
     "prisma": "^6.12.0"
   }
 }
