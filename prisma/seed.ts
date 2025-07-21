@@ -1,15 +1,24 @@
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
+import chalk from 'chalk';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Starting database seed...');
+  console.log(chalk.blue('🌱 Starting database seed...'));
 
-  // Read role templates from JSON file
-  const roleTemplatesPath = path.join(__dirname, 'roleTemplates.seed.json');
+  // Use process.cwd() and relative path - works in all environments
+  const roleTemplatesPath = path.join(process.cwd(), 'prisma', 'roleTemplates.seed.json');
+  if (!fs.existsSync(roleTemplatesPath)) {
+    throw new Error(chalk.red(`🚨 roleTemplates.seed.json not found at: ${roleTemplatesPath}`));
+  }
   const roleTemplatesData = JSON.parse(fs.readFileSync(roleTemplatesPath, 'utf8'));
+
+  // Validate JSON
+  if (!Array.isArray(roleTemplatesData)) {
+    throw new Error(chalk.red('🚨 Invalid roleTemplates.seed.json format: Expected an array'));
+  }
 
   // Create a sample organization
   const organization = await prisma.organization.upsert({
@@ -22,7 +31,7 @@ async function main() {
     },
   });
 
-  console.log(`✅ Created organization: ${organization.name}`);
+  console.log(chalk.green(`✅ Created organization: ${organization.name}`));
 
   // Create role templates
   for (const templateData of roleTemplatesData) {
@@ -51,7 +60,7 @@ async function main() {
       },
     });
 
-    console.log(`✅ Created role template: ${roleTemplate.title}`);
+    console.log(chalk.green(`✅ Created role template: ${roleTemplate.title}`));
   }
 
   // Create a sample digital twin
@@ -73,7 +82,7 @@ async function main() {
       },
     });
 
-    console.log(`✅ Created digital twin: ${digitalTwin.name}`);
+    console.log(chalk.green(`✅ Created digital twin: ${digitalTwin.name}`));
 
     // Add some sample signals
     const signals = await Promise.all([
@@ -111,7 +120,7 @@ async function main() {
       }),
     ]);
 
-    console.log(`✅ Created ${signals.length} signals for digital twin`);
+    console.log(chalk.green(`✅ Created ${signals.length} signals for digital twin`));
 
     // Add a sample certification
     const certification = await prisma.certification.create({
@@ -126,15 +135,15 @@ async function main() {
       },
     });
 
-    console.log(`✅ Created certification: ${certification.name}`);
+    console.log(chalk.green(`✅ Created certification: ${certification.name}`));
   }
 
-  console.log('🎉 Database seeding completed successfully!');
+  console.log(chalk.blue('🎉 Database seeding completed successfully!'));
 }
 
 main()
   .catch((e) => {
-    console.error('❌ Error during seeding:', e);
+    console.error(chalk.red('❌ Error during seeding:'), e);
     process.exit(1);
   })
   .finally(async () => {

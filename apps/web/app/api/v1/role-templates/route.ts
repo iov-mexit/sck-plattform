@@ -1,57 +1,103 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { RoleTemplateService } from '@/lib/database';
+import { PrismaClient } from '@prisma/client';
 
-// Validation schemas
-const GetRoleTemplatesSchema = z.object({
-  organizationId: z.string().min(1, 'Organization ID is required'),
-});
+const prisma = new PrismaClient();
 
+// GET /api/v1/role-templates - List role templates
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
+    const category = searchParams.get('category');
+    const selectable = searchParams.get('selectable');
 
-    if (!organizationId) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Organization ID parameter is required',
-        },
-        { status: 400 }
-      );
+    // Build where clause
+    const where: any = {};
+    
+    if (category && category !== 'all') {
+      where.category = category;
+    }
+    
+    if (selectable !== null) {
+      where.selectable = selectable === 'true';
     }
 
-    const validatedData = GetRoleTemplatesSchema.parse({ organizationId });
-    const roleTemplates = await RoleTemplateService.getByOrganization(validatedData.organizationId);
+    const roleTemplates = await prisma.roleTemplate.findMany({
+      where,
+      orderBy: [
+        { category: 'asc' },
+        { title: 'asc' },
+      ],
+    });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: roleTemplates,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      success: true,
+      data: roleTemplates,
+      count: roleTemplates.length,
+    });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          errors: error.issues.map(e => ({
-            field: e.path.join('.'),
-            message: e.message,
-          })),
-        },
-        { status: 400 }
-      );
-    }
-
     console.error('Error fetching role templates:', error);
     return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch role templates',
+      { success: false, error: 'Failed to fetch role templates' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/v1/role-templates - Create role template
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const {
+      title,
+      focus,
+      category,
+      selectable = true,
+      responsibilities,
+      securityContributions,
+    } = body;
+
+    // Validate required fields
+    if (!title || !focus || !category) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields: title, focus, category' },
+        { status: 400 }
+      );
+    }
+
+    // Create the role template
+    const roleTemplate = await prisma.roleTemplate.create({
+      data: {
+        title,
+        focus,
+        category,
+        selectable,
+        responsibilities,
+        securityContributions,
       },
+    });
+
+    // Create audit log
+    await prisma.auditLog.create({
+      data: {
+        action: 'create',
+        entity: 'role_template',
+        entityId: roleTemplate.id,
+        metadata: {
+          title,
+          category,
+          selectable,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: roleTemplate,
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating role template:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to create role template' },
       { status: 500 }
     );
   }

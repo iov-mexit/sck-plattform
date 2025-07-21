@@ -2,6 +2,8 @@ import { Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SignalCollection } from '@/components/signal-collection';
+import { SignalAnalytics } from '@/components/signal-analytics';
 
 // Mock data for demonstration
 const mockOrganization = {
@@ -316,17 +318,37 @@ function LoadingSpinner() {
 export default function DashboardPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
-      <Suspense fallback={<LoadingSpinner />}>
-        <OrganizationOverview />
-      </Suspense>
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="role-templates">Role Templates</TabsTrigger>
+          <TabsTrigger value="signals">Signal Collection</TabsTrigger>
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+        </TabsList>
 
-      <Suspense fallback={<LoadingSpinner />}>
-        <DigitalTwinsList />
-      </Suspense>
+        <TabsContent value="overview" className="space-y-6">
+          <Suspense fallback={<LoadingSpinner />}>
+            <OrganizationOverview />
+          </Suspense>
+          <Suspense fallback={<LoadingSpinner />}>
+            <DigitalTwinsList />
+          </Suspense>
+        </TabsContent>
 
-      <Suspense fallback={<LoadingSpinner />}>
-        <RoleTemplatesList />
-      </Suspense>
+        <TabsContent value="role-templates" className="space-y-6">
+          <Suspense fallback={<LoadingSpinner />}>
+            <RoleTemplatesList />
+          </Suspense>
+        </TabsContent>
+
+        <TabsContent value="signals" className="space-y-6">
+          <SignalCollection digitalTwinId="dt-1" />
+        </TabsContent>
+
+        <TabsContent value="analytics" className="space-y-6">
+          <SignalAnalytics digitalTwinId="dt-1" />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 } 

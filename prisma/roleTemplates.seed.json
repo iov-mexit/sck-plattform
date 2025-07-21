@@ -2,289 +2,100 @@
   {
     "id": "frontend-developer",
     "title": "Frontend Developer",
-    "focus": "Building user-facing interfaces with accessibility and performance in mind.",
+    "focus": "User Interface Development",
+    "category": "Product",
+    "selectable": true,
     "responsibilities": [
-      "Implement responsive UI components and interactions.",
-      "Integrate frontend with backend APIs securely.",
-      "Ensure accessibility and cross-browser compatibility.",
-      "Collaborate with designers and product teams."
+      "Build responsive web interfaces",
+      "Implement security best practices",
+      "Ensure accessibility compliance",
+      "Optimize performance and user experience"
     ],
     "securityContributions": [
       {
-        "title": "Secure UI Development",
+        "title": "Security Code Reviews",
         "bullets": [
-          "Prevent DOM-based XSS via input/output sanitization.",
-          "Avoid use of unsafe functions like eval.",
-          "Implement Content Security Policy (CSP).",
-          "Secure storage of sensitive data in browser."
+          "Review code for XSS vulnerabilities",
+          "Ensure proper input validation",
+          "Implement secure authentication flows",
+          "Follow OWASP security guidelines"
+        ]
+      },
+      {
+        "title": "Security Best Practices",
+        "bullets": [
+          "Use HTTPS for all communications",
+          "Implement Content Security Policy",
+          "Sanitize user inputs",
+          "Follow secure coding standards"
         ]
       }
-    ],
-    "category": "Architecture",
-    "selectable": true
+    ]
   },
   {
     "id": "backend-developer",
     "title": "Backend Developer",
-    "focus": "Secure and scalable APIs and logic layer implementation.",
+    "focus": "Server-Side Development",
+    "category": "Product",
+    "selectable": true,
     "responsibilities": [
-      "Build and secure REST/GraphQL APIs.",
-      "Ensure authentication and role-based access.",
-      "Integrate with secure databases and services.",
-      "Handle errors and logging safely."
+      "Design and implement APIs",
+      "Ensure data security and privacy",
+      "Optimize database performance",
+      "Maintain system reliability"
     ],
     "securityContributions": [
       {
-        "title": "Secure API Practices",
+        "title": "API Security",
         "bullets": [
-          "Validate all inputs server-side.",
-          "Limit error info exposed to clients.",
-          "Avoid injection flaws.",
-          "Enforce rate-limiting and access controls."
+          "Implement proper authentication and authorization",
+          "Use rate limiting and input validation",
+          "Encrypt sensitive data in transit and at rest",
+          "Follow secure API design principles"
         ]
-      }
-    ],
-    "category": "Architecture",
-    "selectable": true
-  },
-  {
-    "id": "devsecops-engineer",
-    "title": "DevSecOps Engineer",
-    "focus": "Secure CI/CD and infrastructure as code.",
-    "responsibilities": [
-      "Automate security checks in pipelines.",
-      "Manage secrets securely.",
-      "Harden build and runtime environments.",
-      "Monitor cloud and container workloads."
-    ],
-    "securityContributions": [
+      },
       {
-        "title": "Security Automation",
+        "title": "Data Protection",
         "bullets": [
-          "Embed SAST/DAST tools in CI/CD.",
-          "Scan containers for vulnerabilities.",
-          "Enforce policy-as-code (OPA, Checkov).",
-          "Audit access logs and build artifacts."
+          "Implement proper data encryption",
+          "Use secure database connections",
+          "Follow GDPR and privacy regulations",
+          "Implement audit logging"
         ]
       }
-    ],
-    "category": "Architecture",
-    "selectable": true
-  },
-  {
-    "id": "mobile-developer",
-    "title": "Mobile Developer",
-    "focus": "Building secure native apps for iOS and Android.",
-    "responsibilities": [
-      "Implement secure data handling on-device.",
-      "Use secure communication APIs.",
-      "Harden app against tampering and reverse engineering.",
-      "Publish with correct permission scopes."
-    ],
-    "securityContributions": [
-      {
-        "title": "Secure Mobile Practices",
-        "bullets": [
-          "Avoid hardcoded credentials or API keys.",
-          "Use certificate pinning where needed.",
-          "Follow OWASP MASVS guidance.",
-          "Obfuscate sensitive logic when possible."
-        ]
-      }
-    ],
-    "category": "Architecture",
-    "selectable": true
-  },
-  {
-    "id": "qa-automation-engineer",
-    "title": "QA Automation Engineer",
-    "focus": "Write automated tests for functional and security regressions.",
-    "responsibilities": [
-      "Write and maintain test suites.",
-      "Integrate testing into pipelines.",
-      "Detect regressions in business-critical flows.",
-      "Use test data that mimics production securely."
-    ],
-    "securityContributions": [
-      {
-        "title": "Security Test Integration",
-        "bullets": [
-          "Automate checks for XSS, injection, access control.",
-          "Use OWASP ZAP or similar in CI.",
-          "Assert on secure headers, tokens, and sessions.",
-          "Report security test failures as blockers."
-        ]
-      }
-    ],
-    "category": "QA",
-    "selectable": true
+    ]
   },
   {
     "id": "security-engineer",
     "title": "Security Engineer",
-    "focus": "Identify, assess, and mitigate risks across the lifecycle.",
+    "focus": "Security Infrastructure",
+    "category": "Security",
+    "selectable": true,
     "responsibilities": [
-      "Perform threat modeling and code audits.",
-      "Collaborate on secure design.",
-      "Run penetration tests and vulnerability scans.",
-      "Train teams on secure development practices."
+      "Design and implement security controls",
+      "Conduct security assessments",
+      "Monitor and respond to security incidents",
+      "Develop security policies and procedures"
     ],
     "securityContributions": [
       {
-        "title": "Security Strategy & Review",
+        "title": "Security Architecture",
         "bullets": [
-          "Define SDL security gates and controls.",
-          "Maintain secure development playbooks.",
-          "Guide on secure third-party integrations.",
-          "Work with audit and compliance stakeholders."
+          "Design secure system architectures",
+          "Implement zero-trust security models",
+          "Conduct threat modeling and risk assessments",
+          "Develop security controls and monitoring"
         ]
-      }
-    ],
-    "category": "Architecture",
-    "selectable": true
-  },
-  {
-    "id": "product-manager",
-    "title": "Product Manager",
-    "focus": "Own product vision, roadmap, and outcomes.",
-    "responsibilities": [
-      "Define product direction and goals.",
-      "Prioritize customer and business value.",
-      "Collaborate with cross-functional teams.",
-      "Incorporate market and compliance research."
-    ],
-    "securityContributions": [
+      },
       {
-        "title": "Secure Product Strategy",
+        "title": "Incident Response",
         "bullets": [
-          "Treat security as a first-class product feature.",
-          "Understand data protection and compliance needs.",
-          "Fund and prioritize security in roadmaps.",
-          "Align secure defaults with user needs."
+          "Lead security incident investigations",
+          "Develop incident response procedures",
+          "Coordinate with stakeholders during incidents",
+          "Implement security monitoring and alerting"
         ]
       }
-    ],
-    "category": "Product",
-    "selectable": true
-  },
-  {
-    "id": "product-owner",
-    "title": "Product Owner",
-    "focus": "Owns backlog and sprint deliverables.",
-    "responsibilities": [
-      "Write and manage user stories.",
-      "Ensure development aligns with intent.",
-      "Clarify priorities to development teams.",
-      "Work closely with engineering and QA."
-    ],
-    "securityContributions": [
-      {
-        "title": "Secure Sprint Planning",
-        "bullets": [
-          "Prioritize remediation in sprint cycles.",
-          "Ensure user stories capture security needs.",
-          "Balance functional and security acceptance criteria.",
-          "Escalate risk-based decisions to PMs."
-        ]
-      }
-    ],
-    "category": "Product",
-    "selectable": true
-  },
-  {
-    "id": "qa-analyst",
-    "title": "QA Analyst",
-    "focus": "Define test strategy and ensure release quality.",
-    "responsibilities": [
-      "Create and execute test plans.",
-      "Ensure feature acceptance and defect tracking.",
-      "Work across teams to cover scenarios.",
-      "Support regulatory and accessibility testing."
-    ],
-    "securityContributions": [
-      {
-        "title": "Security-Aware Testing",
-        "bullets": [
-          "Test edge cases involving permissions and inputs.",
-          "Include security cases in test plans.",
-          "Ensure session handling works as expected.",
-          "Flag risky UI flows or misconfigurations."
-        ]
-      }
-    ],
-    "category": "QA",
-    "selectable": true
-  },
-  {
-    "id": "business-analyst",
-    "title": "Business Analyst",
-    "focus": "Bridge business needs to implementation strategy.",
-    "responsibilities": [
-      "Gather and translate requirements.",
-      "Work with stakeholders to prioritize needs.",
-      "Document current and future state models.",
-      "Support validation of features and workflows."
-    ],
-    "securityContributions": [
-      {
-        "title": "Secure Process Design",
-        "bullets": [
-          "Document access control and data flows.",
-          "Ensure business rules support least privilege.",
-          "Capture compliance and data retention needs.",
-          "Identify risks early in process modeling."
-        ]
-      }
-    ],
-    "category": "Solution Design",
-    "selectable": true
-  },
-  {
-    "id": "data-analyst",
-    "title": "Data Analyst",
-    "focus": "Use data to generate product and business insights.",
-    "responsibilities": [
-      "Collect and clean data.",
-      "Design and run queries or reports.",
-      "Find trends and outliers in metrics.",
-      "Support A/B testing and usage research."
-    ],
-    "securityContributions": [
-      {
-        "title": "Data Integrity & Compliance",
-        "bullets": [
-          "Ensure anonymized data where applicable.",
-          "Highlight anomalies or potential fraud.",
-          "Use secure access to data sources.",
-          "Document data sources and retention periods."
-        ]
-      }
-    ],
-    "category": "Solution Design",
-    "selectable": true
-  },
-  {
-    "id": "project-manager",
-    "title": "Project Manager",
-    "focus": "Manage scope, risk, and resources for successful delivery.",
-    "responsibilities": [
-      "Define milestones and delivery timelines.",
-      "Manage stakeholders and dependencies.",
-      "Track risks and budgets.",
-      "Ensure team alignment with goals."
-    ],
-    "securityContributions": [
-      {
-        "title": "Security Governance in Delivery",
-        "bullets": [
-          "Ensure security is part of budget and scope.",
-          "Schedule security assessments as milestones.",
-          "Include security gates in release plans.",
-          "Raise security risks during trade-off discussions."
-        ]
-      }
-    ],
-    "category": "Product",
-    "selectable": true
+    ]
   }
 ]

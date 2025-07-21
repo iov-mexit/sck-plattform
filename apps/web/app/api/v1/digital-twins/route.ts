@@ -1,171 +1,193 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { DigitalTwinService, RoleTemplateService } from '@/lib/database';
-import { MOCK_CUSTOMER, getRoleTemplateById } from '@/lib/mock-customer';
+import { PrismaClient } from '@prisma/client';
 
-// Validation schemas
-const CreateDigitalTwinSchema = z.object({
-  roleIdentifier: z.string().min(1, 'Role identifier is required').max(100, 'Role identifier too long'),
-  description: z.string().max(500, 'Description too long').optional(),
-  organizationId: z.string().min(1, 'Organization ID is required'),
-  roleTemplateId: z.string().min(1, 'Role template ID is required'),
-  assignedToDid: z.string().min(1, 'DID is required for assignment'),
-  blockchainAddress: z.string().optional(),
-  blockchainNetwork: z.enum(['ethereum', 'polygon', 'flare']).optional(),
-});
+const prisma = new PrismaClient();
 
-const GetDigitalTwinsSchema = z.object({
-  organizationId: z.string().min(1, 'Organization ID is required'),
-});
-
-export async function POST(request: NextRequest) {
+// GET /api/v1/digital-twins - List all digital twins
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json();
-    const validatedData = CreateDigitalTwinSchema.parse(body);
+    const { searchParams } = new URL(request.url);
+    const organizationId = searchParams.get('organizationId');
+    const status = searchParams.get('status');
+    const roleTemplateId = searchParams.get('roleTemplateId');
 
-    // For demo purposes, use mock data when database is not available
-    const roleTemplate = getRoleTemplateById(validatedData.roleTemplateId);
-    if (!roleTemplate) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: 'Invalid role template for this organization',
-        },
-        { status: 400 }
-      );
+    const where: any = {};
+
+    if (organizationId) {
+      where.organizationId = organizationId;
     }
 
-    // Create mock digital twin response
-    const mockDigitalTwin = {
-      id: `twin_${Date.now()}`,
-      roleIdentifier: validatedData.roleIdentifier,
-      description: validatedData.description,
-      organizationId: validatedData.organizationId,
-      roleTemplateId: validatedData.roleTemplateId,
-      assignedToDid: validatedData.assignedToDid,
-      status: 'active',
-      level: 1,
-      blockchainAddress: validatedData.blockchainAddress,
-      blockchainNetwork: validatedData.blockchainNetwork,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      roleTemplate: {
-        id: roleTemplate.id,
-        title: roleTemplate.title,
-        category: roleTemplate.category,
-        focus: roleTemplate.focus,
-      },
-      organization: {
-        id: MOCK_CUSTOMER.organization.id,
-        name: MOCK_CUSTOMER.organization.name,
-        domain: MOCK_CUSTOMER.organization.domain,
-      },
-    };
+    if (status) {
+      where.status = status;
+    }
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: mockDigitalTwin,
+    if (roleTemplateId) {
+      where.roleTemplateId = roleTemplateId;
+    }
+
+    const digitalTwins = await prisma.digitalTwin.findMany({
+      where,
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            domain: true,
+          },
+        },
+        roleTemplate: {
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            focus: true,
+          },
+        },
+        signals: {
+          select: {
+            id: true,
+            type: true,
+            title: true,
+            value: true,
+            verified: true,
+            createdAt: true,
+          },
+        },
+        certifications: {
+          select: {
+            id: true,
+            name: true,
+            issuer: true,
+            issuedAt: true,
+            expiresAt: true,
+            verified: true,
+          },
+        },
+        blockchainTransactions: {
+          where: {
+            status: 'confirmed',
+          },
+          select: {
+            transactionHash: true,
+            network: true,
+            blockNumber: true,
+          },
+        },
       },
-      { status: 201 }
-    );
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: digitalTwins,
+      count: digitalTwins.length,
+    });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        {
-          success: false,
-          errors: error.issues.map(e => ({
-            field: e.path.join('.'),
-            message: e.message,
-          })),
-        },
-        { status: 400 }
-      );
-    }
-
-    console.error('Error creating digital twin:', error);
+    console.error('Error fetching digital twins:', error);
     return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to create digital twin',
-      },
+      { success: false, error: 'Failed to fetch digital twins' },
       { status: 500 }
     );
   }
 }
 
-export async function GET(request: NextRequest) {
+// POST /api/v1/digital-twins - Create a new digital twin
+export async function POST(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
+    const body = await request.json();
+    const {
+      name,
+      description,
+      organizationId,
+      roleTemplateId,
+      assignedToDid,
+      blockchainAddress,
+      soulboundTokenId,
+      blockchainNetwork = 'ethereum',
+    } = body;
 
-    if (!organizationId) {
+    // Validate required fields
+    if (!name || !organizationId || !roleTemplateId || !assignedToDid) {
       return NextResponse.json(
-        {
-          success: false,
-          message: 'Organization ID parameter is required',
-        },
+        { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    const validatedData = GetDigitalTwinsSchema.parse({ organizationId });
-
-    // For demo purposes, return mock digital twins
-    const mockDigitalTwins = MOCK_CUSTOMER.sampleDigitalTwins.map((twin, index) => {
-      const roleTemplate = getRoleTemplateById(twin.roleTemplateId);
-      return {
-        id: `twin_demo_${index + 1}`,
-        roleIdentifier: twin.roleIdentifier,
-        description: twin.description,
-        organizationId: MOCK_CUSTOMER.organization.id,
-        roleTemplateId: twin.roleTemplateId,
-        assignedToDid: twin.assignedToDid,
-        status: twin.status,
-        level: twin.level,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        roleTemplate: {
-          id: roleTemplate?.id,
-          title: roleTemplate?.title,
-          category: roleTemplate?.category,
-          focus: roleTemplate?.focus,
-        },
-        organization: {
-          id: MOCK_CUSTOMER.organization.id,
-          name: MOCK_CUSTOMER.organization.name,
-          domain: MOCK_CUSTOMER.organization.domain,
-        },
-      };
+    // Check if DID is already assigned
+    const existingTwin = await prisma.digitalTwin.findFirst({
+      where: {
+        assignedToDid,
+        organizationId,
+      },
     });
 
-    return NextResponse.json(
-      {
-        success: true,
-        data: mockDigitalTwins,
-      },
-      { status: 200 }
-    );
-  } catch (error) {
-    if (error instanceof z.ZodError) {
+    if (existingTwin) {
       return NextResponse.json(
-        {
-          success: false,
-          errors: error.issues.map(e => ({
-            field: e.path.join('.'),
-            message: e.message,
-          })),
-        },
-        { status: 400 }
+        { success: false, error: 'DID is already assigned to another digital twin in this organization' },
+        { status: 409 }
       );
     }
 
-    console.error('Error fetching digital twins:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Failed to fetch digital twins',
+    // Create the digital twin
+    const digitalTwin = await prisma.digitalTwin.create({
+      data: {
+        name,
+        description,
+        organizationId,
+        roleTemplateId,
+        assignedToDid,
+        blockchainAddress,
+        soulboundTokenId,
+        blockchainNetwork,
+        status: 'active',
+        level: 1,
       },
+      include: {
+        organization: {
+          select: {
+            id: true,
+            name: true,
+            domain: true,
+          },
+        },
+        roleTemplate: {
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            focus: true,
+          },
+        },
+      },
+    });
+
+    // Create audit log
+    await prisma.auditLog.create({
+      data: {
+        action: 'create',
+        entity: 'digital_twin',
+        entityId: digitalTwin.id,
+        metadata: {
+          organizationId,
+          roleTemplateId,
+          assignedToDid,
+          blockchainAddress,
+          soulboundTokenId,
+        },
+      },
+    });
+
+    return NextResponse.json({
+      success: true,
+      data: digitalTwin,
+    }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating digital twin:', error);
+    return NextResponse.json(
+      { success: false, error: 'Failed to create digital twin' },
       { status: 500 }
     );
   }

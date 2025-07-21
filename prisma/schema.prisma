@@ -27,6 +27,7 @@ model Organization {
   roleTemplates RoleTemplate[]
   digitalTwins  DigitalTwin[]
   members       OrganizationMember[]
+  roleTrustThresholds RoleTrustThreshold[]
 
   @@map("organizations")
   
@@ -56,6 +57,25 @@ model RoleTemplate {
   @@map("role_templates")
 }
 
+model RoleTrustThreshold {
+  id          String   @id @default(cuid())
+  roleTitle   String   // e.g., "Developer", "Analyst", "Architect"
+  minTrustScore Float  // Minimum trust score required (0-100)
+  isActive    Boolean  @default(true)
+  
+  // Relations
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("role_trust_thresholds")
+  
+  @@unique([organizationId, roleTitle], name: "idx_role_threshold_org_role")
+  @@index([organizationId], name: "idx_role_threshold_org")
+}
+
 model DigitalTwin {
   id          String   @id @default(cuid())
   name        String
@@ -66,8 +86,14 @@ model DigitalTwin {
   soulboundTokenId  String? // NFT token ID
   blockchainNetwork String? // "ethereum", "polygon", "flare"
   
+  // Trust-based credentialing
+  trustScore        Float?   // Trust score from SCW or other sources (0-100)
+  assignedTo        String?  // Org-internal ID (email, HR ID, wallet)
+  isEligibleForMint Boolean  @default(false) // Whether twin meets trust threshold
+  lastTrustCheck    DateTime? // When trust score was last checked
+  
   // Status tracking
-  status      String   @default("active") // "active", "inactive", "suspended"
+  status      String   @default("active") // "active", "inactive", "suspended", "idle"
   level       Int      @default(1) // Digital twin level/experience
   
   // Relations
@@ -97,6 +123,8 @@ model DigitalTwin {
   @@index([assignedToDid], name: "idx_digital_twins_assigned")
   @@index([blockchainAddress], name: "idx_digital_twins_blockchain")
   @@index([status], name: "idx_digital_twins_status")
+  @@index([trustScore], name: "idx_digital_twins_trust")
+  @@index([isEligibleForMint], name: "idx_digital_twins_eligible")
 }
 
 model OrganizationMember {
@@ -128,6 +156,7 @@ model Signal {
   metadata      Json?    // Flexible metadata
   value         Float?   // Numeric value if applicable
   source        String   // Source of the signal
+  url           String?  // External reference URL
   verified      Boolean  @default(false)
   
   // Relations

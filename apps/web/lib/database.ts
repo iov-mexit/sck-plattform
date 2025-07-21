@@ -1,115 +1,132 @@
 import { PrismaClient } from '@prisma/client';
 
-// Global variable to store the Prisma client instance
-declare global {
-  var __prisma: PrismaClient | undefined;
-}
+// Create a global Prisma client instance
+const globalForPrisma = globalThis as unknown as {
+  prisma: PrismaClient | undefined;
+};
 
-// Create a singleton Prisma client instance
-const prisma = globalThis.__prisma || new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-// Store the client in global scope to prevent multiple instances in development
-if (process.env.NODE_ENV === 'development') {
-  globalThis.__prisma = prisma;
-}
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma;
 
-export { prisma };
+// Database service class
+export class DatabaseService {
+  private static instance: DatabaseService;
+  private prisma: PrismaClient;
 
-// =============================================================================
-// DATABASE SERVICE CLASSES
-// =============================================================================
+  private constructor() {
+    this.prisma = prisma;
+  }
 
-export class OrganizationService {
-  /**
-   * Get organization by domain
-   */
-  static async getByDomain(domain: string) {
+  public static getInstance(): DatabaseService {
+    if (!DatabaseService.instance) {
+      DatabaseService.instance = new DatabaseService();
+    }
+    return DatabaseService.instance;
+  }
+
+  // Test database connection
+  async testConnection() {
     try {
-      return await prisma.organization.findUnique({
-        where: { domain },
-        include: {
-          roleTemplates: true,
-          digitalTwins: {
-            include: {
-              roleTemplate: true,
-              signals: true,
-              certifications: true,
-            },
-          },
-        },
-      });
+      const result = await this.prisma.$queryRaw`SELECT 1 as test`;
+      return { success: true, result };
     } catch (error) {
-      console.error('Error fetching organization:', error);
-      throw new Error('Failed to fetch organization');
+      return { success: false, error: error.message };
     }
   }
 
-  /**
-   * Create a new organization
-   */
-  static async create(data: {
+  // Get all organizations
+  async getOrganizations() {
+    try {
+      return await this.prisma.organization.findMany({
+        where: { isActive: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    } catch (error) {
+      console.error('Error fetching organizations:', error);
+      return [];
+    }
+  }
+
+  // Get all role templates
+  async getRoleTemplates() {
+    try {
+      return await this.prisma.roleTemplate.findMany({
+        where: { selectable: true },
+        orderBy: { createdAt: 'desc' }
+      });
+    } catch (error) {
+      console.error('Error fetching role templates:', error);
+      return [];
+    }
+  }
+
+  // Get digital twins
+  async getDigitalTwins() {
+    try {
+      return await this.prisma.digitalTwin.findMany({
+        include: {
+          organization: true,
+          roleTemplate: true,
+          signals: true,
+          certifications: true
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+    } catch (error) {
+      console.error('Error fetching digital twins:', error);
+      return [];
+    }
+  }
+
+  // Create a new organization
+  async createOrganization(data: {
     name: string;
     description?: string;
     domain: string;
   }) {
     try {
-      return await prisma.organization.create({
-        data,
-        include: {
-          roleTemplates: true,
-        },
+      return await this.prisma.organization.create({
+        data: {
+          name: data.name,
+          description: data.description,
+          domain: data.domain,
+        }
       });
     } catch (error) {
       console.error('Error creating organization:', error);
-      throw new Error('Failed to create organization');
+      throw error;
     }
   }
-}
 
-export class RoleTemplateService {
-  /**
-   * Get all role templates for an organization
-   */
-  static async getByOrganization(organizationId: string) {
+  // Create a new role template
+  async createRoleTemplate(data: {
+    title: string;
+    focus: string;
+    category: string;
+    responsibilities: any;
+    securityContributions: any;
+    organizationId?: string;
+  }) {
     try {
-      return await prisma.roleTemplate.findMany({
-        where: { organizationId },
-        orderBy: [
-          { category: 'asc' },
-          { title: 'asc' },
-        ],
+      return await this.prisma.roleTemplate.create({
+        data: {
+          title: data.title,
+          focus: data.focus,
+          category: data.category,
+          responsibilities: data.responsibilities,
+          securityContributions: data.securityContributions,
+          organizationId: data.organizationId,
+        }
       });
     } catch (error) {
-      console.error('Error fetching role templates:', error);
-      throw new Error('Failed to fetch role templates');
+      console.error('Error creating role template:', error);
+      throw error;
     }
   }
 
-  /**
-   * Get role template by ID
-   */
-  static async getById(id: string) {
-    try {
-      return await prisma.roleTemplate.findUnique({
-        where: { id },
-        include: {
-          organization: true,
-        },
-      });
-    } catch (error) {
-      console.error('Error fetching role template:', error);
-      throw new Error('Failed to fetch role template');
-    }
-  }
-}
-
-export class DigitalTwinService {
-  /**
-   * Create a new digital twin
-   */
-  static async create(data: {
+  // Create a new digital twin
+  async createDigitalTwin(data: {
     name: string;
     description?: string;
     organizationId: string;
@@ -119,100 +136,25 @@ export class DigitalTwinService {
     blockchainNetwork?: string;
   }) {
     try {
-      return await prisma.digitalTwin.create({
-        data,
-        include: {
-          organization: true,
-          roleTemplate: true,
-          signals: true,
-          certifications: true,
-        },
+      return await this.prisma.digitalTwin.create({
+        data: {
+          name: data.name,
+          description: data.description,
+          organizationId: data.organizationId,
+          roleTemplateId: data.roleTemplateId,
+          assignedToDid: data.assignedToDid,
+          blockchainAddress: data.blockchainAddress,
+          blockchainNetwork: data.blockchainNetwork,
+        }
       });
     } catch (error) {
       console.error('Error creating digital twin:', error);
-      throw new Error('Failed to create digital twin');
+      throw error;
     }
   }
 
-  /**
-   * Get digital twin by ID
-   */
-  static async getById(id: string) {
-    try {
-      return await prisma.digitalTwin.findUnique({
-        where: { id },
-        include: {
-          organization: true,
-          roleTemplate: true,
-          signals: {
-            orderBy: { createdAt: 'desc' },
-          },
-          certifications: {
-            orderBy: { issuedAt: 'desc' },
-          },
-        },
-      });
-    } catch (error) {
-      console.error('Error fetching digital twin:', error);
-      throw new Error('Failed to fetch digital twin');
-    }
-  }
-
-  /**
-   * Get digital twins by organization
-   */
-  static async getByOrganization(organizationId: string) {
-    try {
-      return await prisma.digitalTwin.findMany({
-        where: { organizationId },
-        include: {
-          roleTemplate: true,
-          signals: true,
-          certifications: true,
-        },
-        orderBy: { createdAt: 'desc' },
-      });
-    } catch (error) {
-      console.error('Error fetching digital twins:', error);
-      throw new Error('Failed to fetch digital twins');
-    }
-  }
-
-  /**
-   * Update digital twin
-   */
-  static async update(id: string, data: Partial<{
-    name: string;
-    description: string;
-    status: string;
-    level: number;
-    blockchainAddress: string;
-    blockchainNetwork: string;
-    soulboundTokenId: string;
-  }>) {
-    try {
-      return await prisma.digitalTwin.update({
-        where: { id },
-        data,
-        include: {
-          organization: true,
-          roleTemplate: true,
-          signals: true,
-          certifications: true,
-        },
-      });
-    } catch (error) {
-      console.error('Error updating digital twin:', error);
-      throw new Error('Failed to update digital twin');
-    }
-  }
-}
-
-export class SignalService {
-  /**
-   * Add a signal to a digital twin
-   */
-  static async create(data: {
+  // Add a signal to a digital twin
+  async addSignal(data: {
     type: string;
     title: string;
     description?: string;
@@ -223,98 +165,29 @@ export class SignalService {
     digitalTwinId: string;
   }) {
     try {
-      return await prisma.signal.create({
-        data,
-        include: {
-          digitalTwin: true,
-        },
+      return await this.prisma.signal.create({
+        data: {
+          type: data.type,
+          title: data.title,
+          description: data.description,
+          value: data.value,
+          source: data.source,
+          verified: data.verified || false,
+          metadata: data.metadata,
+          digitalTwinId: data.digitalTwinId,
+        }
       });
     } catch (error) {
-      console.error('Error creating signal:', error);
-      throw new Error('Failed to create signal');
+      console.error('Error adding signal:', error);
+      throw error;
     }
   }
 
-  /**
-   * Get signals for a digital twin
-   */
-  static async getByDigitalTwin(digitalTwinId: string) {
-    try {
-      return await prisma.signal.findMany({
-        where: { digitalTwinId },
-        orderBy: { createdAt: 'desc' },
-      });
-    } catch (error) {
-      console.error('Error fetching signals:', error);
-      throw new Error('Failed to fetch signals');
-    }
+  // Disconnect from database
+  async disconnect() {
+    await this.prisma.$disconnect();
   }
 }
 
-export class CertificationService {
-  /**
-   * Add a certification to a digital twin
-   */
-  static async create(data: {
-    name: string;
-    issuer: string;
-    issuedAt: Date;
-    expiresAt?: Date;
-    credentialUrl?: string;
-    verified?: boolean;
-    digitalTwinId: string;
-  }) {
-    try {
-      return await prisma.certification.create({
-        data,
-        include: {
-          digitalTwin: true,
-        },
-      });
-    } catch (error) {
-      console.error('Error creating certification:', error);
-      throw new Error('Failed to create certification');
-    }
-  }
-
-  /**
-   * Get certifications for a digital twin
-   */
-  static async getByDigitalTwin(digitalTwinId: string) {
-    try {
-      return await prisma.certification.findMany({
-        where: { digitalTwinId },
-        orderBy: { issuedAt: 'desc' },
-      });
-    } catch (error) {
-      console.error('Error fetching certifications:', error);
-      throw new Error('Failed to fetch certifications');
-    }
-  }
-}
-
-
-
-// =============================================================================
-// UTILITY FUNCTIONS
-// =============================================================================
-
-/**
- * Disconnect from the database
- */
-export async function disconnect() {
-  await prisma.$disconnect();
-}
-
-/**
- * Health check for database connection
- */
-export async function healthCheck() {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    return true;
-  } catch (error) {
-    console.error('Database health check failed:', error);
-    return false;
-  }
-} 
+// Export a singleton instance
+export const db = DatabaseService.getInstance(); 
