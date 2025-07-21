@@ -8,7 +8,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface Signal {
   id: string;
@@ -19,7 +18,7 @@ interface Signal {
   source: string;
   verified: boolean;
   createdAt: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
 }
 
 interface SignalCollectionProps {
@@ -47,7 +46,7 @@ export function SignalCollection({ digitalTwinId, onSignalCreated }: SignalColle
     description: '',
     value: '',
     source: '',
-    metadata: {}
+    metadata: {} as Record<string, unknown>
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,7 +80,7 @@ export function SignalCollection({ digitalTwinId, onSignalCreated }: SignalColle
           description: '',
           value: '',
           source: '',
-          metadata: {}
+          metadata: {} as Record<string, unknown>
         });
       } else {
         console.error('Failed to create signal:', result.error);

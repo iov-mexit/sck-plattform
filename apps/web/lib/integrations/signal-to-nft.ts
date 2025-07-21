@@ -1,5 +1,5 @@
 import { signalCollection, Signal } from '../signal-collection';
-import { sckNFTService, DigitalTwin, Achievement } from '../contracts/sck-nft';
+import { sckNFTService, Achievement } from '../contracts/sck-nft';
 
 // =============================================================================
 // SIGNAL TO NFT INTEGRATION SERVICE
@@ -69,11 +69,11 @@ export class SignalToNFTIntegration {
         achievement
       };
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error processing signal for NFT:', error);
       return {
         achievementMinted: false,
-        error: error.message
+        error: (error as Error).message
       };
     }
   }
@@ -181,7 +181,7 @@ export class SignalToNFTIntegration {
   /**
    * Create metadata for an achievement
    */
-  private createAchievementMetadata(signal: Signal): any {
+  private createAchievementMetadata(signal: Signal): unknown {
     const baseMetadata = {
       source: signal.source,
       url: signal.url,

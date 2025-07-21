@@ -167,7 +167,7 @@ export function AdminPanel() {
         <CardHeader>
           <CardTitle>Digital Twins Admin Panel</CardTitle>
           <CardDescription>
-            Manage your organization's digital twins and track their progress
+            Manage your organization&apos;s digital twins and track their progress
           </CardDescription>
         </CardHeader>
         <CardContent>

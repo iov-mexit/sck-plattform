@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const statistics = {
       total: totalSignals,
       recent: recentSignals.length,
-      recentSignals: recentSignals.map((signal: any) => ({
+      recentSignals: recentSignals.map((signal: Record<string, unknown>) => ({
         id: signal.id,
         type: signal.type,
         title: signal.title,
@@ -36,13 +36,13 @@ export async function GET(request: NextRequest) {
       data: statistics,
       timestamp: new Date().toISOString()
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching signal statistics:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to fetch signal statistics',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -47,7 +47,7 @@ export function TrustDashboard({ organizationId }: TrustDashboardProps) {
   });
 
   // Fetch digital twins
-  const fetchDigitalTwins = async () => {
+  const fetchDigitalTwins = useCallback(async () => {
     try {
       const response = await fetch(`/api/v1/digital-twins?organizationId=${organizationId}`);
       const data = await response.json();
@@ -57,10 +57,10 @@ export function TrustDashboard({ organizationId }: TrustDashboardProps) {
     } catch (error) {
       console.error('Error fetching digital twins:', error);
     }
-  };
+  }, [organizationId]);
 
   // Fetch trust thresholds
-  const fetchThresholds = async () => {
+  const fetchThresholds = useCallback(async () => {
     try {
       const response = await fetch(`/api/v1/role-trust-thresholds?organizationId=${organizationId}`);
       const data = await response.json();
@@ -70,7 +70,7 @@ export function TrustDashboard({ organizationId }: TrustDashboardProps) {
     } catch (error) {
       console.error('Error fetching thresholds:', error);
     }
-  };
+  }, [organizationId]);
 
   // Import digital twin
   const handleImport = async (e: React.FormEvent) => {
@@ -146,7 +146,7 @@ export function TrustDashboard({ organizationId }: TrustDashboardProps) {
       setLoading(false);
     };
     loadData();
-  }, [organizationId]);
+  }, [organizationId, fetchDigitalTwins, fetchThresholds]);
 
   const getTrustStatus = (twin: DigitalTwin) => {
     const threshold = thresholds.find(t => t.roleTitle === twin.roleTemplate.title);

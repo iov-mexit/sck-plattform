@@ -36,13 +36,13 @@ export async function GET(request: NextRequest) {
         hasMore: signals.length === limit
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error fetching signals:', error);
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to fetch signals',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );
@@ -64,16 +64,16 @@ export async function POST(request: NextRequest) {
       data: signal,
       message: 'Signal created successfully'
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Error creating signal:', error);
 
     // Handle validation errors
-    if (error.name === 'ZodError') {
+    if (error instanceof Error && error.name === 'ZodError') {
       return NextResponse.json(
         {
           success: false,
           error: 'Validation failed',
-          details: error.errors
+          details: (error as unknown as { errors: unknown[] }).errors
         },
         { status: 400 }
       );
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         error: 'Failed to create signal',
-        details: error.message
+        details: error instanceof Error ? error.message : String(error)
       },
       { status: 500 }
     );

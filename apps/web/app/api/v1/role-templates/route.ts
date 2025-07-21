@@ -3,30 +3,23 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// GET /api/v1/role-templates - List role templates
+// GET /api/v1/role-templates - List all role templates
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
-    const selectable = searchParams.get('selectable');
 
-    // Build where clause
-    const where: any = {};
-    
-    if (category && category !== 'all') {
+    // Use Record<string, unknown> for where clause
+    const where: Record<string, unknown> = {};
+    if (category) {
       where.category = category;
-    }
-    
-    if (selectable !== null) {
-      where.selectable = selectable === 'true';
     }
 
     const roleTemplates = await prisma.roleTemplate.findMany({
       where,
-      orderBy: [
-        { category: 'asc' },
-        { title: 'asc' },
-      ],
+      orderBy: {
+        title: 'asc',
+      },
     });
 
     return NextResponse.json({

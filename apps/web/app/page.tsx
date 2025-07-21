@@ -8,7 +8,6 @@ import { Badge } from '@/components/ui/badge';
 import { DigitalTwinFlow } from '@/components/digital-twin-flow';
 import { AdminPanel } from '@/components/admin-panel';
 import { TrustDashboard } from '@/components/trust-dashboard';
-import { WalletProvider } from '@/components/wallet-provider';
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('overview');

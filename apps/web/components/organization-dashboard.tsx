@@ -27,7 +27,7 @@ interface Achievement {
   description: string;
   score?: number;
   nftTokenId?: string;
-  metadata: Record<string, any>;
+  metadata: Record<string, unknown>;
   createdAt: string;
 }
 
@@ -41,7 +41,8 @@ interface Organization {
 
 export function OrganizationDashboard() {
   const { address, isConnected } = useAccount();
-  const [selectedOrganization, setSelectedOrganization] = useState<Organization | null>(null);
+  // Remove the unused variable setSelectedOrganization
+  const [selectedOrganization] = useState<Organization | null>(null);
   const [digitalTwins, setDigitalTwins] = useState<DigitalTwin[]>([]);
   const [isCreatingTwin, setIsCreatingTwin] = useState(false);
   const [isMintingAchievement, setIsMintingAchievement] = useState(false);
@@ -95,7 +96,7 @@ export function OrganizationDashboard() {
     title: string;
     description: string;
     score?: number;
-    metadata: Record<string, any>;
+    metadata: Record<string, unknown>;
   }) => {
     if (!isConnected) {
       alert('Please connect your wallet first');
@@ -270,7 +271,12 @@ function DigitalTwinManager({
   isCreating
 }: {
   digitalTwins: DigitalTwin[];
-  onCreateTwin: (data: any) => Promise<void>;
+  onCreateTwin: (data: {
+    name: string;
+    role: string;
+    assignedDid: string;
+    description?: string;
+  }) => Promise<void>;
   isCreating: boolean;
 }) {
   const [formData, setFormData] = useState({
@@ -356,7 +362,7 @@ function DigitalTwinManager({
         <CardHeader>
           <CardTitle>Digital Twins</CardTitle>
           <CardDescription>
-            Manage your organization's digital twins
+            Manage your organization&apos;s digital twins
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -400,7 +406,13 @@ function AchievementManager({
   isMinting
 }: {
   digitalTwins: DigitalTwin[];
-  onMintAchievement: (twinId: string, data: any) => Promise<void>;
+  onMintAchievement: (twinId: string, data: {
+    type: 'certification' | 'score' | 'milestone';
+    title: string;
+    description: string;
+    score?: number;
+    metadata: Record<string, unknown>;
+  }) => Promise<void>;
   isMinting: boolean;
 }) {
   const [selectedTwin, setSelectedTwin] = useState<string>('');

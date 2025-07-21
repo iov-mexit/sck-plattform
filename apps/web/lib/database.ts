@@ -104,8 +104,8 @@ export class DatabaseService {
     title: string;
     focus: string;
     category: string;
-    responsibilities: any;
-    securityContributions: any;
+    responsibilities: unknown;
+    securityContributions: unknown;
     organizationId?: string;
   }) {
     try {
@@ -161,7 +161,7 @@ export class DatabaseService {
     value?: number;
     source: string;
     verified?: boolean;
-    metadata?: any;
+    metadata?: unknown;
     digitalTwinId: string;
   }) {
     try {

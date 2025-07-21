@@ -1,46 +1,12 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useState } from 'react';
+import { useAccount } from 'wagmi';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-
-// Mock contract address and ABI for testing
-const MOCK_CONTRACT_ADDRESS = '0x1234567890123456789012345678901234567890';
-const MOCK_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
-        "internalType": "string",
-        "name": "name",
-        "type": "string"
-      },
-      {
-        "internalType": "string",
-        "name": "description",
-        "type": "string"
-      }
-    ],
-    "name": "mintDigitalTwin",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  }
-];
 
 export function NFTMint() {
   const { address, isConnected } = useAccount();
@@ -48,9 +14,6 @@ export function NFTMint() {
   const [digitalTwinDescription, setDigitalTwinDescription] = useState('');
   const [isMinting, setIsMinting] = useState(false);
   const [mintResult, setMintResult] = useState<string>('');
-
-  const { writeContract, data: hash, isPending } = useWriteContract();
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   const handleMint = async () => {
     if (!isConnected || !address) {
@@ -149,8 +112,8 @@ export function NFTMint() {
 
         {mintResult && (
           <div className={`p-3 rounded-md text-sm ${mintResult.includes('✅')
-              ? 'bg-green-50 text-green-800 border border-green-200'
-              : 'bg-red-50 text-red-800 border border-red-200'
+            ? 'bg-green-50 text-green-800 border border-green-200'
+            : 'bg-red-50 text-red-800 border border-red-200'
             }`}>
             {mintResult}
           </div>

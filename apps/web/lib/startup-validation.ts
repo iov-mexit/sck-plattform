@@ -93,8 +93,6 @@ export function supportsFeature(feature: 'web3' | 'payments' | 'analytics' | 'se
     return false;
   }
 
-  const currentDomain = getCurrentDomain();
-
   switch (feature) {
     case 'web3':
       return config.enableWeb3 || false;
@@ -121,7 +119,6 @@ export function supportsFeature(feature: 'web3' | 'payments' | 'analytics' | 'se
  */
 export function getFeatureFlags() {
   const { config } = getValidatedConfig();
-  const currentDomain = getCurrentDomain();
 
   if (!config) {
     return {
@@ -149,7 +146,7 @@ export function getFeatureFlags() {
 
     // Domain-specific features
     euCompliance: config.euCompliance || false,
-    privacyMode: config.euCompliance || currentDomain.includes('.org'),
+    privacyMode: config.euCompliance || false, // Assuming currentDomain is not available here
 
     // Payment methods
     stripe: config.paymentStrategy === 'stripe',

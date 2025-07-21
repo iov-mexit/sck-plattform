@@ -430,7 +430,7 @@ export class OrganizationalNFTService {
     provider?: ethers.Provider
   ) {
     this.signer = signer;
-    this.provider = provider || signer?.provider!;
+    this.provider = provider || signer?.provider;
 
     if (!this.provider) {
       throw new Error('Provider is required');
@@ -451,7 +451,7 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract organization ID from event
-    const event = receipt.logs.find((log: any) =>
+    const event = receipt.logs.find((log: ethers.Log) =>
       log.eventName === 'OrganizationCreated'
     );
 
@@ -488,7 +488,7 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract twin ID from event
-    const event = receipt.logs.find((log: any) =>
+    const event = receipt.logs.find((log: ethers.Log) =>
       log.eventName === 'DigitalTwinCreated'
     );
 
@@ -533,7 +533,7 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract achievement ID from event
-    const event = receipt.logs.find((log: any) =>
+    const event = receipt.logs.find((log: ethers.Log) =>
       log.eventName === 'AchievementMinted'
     );
 

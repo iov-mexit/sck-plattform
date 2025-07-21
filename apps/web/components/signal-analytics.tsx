@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface SignalStatistics {
   total: number;
@@ -26,11 +25,7 @@ export function SignalAnalytics({ digitalTwinId, organizationId }: SignalAnalyti
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    loadStatistics();
-  }, [digitalTwinId, organizationId]);
-
-  const loadStatistics = async () => {
+  const loadStatistics = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -56,7 +51,11 @@ export function SignalAnalytics({ digitalTwinId, organizationId }: SignalAnalyti
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [digitalTwinId, organizationId]);
+
+  useEffect(() => {
+    loadStatistics();
+  }, [loadStatistics]);
 
   if (isLoading) {
     return (

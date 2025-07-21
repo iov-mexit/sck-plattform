@@ -12,7 +12,7 @@ export const SignalSchema = z.object({
   value: z.number().optional(),
   source: z.enum(['securecodewarrior', 'certification_provider', 'manual']),
   url: z.string().optional(),
-  metadata: z.any().optional(), // dump raw API data
+  metadata: z.unknown().optional(), // dump raw API data
   digitalTwinId: z.string()
 });
 
@@ -35,7 +35,7 @@ export class SignalCollectionService {
   }
 
   // Create a new signal
-  async createSignal(data: Signal): Promise<any> {
+  async createSignal(data: Signal): Promise<unknown> {
     try {
       // Validate the signal data
       const validatedData = SignalSchema.parse(data);
@@ -72,7 +72,7 @@ export class SignalCollectionService {
       });
 
       return signal;
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error creating signal:', error);
       throw error;
     }
@@ -83,9 +83,9 @@ export class SignalCollectionService {
     type?: 'certification' | 'activity';
     limit?: number;
     offset?: number;
-  }): Promise<any[]> {
+  }): Promise<unknown[]> {
     try {
-      const where: any = { digitalTwinId };
+      const where: Record<string, unknown> = { digitalTwinId };
 
       if (options?.type) {
         where.type = options.type;
@@ -107,7 +107,7 @@ export class SignalCollectionService {
       });
 
       return signals;
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching signals:', error);
       throw error;
     }
@@ -119,14 +119,14 @@ export class SignalCollectionService {
       return await prisma.signal.count({
         where: { digitalTwinId }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error counting signals:', error);
       throw error;
     }
   }
 
   // Get recent signals for a digital twin
-  async getRecentSignals(digitalTwinId: string, limit: number = 5): Promise<any[]> {
+  async getRecentSignals(digitalTwinId: string, limit: number = 5): Promise<unknown[]> {
     try {
       return await prisma.signal.findMany({
         where: { digitalTwinId },
@@ -141,7 +141,7 @@ export class SignalCollectionService {
           }
         }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Error fetching recent signals:', error);
       throw error;
     }
@@ -163,11 +163,11 @@ export class SignalCollectionService {
       try {
         await this.createSignal(signalData);
         results.success++;
-      } catch (error: any) {
+      } catch (error: unknown) {
         results.failed++;
         results.errors.push({
           signal: signalData,
-          message: error.message
+          message: (error as Error).message
         });
       }
     }

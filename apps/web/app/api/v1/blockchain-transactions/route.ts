@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
     const network = searchParams.get('network');
     const status = searchParams.get('status');
 
-    const where: any = {};
+    // Use Record<string, unknown> for where clause
+    const where: Record<string, unknown> = {};
 
     if (digitalTwinId) {
       where.digitalTwinId = digitalTwinId;

@@ -100,15 +100,7 @@ export async function GET(request: NextRequest, context: { params: { id: string 
 export async function PATCH(request: NextRequest, context: { params: { id: string } }) {
   try {
     const body = await request.json();
-    const {
-      name,
-      description,
-      status,
-      level,
-      blockchainAddress,
-      soulboundTokenId,
-      blockchainNetwork,
-    } = body;
+    const { name, description, trustScore, status, isEligibleForMint } = body;
 
     // Check if digital twin exists
     const existingTwin = await prisma.digitalTwin.findUnique({
@@ -127,33 +119,19 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
       where: { id: context.params.id },
       data: {
         ...(name && { name }),
-        ...(description !== undefined && { description }),
+        ...(description && { description }),
+        ...(trustScore !== undefined && { trustScore }),
         ...(status && { status }),
-        ...(level && { level }),
-        ...(blockchainAddress && { blockchainAddress }),
-        ...(soulboundTokenId && { soulboundTokenId }),
-        ...(blockchainNetwork && { blockchainNetwork }),
+        ...(isEligibleForMint !== undefined && { isEligibleForMint }),
+        lastTrustCheck: trustScore !== undefined ? new Date() : existingTwin.lastTrustCheck,
       },
       include: {
-        organization: {
-          select: {
-            id: true,
-            name: true,
-            domain: true,
-          },
-        },
-        roleTemplate: {
-          select: {
-            id: true,
-            title: true,
-            category: true,
-            focus: true,
-          },
-        },
+        organization: true,
+        roleTemplate: true,
       },
     });
 
-    // Create audit log
+    // Optionally, log the update
     await prisma.auditLog.create({
       data: {
         action: 'update',
@@ -161,8 +139,6 @@ export async function PATCH(request: NextRequest, context: { params: { id: strin
         entityId: context.params.id,
         metadata: {
           updatedFields: Object.keys(body),
-          previousStatus: existingTwin.status,
-          newStatus: status,
         },
       },
     });
@@ -203,7 +179,7 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
       },
     });
 
-    // Create audit log
+    // Optionally, log the deletion
     await prisma.auditLog.create({
       data: {
         action: 'delete',
@@ -211,7 +187,6 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
         entityId: context.params.id,
         metadata: {
           previousStatus: existingTwin.status,
-          assignedToDid: existingTwin.assignedToDid,
         },
       },
     });
@@ -219,7 +194,6 @@ export async function DELETE(request: NextRequest, context: { params: { id: stri
     return NextResponse.json({
       success: true,
       data: deletedTwin,
-      message: 'Digital twin deleted successfully',
     });
   } catch (error) {
     console.error('Error deleting digital twin:', error);

@@ -11,7 +11,8 @@ export async function GET(request: NextRequest) {
     const status = searchParams.get('status');
     const roleTemplateId = searchParams.get('roleTemplateId');
 
-    const where: any = {};
+    // Use Record<string, unknown> for where clause
+    const where: Record<string, unknown> = {};
 
     if (organizationId) {
       where.organizationId = organizationId;

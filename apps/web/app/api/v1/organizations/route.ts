@@ -15,7 +15,7 @@ const GetOrganizationSchema = z.object({
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const validatedData = CreateOrganizationSchema.parse(body);
+    CreateOrganizationSchema.parse(body);
 
     // The following lines were removed as OrganizationService is no longer imported
     // const organization = await OrganizationService.create(validatedData);
@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const validatedData = GetOrganizationSchema.parse({ domain });
+    GetOrganizationSchema.parse({ domain });
     // The following lines were removed as OrganizationService is no longer imported
     // const organization = await OrganizationService.getByDomain(validatedData.domain);
 
