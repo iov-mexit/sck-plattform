@@ -4,8 +4,11 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 // GET /api/v1/digital-twins/[id] - Get a specific digital twin
-export async function GET(request, context) {
-  const id = context.params.id;
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
   try {
     const digitalTwin = await prisma.digitalTwin.findUnique({
       where: { id },
@@ -98,8 +101,11 @@ export async function GET(request, context) {
 }
 
 // PATCH /api/v1/digital-twins/[id] - Update a digital twin
-export async function PATCH(request, context) {
-  const id = context.params.id;
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
   try {
     const body = await request.json();
     const { name, description, trustScore, status, isEligibleForMint } = body;
@@ -159,8 +165,11 @@ export async function PATCH(request, context) {
 }
 
 // DELETE /api/v1/digital-twins/[id] - Delete a digital twin (soft delete)
-export async function DELETE(request, context) {
-  const id = context.params.id;
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const id = params.id;
   try {
     // Check if digital twin exists
     const existingTwin = await prisma.digitalTwin.findUnique({
