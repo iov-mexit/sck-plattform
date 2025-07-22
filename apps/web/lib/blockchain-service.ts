@@ -51,7 +51,7 @@ export class BlockchainService {
 
   // Initialize contract instance
   private getContract(contractAddress: string, signer?: ethers.Signer) {
-    if (!this.contract || this.contract.address !== contractAddress) {
+    if (!this.contract || this.contract.target !== contractAddress) {
       this.contract = new ethers.Contract(contractAddress, DIGITAL_TWIN_ABI, signer || this.provider);
     }
     return this.contract;
@@ -77,7 +77,7 @@ export class BlockchainService {
         params.role,
         params.org,
         {
-          gasLimit: gasEstimate.mul(120).div(100), // Add 20% buffer
+          gasLimit: (gasEstimate * 120n) / 100n, // Add 20% buffer
         }
       );
 
@@ -120,7 +120,7 @@ export class BlockchainService {
         params.metadata,
         params.isSoulbound,
         {
-          gasLimit: gasEstimate.mul(120).div(100), // Add 20% buffer
+          gasLimit: (gasEstimate * 120n) / 100n, // Add 20% buffer
         }
       );
 
@@ -151,7 +151,7 @@ export class BlockchainService {
 
       // Set the status
       const tx = await contract.setTwinStatus(tokenId, isActive, {
-        gasLimit: gasEstimate.mul(120).div(100), // Add 20% buffer
+        gasLimit: (gasEstimate * 120n) / 100n, // Add 20% buffer
       });
 
       // Wait for transaction confirmation

@@ -28,7 +28,7 @@ type Step = 'wallet' | 'role' | 'did' | 'confirm' | 'mint' | 'signals';
 export function DigitalTwinFlow() {
   const { isConnected } = useAccount();
   const [currentStep, setCurrentStep] = useState<Step>('wallet');
-  const [selectedRole, setSelectedRole] = useState<RoleTemplate | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleTemplate | undefined>(undefined);
   const [did, setDid] = useState('');
   const [isMinting, setIsMinting] = useState(false);
   const [mintedTokenId, setMintedTokenId] = useState<string | null>(null);

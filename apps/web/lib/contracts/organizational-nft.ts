@@ -430,8 +430,7 @@ export class OrganizationalNFTService {
     provider?: ethers.Provider
   ) {
     this.signer = signer;
-    this.provider = provider || signer?.provider;
-
+    this.provider = (provider || signer?.provider)!;
     if (!this.provider) {
       throw new Error('Provider is required');
     }
@@ -451,9 +450,15 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract organization ID from event
-    const event = receipt.logs.find((log: ethers.Log) =>
-      log.eventName === 'OrganizationCreated'
-    );
+    const event = receipt.logs
+      .map((log: any) => {
+        try {
+          return this.contract.interface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .find((parsed: any) => parsed && parsed.name === 'OrganizationCreated');
 
     return event?.args?.organizationId || 0;
   }
@@ -488,9 +493,15 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract twin ID from event
-    const event = receipt.logs.find((log: ethers.Log) =>
-      log.eventName === 'DigitalTwinCreated'
-    );
+    const event = receipt.logs
+      .map((log: any) => {
+        try {
+          return this.contract.interface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .find((parsed: any) => parsed && parsed.name === 'DigitalTwinCreated');
 
     return event?.args?.twinId || 0;
   }
@@ -533,9 +544,15 @@ export class OrganizationalNFTService {
     const receipt = await tx.wait();
 
     // Extract achievement ID from event
-    const event = receipt.logs.find((log: ethers.Log) =>
-      log.eventName === 'AchievementMinted'
-    );
+    const event = receipt.logs
+      .map((log: any) => {
+        try {
+          return this.contract.interface.parseLog(log);
+        } catch {
+          return null;
+        }
+      })
+      .find((parsed: any) => parsed && parsed.name === 'AchievementMinted');
 
     return event?.args?.achievementId || 0;
   }

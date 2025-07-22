@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { signalCollection } from '@/lib/signal-collection';
+import type { Signal } from '@prisma/client';
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,12 +19,12 @@ export async function GET(request: NextRequest) {
 
     // Get basic statistics for the digital twin
     const totalSignals = await signalCollection.getSignalCount(digitalTwinId);
-    const recentSignals = await signalCollection.getRecentSignals(digitalTwinId, 5);
+    const recentSignals = await signalCollection.getRecentSignals(digitalTwinId, 5) as Signal[];
 
     const statistics = {
       total: totalSignals,
       recent: recentSignals.length,
-      recentSignals: recentSignals.map((signal: Record<string, unknown>) => ({
+      recentSignals: recentSignals.map(signal => ({
         id: signal.id,
         type: signal.type,
         title: signal.title,

@@ -134,7 +134,7 @@ export class SCKNFTDynamicService {
       "event AchievementTemplateUpdated(string achievementType, string title, bool isSoulbound, uint256 minThreshold, uint256 maxThreshold)"
     ];
 
-    this.contract = new ethers.Contract(contractAddress, contractABI, signer || provider) as SCKNFTDynamicContract;
+    this.contract = new ethers.Contract(contractAddress, contractABI, signer || provider) as unknown as SCKNFTDynamicContract;
   }
 
   // Check if service is initialized

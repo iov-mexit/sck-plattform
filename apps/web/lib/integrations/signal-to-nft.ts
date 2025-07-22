@@ -171,7 +171,7 @@ export class SignalToNFTIntegration {
     );
 
     // Wait for transaction confirmation
-    await tx.wait();
+    await sckNFTService.getProvider()?.waitForTransaction((tx as import('ethers').TransactionResponse).hash);
 
     // Return the achievement data
     const achievements = await sckNFTService.getAchievements(tokenId);

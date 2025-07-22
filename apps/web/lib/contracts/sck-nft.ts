@@ -93,7 +93,7 @@ export class SCKNFTService {
       "event SoulboundStatusChanged(uint256 indexed tokenId, bool isSoulbound)"
     ];
 
-    this.contract = new ethers.Contract(contractAddress, contractABI, signer || provider) as SCKNFTContract;
+    this.contract = new ethers.Contract(contractAddress, contractABI, signer || provider) as unknown as SCKNFTContract;
   }
 
   // Check if service is initialized

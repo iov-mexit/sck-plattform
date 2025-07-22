@@ -6,23 +6,18 @@ import { http } from 'viem';
 import { mainnet, sepolia } from 'wagmi/chains';
 import { injected } from 'wagmi/connectors';
 
-// Create wagmi config with only MetaMask
 const config = createConfig({
   chains: [mainnet, sepolia],
   connectors: [
     injected({
       target: 'metaMask',
       shimDisconnect: true,
-      name: 'MetaMask',
     }),
   ],
-  client: ({ chain }) => {
-    return {
-      chain,
-      transport: http(),
-    };
+  transports: {
+    [mainnet.id]: http(),
+    [sepolia.id]: http(),
   },
-  ssr: true,
 });
 
 const queryClient = new QueryClient({

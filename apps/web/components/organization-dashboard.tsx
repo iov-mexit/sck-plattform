@@ -416,11 +416,17 @@ function AchievementManager({
   isMinting: boolean;
 }) {
   const [selectedTwin, setSelectedTwin] = useState<string>('');
-  const [achievementData, setAchievementData] = useState({
-    type: 'certification' as const,
+  const [achievementData, setAchievementData] = useState<{
+    type: 'certification' | 'score' | 'milestone';
+    title: string;
+    description: string;
+    score?: number;
+    metadata: Record<string, unknown>;
+  }>({
+    type: 'certification',
     title: '',
     description: '',
-    score: undefined as number | undefined,
+    score: undefined,
     metadata: {}
   });
 

@@ -31,7 +31,7 @@ export class DatabaseService {
       const result = await this.prisma.$queryRaw`SELECT 1 as test`;
       return { success: true, result };
     } catch (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -114,8 +114,8 @@ export class DatabaseService {
           title: data.title,
           focus: data.focus,
           category: data.category,
-          responsibilities: data.responsibilities,
-          securityContributions: data.securityContributions,
+          responsibilities: data.responsibilities as import('@prisma/client').Prisma.InputJsonValue,
+          securityContributions: data.securityContributions as import('@prisma/client').Prisma.InputJsonValue,
           organizationId: data.organizationId,
         }
       });
@@ -173,7 +173,7 @@ export class DatabaseService {
           value: data.value,
           source: data.source,
           verified: data.verified || false,
-          metadata: data.metadata,
+          metadata: data.metadata as import('@prisma/client').Prisma.InputJsonValue,
           digitalTwinId: data.digitalTwinId,
         }
       });
