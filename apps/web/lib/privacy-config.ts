@@ -71,7 +71,7 @@ export const PrivacyValidationSchema = z.object({
   }),
 
   // Metadata validation (encrypted only)
-  metadata: z.record(z.any()).optional().refine(
+  metadata: z.record(z.string(), z.any()).optional().refine(
     (data) => {
       if (!data) return true;
       const jsonStr = JSON.stringify(data);
@@ -133,7 +133,7 @@ export function sanitizeForPrivacy(data: any): any {
 
     for (const [key, value] of Object.entries(data)) {
       // Only allow privacy-safe fields
-      if (PRIVACY_CONFIG.ZERO_PII.ALLOWED_FIELDS.includes(key) ||
+      if ((PRIVACY_CONFIG.ZERO_PII.ALLOWED_FIELDS as readonly string[]).includes(key) ||
         key.startsWith('encrypted_') ||
         key.startsWith('hash_')) {
         sanitized[key] = sanitizeForPrivacy(value);
@@ -332,7 +332,7 @@ export function isPrivacyCompliant(data: any): { compliant: boolean; issues: str
   // Check for forbidden fields
   if (typeof data === 'object' && data !== null) {
     for (const key of Object.keys(data)) {
-      if (!PRIVACY_CONFIG.ZERO_PII.ALLOWED_FIELDS.includes(key) &&
+      if (!(PRIVACY_CONFIG.ZERO_PII.ALLOWED_FIELDS as readonly string[]).includes(key) &&
         !key.startsWith('encrypted_') &&
         !key.startsWith('hash_')) {
         issues.push(`Forbidden field detected: ${key}`);

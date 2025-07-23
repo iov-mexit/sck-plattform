@@ -458,7 +458,7 @@ export class OrganizationalNFTService {
           return null;
         }
       })
-      .find((parsed) => parsed && parsed.name === 'OrganizationCreated');
+      .find((parsed: any) => parsed && parsed.name === 'OrganizationCreated');
 
     return event?.args?.organizationId || 0;
   }
@@ -501,7 +501,7 @@ export class OrganizationalNFTService {
           return null;
         }
       })
-      .find((parsed) => parsed && parsed.name === 'DigitalTwinCreated');
+      .find((parsed: any) => parsed && parsed.name === 'DigitalTwinCreated');
 
     return event?.args?.twinId || 0;
   }
@@ -552,7 +552,7 @@ export class OrganizationalNFTService {
           return null;
         }
       })
-      .find((parsed) => parsed && parsed.name === 'AchievementMinted');
+      .find((parsed: any) => parsed && parsed.name === 'AchievementMinted');
 
     return event?.args?.achievementId || 0;
   }

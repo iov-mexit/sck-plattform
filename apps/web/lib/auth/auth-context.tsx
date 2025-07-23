@@ -56,7 +56,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
               const user: User = {
                 id: metadata.issuer || '',
                 email: metadata.email || '',
-                walletAddress: metadata.publicAddress,
+                walletAddress: metadata.publicAddress || undefined,
                 createdAt: new Date(),
                 updatedAt: new Date(),
               };
@@ -134,7 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const user: User = {
         id: metadata.issuer || '',
         email: metadata.email || '',
-        walletAddress: metadata.publicAddress,
+        walletAddress: metadata.publicAddress || undefined,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
