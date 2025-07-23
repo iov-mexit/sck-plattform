@@ -140,7 +140,7 @@ async function seedData() {
           description: 'Digital twin for DevOps engineering role',
           blockchainAddress: '0x2345678901234567890123456789012345678901',
           soulboundTokenId: '2',
-          blockchainNetwork: 'polygon',
+          blockchainNetwork: 'sepolia',
           status: 'active',
           level: 2,
           organizationId: organization.id,
@@ -251,7 +251,7 @@ async function seedData() {
       prisma.blockchainTransaction.create({
         data: {
           transactionHash: '0x2345678901234567890123456789012345678901234567890123456789012345',
-          network: 'polygon',
+          network: 'sepolia',
           blockNumber: 45000000,
           gasUsed: '200000',
           gasPrice: '30000000000',

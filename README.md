@@ -89,7 +89,7 @@ The platform includes a complete demo with "SecureCorp", a cybersecurity consult
 ### Key Demo Features
 1. **Create Digital Twin**: Assign roles using DID-only identification
 2. **Dashboard**: View all twins with privacy-preserving display
-3. **Demo Twins**: Pre-created examples showing real-world usage
+3. **Role Templates**: Select role templates for specific tasks and roles
 4. **System Status**: Platform health and performance monitoring
 
 ## 🔧 Configuration
@@ -163,6 +163,11 @@ npm run start
 - [x] DID-only assignment
 - [x] Mock SaaS customer
 - [x] Environment validation
+- [ ] Role-based digital twin management
+- [ ] Real-time dashboard
+- [ ] Zero PII storage
+- [ ] Role-based digital twin management
+- [ ] Real-time 
 
 ### Phase 2: Database Integration
 - [ ] Connect PostgreSQL database
@@ -215,3 +220,23 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **🛡️ Built with privacy and security in mind for the future of decentralized development.** 
+
+## 🐘 Starting the Database with Docker Compose
+
+To start the PostgreSQL database for local development, run:
+
+```bash
+docker-compose up -d
+```
+
+This will start a PostgreSQL instance with the correct credentials and database name. The app will be able to connect using the default `DATABASE_URL` in your `.env.local`:
+
+```
+DATABASE_URL="postgresql://postgres:password@localhost:5432/sck_database"
+```
+
+If you need to stop the database:
+
+```bash
+docker-compose down
+``` 

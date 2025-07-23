@@ -1,4 +1,4 @@
-import { ethers } from 'ethers';
+import { ethers, Log, EventLog } from 'ethers';
 
 // Organizational NFT Contract ABI
 export const ORGANIZATIONAL_NFT_ABI = [
@@ -451,14 +451,14 @@ export class OrganizationalNFTService {
 
     // Extract organization ID from event
     const event = receipt.logs
-      .map((log: any) => {
+      .map((log: Log | EventLog) => {
         try {
           return this.contract.interface.parseLog(log);
         } catch {
           return null;
         }
       })
-      .find((parsed: any) => parsed && parsed.name === 'OrganizationCreated');
+      .find((parsed) => parsed && parsed.name === 'OrganizationCreated');
 
     return event?.args?.organizationId || 0;
   }
@@ -494,14 +494,14 @@ export class OrganizationalNFTService {
 
     // Extract twin ID from event
     const event = receipt.logs
-      .map((log: any) => {
+      .map((log: Log | EventLog) => {
         try {
           return this.contract.interface.parseLog(log);
         } catch {
           return null;
         }
       })
-      .find((parsed: any) => parsed && parsed.name === 'DigitalTwinCreated');
+      .find((parsed) => parsed && parsed.name === 'DigitalTwinCreated');
 
     return event?.args?.twinId || 0;
   }
@@ -545,14 +545,14 @@ export class OrganizationalNFTService {
 
     // Extract achievement ID from event
     const event = receipt.logs
-      .map((log: any) => {
+      .map((log: Log | EventLog) => {
         try {
           return this.contract.interface.parseLog(log);
         } catch {
           return null;
         }
       })
-      .find((parsed: any) => parsed && parsed.name === 'AchievementMinted');
+      .find((parsed) => parsed && parsed.name === 'AchievementMinted');
 
     return event?.args?.achievementId || 0;
   }
@@ -610,4 +610,4 @@ export class OrganizationalNFTService {
 // Export singleton instance
 export const organizationalNFTService = new OrganizationalNFTService(
   process.env.NEXT_PUBLIC_ORGANIZATIONAL_NFT_ADDRESS || '0x0000000000000000000000000000000000000000'
-); 
+);

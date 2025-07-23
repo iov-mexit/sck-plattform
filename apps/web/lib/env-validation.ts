@@ -7,6 +7,7 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_PAYMENT_STRATEGY: z.enum(['stripe', 'crypto', 'none']).default('none'),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_MAGIC_API_KEY: z.string().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_ANALYTICS_ID: z.string().optional(),
   NEXT_PUBLIC_EU_COMPLIANCE: z.string().optional().transform((v: string | undefined) => v === 'true'),
@@ -26,6 +27,8 @@ export interface EnvironmentConfig {
   stripeKey?: string;
   enableWeb3: boolean;
   walletConnectProjectId?: string;
+  enableMagicAuth: boolean;
+  magicApiKey?: string;
   euCompliance: boolean;
   validateEnvironment: boolean;
   sentryDsn?: string;
@@ -71,6 +74,8 @@ export function getEnvironmentConfig(): EnvironmentConfig {
     stripeKey: env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
     enableWeb3: !!env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     walletConnectProjectId: env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    enableMagicAuth: !!env.NEXT_PUBLIC_MAGIC_API_KEY,
+    magicApiKey: env.NEXT_PUBLIC_MAGIC_API_KEY,
     euCompliance: env.NEXT_PUBLIC_EU_COMPLIANCE ?? false,
     validateEnvironment: env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT ?? true,
     sentryDsn: env.NEXT_PUBLIC_SENTRY_DSN,
@@ -96,6 +101,11 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
     if (!config.baseUrl.startsWith('https://')) {
       warnings.push('Production should use HTTPS base URLs');
     }
+  }
+
+  // Authentication validation
+  if (!config.enableMagicAuth) {
+    warnings.push('Magic Link authentication is not configured - users will not be able to log in');
   }
 
   // Payment strategy check

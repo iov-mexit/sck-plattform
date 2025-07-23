@@ -1,7 +1,7 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
-describe("SCK NFT Contract", function () {
+describe("SCK NFT Contract - Simplified", function () {
   let sckNFT;
   let owner;
   let user1;
@@ -22,174 +22,153 @@ describe("SCK NFT Contract", function () {
     });
 
     it("Should have correct name and symbol", async function () {
-      expect(await sckNFT.name()).to.equal("SCK Digital Twin");
+      expect(await sckNFT.name()).to.equal("SCK NFT");
       expect(await sckNFT.symbol()).to.equal("SCK");
     });
 
-    it("Should start with 0 total digital twins", async function () {
-      expect(await sckNFT.totalDigitalTwins()).to.equal(0);
+    it("Should start with 0 total supply", async function () {
+      expect(await sckNFT.totalSupply()).to.equal(0);
     });
   });
 
-  describe("Digital Twin Minting", function () {
-    it("Should mint a digital twin successfully", async function () {
-      const did = "did:sck:123456789";
-      const role = "Developer";
-      const organization = "SecureCorp";
+  describe("NFT Minting", function () {
+    it("Should mint an NFT successfully", async function () {
+      const tokenURI = "https://api.securecodeknight.com/metadata/1";
 
-      await expect(sckNFT.mintDigitalTwin(user1.address, did, role, organization))
-        .to.emit(sckNFT, "DigitalTwinMinted")
-        .withArgs(0, did, role, organization, user1.address);
+      await expect(sckNFT.mint(user1.address, tokenURI))
+        .to.emit(sckNFT, "TokenMinted")
+        .withArgs(0, user1.address, tokenURI);
 
       expect(await sckNFT.ownerOf(0)).to.equal(user1.address);
-      expect(await sckNFT.totalDigitalTwins()).to.equal(1);
+      expect(await sckNFT.totalSupply()).to.equal(1);
+      expect(await sckNFT.tokenURI(0)).to.equal(tokenURI);
     });
 
-    it("Should prevent minting with empty DID", async function () {
+    it("Should prevent minting to zero address", async function () {
       await expect(
-        sckNFT.mintDigitalTwin(user1.address, "", "Developer", "SecureCorp")
-      ).to.be.revertedWith("DID cannot be empty");
+        sckNFT.mint(ethers.ZeroAddress, "https://example.com/metadata/1")
+      ).to.be.revertedWith("Cannot mint to zero address");
     });
 
-    it("Should prevent minting duplicate DID", async function () {
-      const did = "did:sck:123456789";
-
-      await sckNFT.mintDigitalTwin(user1.address, did, "Developer", "SecureCorp");
-
+    it("Should prevent minting with empty token URI", async function () {
       await expect(
-        sckNFT.mintDigitalTwin(user2.address, did, "Security Expert", "AnotherCorp")
-      ).to.be.revertedWith("DID already exists");
+        sckNFT.mint(user1.address, "")
+      ).to.be.revertedWith("Token URI cannot be empty");
     });
 
     it("Should only allow owner to mint", async function () {
       await expect(
-        sckNFT.connect(user1).mintDigitalTwin(user1.address, "did:sck:123", "Developer", "SecureCorp")
+        sckNFT.connect(user1).mint(user1.address, "https://example.com/metadata/1")
       ).to.be.revertedWithCustomError(sckNFT, "OwnableUnauthorizedAccount");
     });
-  });
 
-  describe("Achievement Minting", function () {
-    beforeEach(async function () {
-      // Mint a digital twin first
-      await sckNFT.mintDigitalTwin(user1.address, "did:sck:123", "Developer", "SecureCorp");
-    });
+    it("Should increment token ID correctly", async function () {
+      const tokenURI1 = "https://api.securecodeknight.com/metadata/1";
+      const tokenURI2 = "https://api.securecodeknight.com/metadata/2";
 
-    it("Should mint an achievement successfully", async function () {
-      const achievementType = "certification";
-      const title = "Security Expert Certification";
-      const metadata = '{"provider": "SecureCodeWarrior", "score": 95}';
+      await sckNFT.mint(user1.address, tokenURI1);
+      await sckNFT.mint(user2.address, tokenURI2);
 
-      await expect(sckNFT.mintAchievement(0, achievementType, title, metadata, false))
-        .to.emit(sckNFT, "AchievementEarned")
-        .withArgs(0, achievementType, title, false);
-
-      const achievements = await sckNFT.getAchievements(0);
-      expect(achievements.length).to.equal(1);
-      expect(achievements[0].achievementType).to.equal(achievementType);
-      expect(achievements[0].title).to.equal(title);
-    });
-
-    it("Should make token soulbound when achievement is soulbound", async function () {
-      await sckNFT.mintAchievement(0, "certification", "Soulbound Achievement", "{}", true);
-
-      expect(await sckNFT.isSoulbound(0)).to.be.true;
-    });
-
-    it("Should prevent minting achievement for non-existent token", async function () {
-      await expect(
-        sckNFT.mintAchievement(999, "certification", "Test", "{}", false)
-      ).to.be.revertedWith("Digital twin does not exist");
-    });
-
-    it("Should prevent minting achievement with empty type", async function () {
-      await expect(
-        sckNFT.mintAchievement(0, "", "Test", "{}", false)
-      ).to.be.revertedWith("Achievement type cannot be empty");
+      expect(await sckNFT.ownerOf(0)).to.equal(user1.address);
+      expect(await sckNFT.ownerOf(1)).to.equal(user2.address);
+      expect(await sckNFT.totalSupply()).to.equal(2);
     });
   });
 
-  describe("Soulbound Functionality", function () {
+  describe("Token URI Management", function () {
     beforeEach(async function () {
-      await sckNFT.mintDigitalTwin(user1.address, "did:sck:123", "Developer", "SecureCorp");
+      await sckNFT.mint(user1.address, "https://api.securecodeknight.com/metadata/1");
     });
 
-    it("Should prevent transfer of soulbound tokens", async function () {
-      await sckNFT.mintAchievement(0, "certification", "Soulbound Achievement", "{}", true);
+    it("Should return custom token URI when set", async function () {
+      const customURI = "https://custom.example.com/metadata/1";
+      await sckNFT.setTokenURI(0, customURI);
+      expect(await sckNFT.tokenURI(0)).to.equal(customURI);
+    });
 
+    it("Should return base URI + token ID when no custom URI set", async function () {
+      const baseURI = "https://api.securecodeknight.com/metadata/";
+      await sckNFT.setBaseURI(baseURI);
+      expect(await sckNFT.tokenURI(0)).to.equal(baseURI + "0");
+    });
+
+    it("Should emit TokenURISet event", async function () {
+      const customURI = "https://custom.example.com/metadata/1";
+      await expect(sckNFT.setTokenURI(0, customURI))
+        .to.emit(sckNFT, "TokenURISet")
+        .withArgs(0, customURI);
+    });
+
+    it("Should prevent setting token URI for non-existent token", async function () {
       await expect(
-        sckNFT.connect(user1).transferFrom(user1.address, user2.address, 0)
-      ).to.be.revertedWith("Token is soulbound and cannot be transferred");
+        sckNFT.setTokenURI(999, "https://example.com/metadata/1")
+      ).to.be.revertedWith("Token does not exist");
     });
 
-    it("Should allow transfer of non-soulbound tokens", async function () {
-      await sckNFT.mintAchievement(0, "certification", "Regular Achievement", "{}", false);
-
+    it("Should prevent setting empty token URI", async function () {
       await expect(
-        sckNFT.connect(user1).transferFrom(user1.address, user2.address, 0)
-      ).to.not.be.reverted;
+        sckNFT.setTokenURI(0, "")
+      ).to.be.revertedWith("Token URI cannot be empty");
     });
 
-    it("Should allow admin to set soulbound status", async function () {
-      await sckNFT.setSoulboundStatus(0, true);
-      expect(await sckNFT.isSoulbound(0)).to.be.true;
-
-      await sckNFT.setSoulboundStatus(0, false);
-      expect(await sckNFT.isSoulbound(0)).to.be.false;
+    it("Should only allow owner to set token URI", async function () {
+      await expect(
+        sckNFT.connect(user1).setTokenURI(0, "https://example.com/metadata/1")
+      ).to.be.revertedWithCustomError(sckNFT, "OwnableUnauthorizedAccount");
     });
   });
 
   describe("View Functions", function () {
     beforeEach(async function () {
-      await sckNFT.mintDigitalTwin(user1.address, "did:sck:123", "Developer", "SecureCorp");
-      await sckNFT.mintAchievement(0, "certification", "Test Achievement", "{}", false);
+      await sckNFT.mint(user1.address, "https://api.securecodeknight.com/metadata/1");
     });
 
-    it("Should return correct digital twin data", async function () {
-      const twinData = await sckNFT.getDigitalTwinData(0);
-      expect(twinData.did).to.equal("did:sck:123");
-      expect(twinData.role).to.equal("Developer");
-      expect(twinData.organization).to.equal("SecureCorp");
-      expect(twinData.isActive).to.be.true;
+    it("Should return correct total supply", async function () {
+      expect(await sckNFT.totalSupply()).to.equal(1);
+
+      await sckNFT.mint(user2.address, "https://api.securecodeknight.com/metadata/2");
+      expect(await sckNFT.totalSupply()).to.equal(2);
     });
 
-    it("Should return correct achievement count", async function () {
-      expect(await sckNFT.getAchievementCount(0)).to.equal(1);
-
-      await sckNFT.mintAchievement(0, "activity", "Another Achievement", "{}", false);
-      expect(await sckNFT.getAchievementCount(0)).to.equal(2);
+    it("Should check token existence", async function () {
+      expect(await sckNFT.exists(0)).to.be.true;
+      expect(await sckNFT.exists(999)).to.be.false;
     });
 
-    it("Should find token by DID", async function () {
-      expect(await sckNFT.getTokenIdByDID("did:sck:123")).to.equal(0);
-    });
-
-    it("Should check DID existence", async function () {
-      expect(await sckNFT.doesDIDExist("did:sck:123")).to.be.true;
-      expect(await sckNFT.doesDIDExist("did:sck:999")).to.be.false;
+    it("Should return correct base URI", async function () {
+      const baseURI = "https://api.securecodeknight.com/metadata/";
+      expect(await sckNFT.getBaseURI()).to.equal(baseURI);
     });
   });
 
   describe("Admin Functions", function () {
-    beforeEach(async function () {
-      await sckNFT.mintDigitalTwin(user1.address, "did:sck:123", "Developer", "SecureCorp");
-    });
-
     it("Should allow owner to set base URI", async function () {
       const newURI = "https://new-api.example.com/metadata/";
       await sckNFT.setBaseURI(newURI);
-      expect(await sckNFT.tokenURI(0)).to.equal(newURI + "0");
+      expect(await sckNFT.getBaseURI()).to.equal(newURI);
     });
 
-    it("Should allow owner to deactivate digital twin", async function () {
-      await sckNFT.deactivateDigitalTwin(0);
-      const twinData = await sckNFT.getDigitalTwinData(0);
-      expect(twinData.isActive).to.be.false;
-    });
-
-    it("Should prevent non-owner from calling admin functions", async function () {
+    it("Should prevent non-owner from setting base URI", async function () {
       await expect(
         sckNFT.connect(user1).setBaseURI("https://example.com/")
       ).to.be.revertedWithCustomError(sckNFT, "OwnableUnauthorizedAccount");
+    });
+  });
+
+  describe("Token Transfers", function () {
+    beforeEach(async function () {
+      await sckNFT.mint(user1.address, "https://api.securecodeknight.com/metadata/1");
+    });
+
+    it("Should allow token transfers", async function () {
+      await sckNFT.connect(user1).transferFrom(user1.address, user2.address, 0);
+      expect(await sckNFT.ownerOf(0)).to.equal(user2.address);
+    });
+
+    it("Should prevent unauthorized transfers", async function () {
+      await expect(
+        sckNFT.connect(user2).transferFrom(user1.address, user2.address, 0)
+      ).to.be.revertedWith("ERC721: caller is not token owner or approved");
     });
   });
 }); 

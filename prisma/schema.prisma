@@ -84,7 +84,7 @@ model DigitalTwin {
   // Blockchain integration
   blockchainAddress String? // Wallet address
   soulboundTokenId  String? // NFT token ID
-  blockchainNetwork String? // "ethereum", "polygon", "flare"
+  blockchainNetwork String? // "ethereum", "sepolia", "flare"
   
   // Trust-based credentialing
   trustScore        Float?   // Trust score from SCW or other sources (0-100)
@@ -203,7 +203,7 @@ model Certification {
 model BlockchainTransaction {
   id              String   @id @default(cuid())
   transactionHash String   @unique
-  network         String   // "ethereum", "polygon", "flare"
+  network         String   // "ethereum", "sepolia", "flare"
   blockNumber     Int?
   gasUsed         String?
   gasPrice        String?

@@ -9,10 +9,7 @@ import { injected } from 'wagmi/connectors';
 const config = createConfig({
   chains: [mainnet, sepolia],
   connectors: [
-    injected({
-      target: 'metaMask',
-      shimDisconnect: true,
-    }),
+    injected(),
   ],
   transports: {
     [mainnet.id]: http(),
