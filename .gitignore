@@ -20,3 +20,4 @@ apps/web/components/**/*.js
 apps/web/components/**/*.jsx
 apps/web/lib/**/*.js
 apps/web/lib/**/*.jsx
+.vercel
