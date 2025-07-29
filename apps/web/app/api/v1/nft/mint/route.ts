@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { BlockchainService } from '../../../../../lib/blockchain-service';
 import { ethers } from 'ethers';
 
@@ -29,11 +29,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch the digital twin
-    const digitalTwin = await prisma.digital_twins.findUnique({
+    const digitalTwin = await prisma.digitalTwin.findUnique({
       where: { id: body.digitalTwinId },
       include: {
-        organizations: true,
-        role_templates: true,
+        organization: true,
+        roleTemplate: true,
       },
     });
 
@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
 
     // Check if this specific achievement NFT already exists for this digital twin
     const achievementType = body.achievementType || 'Security Achievement';
-    const existingNFT = await prisma.blockchain_transactions.findFirst({
+    const existingNFT = await prisma.blockchainTransaction.findFirst({
       where: {
         digitalTwinId: body.digitalTwinId,
         status: 'confirmed',
@@ -84,11 +84,11 @@ export async function POST(request: NextRequest) {
         },
         {
           trait_type: 'Role',
-          value: digitalTwin.role_templates?.title || 'Unknown',
+          value: digitalTwin.roleTemplate?.title || 'Unknown',
         },
         {
           trait_type: 'Organization',
-          value: digitalTwin.organizations?.name || 'Unknown',
+          value: digitalTwin.organization?.name || 'Unknown',
         },
         {
           trait_type: 'Trust Score',

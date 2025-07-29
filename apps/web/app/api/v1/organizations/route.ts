@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
-import { PrismaClient } from '../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateOrganizationSchema.parse(body);
 
     // Check if organization with same domain already exists
-    const existingOrganization = await prisma.organizations.findUnique({
+    const existingOrganization = await prisma.organization.findUnique({
       where: { domain: validatedData.domain },
     });
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
     // Generate a unique ID
     const uniqueId = `org-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    const organization = await prisma.organizations.create({
+    const organization = await prisma.organization.create({
       data: {
         id: uniqueId,
         name: validatedData.name,
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
 
     if (domain) {
       const validatedData = GetOrganizationSchema.parse({ domain });
-      const organization = await prisma.organizations.findUnique({
+      const organization = await prisma.organization.findUnique({
         where: { domain: validatedData.domain },
       });
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
       );
     } else {
       // Return all organizations
-      const organizations = await prisma.organizations.findMany();
+      const organizations = await prisma.organization.findMany();
       return NextResponse.json(
         {
           success: true,
@@ -161,7 +161,7 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json();
     const validatedData = UpdateOnboardingSchema.parse(body);
 
-    const organization = await prisma.organizations.update({
+    const organization = await prisma.organization.update({
       where: { domain: validatedData.domain },
       data: {
         onboardingComplete: validatedData.onboardingComplete,

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       whereClause.category = category;
     }
 
-    const roleTemplates = await prisma.role_templates.findMany({
+    const roleTemplates = await prisma.roleTemplate.findMany({
       where: whereClause,
       orderBy: {
         title: 'asc',
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const roleTemplate = await prisma.role_templates.create({
+    const roleTemplate = await prisma.roleTemplate.create({
       data: {
         id: `role-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         title: body.title,

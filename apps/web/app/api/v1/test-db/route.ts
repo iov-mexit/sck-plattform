@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -8,14 +8,14 @@ export async function GET(request: NextRequest) {
     console.log('Testing database connection...');
 
     // Test basic connection
-    const organizations = await prisma.organizations.findMany({
+    const organizations = await prisma.organization.findMany({
       take: 1,
     });
 
     console.log('Found organizations:', organizations.length);
 
     // Test digital twins table
-    const digitalTwins = await prisma.digital_twins.findMany({
+    const digitalTwins = await prisma.digitalTwin.findMany({
       take: 1,
     });
 

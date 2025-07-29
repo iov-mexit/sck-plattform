@@ -1,4 +1,4 @@
-import { PrismaClient } from './generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -8,21 +8,21 @@ async function seedData() {
   try {
     // Clear existing data
     console.log('🗑️  Clearing existing data...');
-    await prisma.blockchain_transactions.deleteMany();
-    await prisma.certifications.deleteMany();
-    await prisma.signals.deleteMany();
-    await prisma.digital_twins.deleteMany();
-    await prisma.role_templates.deleteMany();
-    await prisma.organizations.deleteMany();
+    await prisma.blockchainTransaction.deleteMany();
+    await prisma.certification.deleteMany();
+    await prisma.signal.deleteMany();
+    await prisma.digitalTwin.deleteMany();
+    await prisma.roleTemplate.deleteMany();
+    await prisma.organization.deleteMany();
 
     // Create organization
     console.log('🏢 Creating organization...');
-    let organization = await prisma.organizations.findUnique({
+    let organization = await prisma.organization.findUnique({
       where: { id: 'org-securecodecorp' }
     });
 
     if (!organization) {
-      organization = await prisma.organizations.create({
+      organization = await prisma.organization.create({
         data: {
           id: 'org-securecodecorp',
           name: 'SecureCode Corp',
@@ -481,7 +481,7 @@ async function seedData() {
     ];
 
     for (const template of roleTemplates) {
-      await prisma.role_templates.create({
+      await prisma.roleTemplate.create({
         data: template
       });
     }
@@ -524,7 +524,7 @@ async function seedData() {
     ];
 
     for (const twin of digitalTwins) {
-      await prisma.digital_twins.create({
+      await prisma.digitalTwin.create({
         data: twin
       });
     }
@@ -571,7 +571,7 @@ async function seedData() {
     ];
 
     for (const signal of signals) {
-      await prisma.signals.create({
+      await prisma.signal.create({
         data: signal
       });
     }
@@ -610,7 +610,7 @@ async function seedData() {
     ];
 
     for (const cert of certifications) {
-      await prisma.certifications.create({
+      await prisma.certification.create({
         data: cert
       });
     }
@@ -645,7 +645,7 @@ async function seedData() {
     ];
 
     for (const tx of blockchainTransactions) {
-      await prisma.blockchain_transactions.create({
+      await prisma.blockchainTransaction.create({
         data: tx
       });
     }

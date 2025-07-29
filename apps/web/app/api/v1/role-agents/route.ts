@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -28,17 +28,17 @@ export async function GET(request: NextRequest) {
     const whereClause = organizationId ? { organizationId } : {};
 
     const [digitalTwins, total] = await Promise.all([
-      prisma.digital_twins.findMany({
+      prisma.digitalTwin.findMany({
         where: whereClause,
         include: {
-          organizations: true,
-          role_templates: true,
+          organization: true,
+          roleTemplate: true,
         },
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.digital_twins.count({ where: whereClause }),
+      prisma.digitalTwin.count({ where: whereClause }),
     ]);
 
     return NextResponse.json({
@@ -64,12 +64,12 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateRoleAgentSchema.parse(body);
 
     // Check for duplicate DID
-    const existingRoleAgent = await prisma.digital_twins.findFirst({
+    const existingRoleAgent = await prisma.digitalTwin.findFirst({
       where: {
         assignedToDid: validatedData.assignedToDid,
       },
       include: {
-        organizations: true,
+        organization: true,
       },
     });
 
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     const uniqueId = `twin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Create digital twin with DID only - manually provide the id
-    const roleAgent = await prisma.digital_twins.create({
+    const roleAgent = await prisma.digitalTwin.create({
       data: {
         id: uniqueId,
         organizationId: validatedData.organizationId,

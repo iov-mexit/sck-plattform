@@ -1,4 +1,4 @@
-import { PrismaClient } from '../apps/web/generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
 import chalk from 'chalk';

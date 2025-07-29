@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '../../../../../generated/prisma';
+import { PrismaClient } from '@prisma/client';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
     const validatedData = TrustScoreSignalSchema.parse(body);
 
     // Find the digital twin by DID
-    const digitalTwin = await prisma.digital_twins.findFirst({
+    const digitalTwin = await prisma.digitalTwin.findFirst({
       where: {
         assignedToDid: validatedData.did,
         ...(validatedData.organizationId && { organizationId: validatedData.organizationId }),
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     const isEligibleForMint = validatedData.trustScore >= 75;
 
     // Update the digital twin with the new trust score
-    const updatedTwin = await prisma.digital_twins.update({
+    const updatedTwin = await prisma.digitalTwin.update({
       where: { id: digitalTwin.id },
       data: {
         trustScore: validatedData.trustScore,
@@ -45,14 +45,14 @@ export async function POST(request: NextRequest) {
         lastTrustCheck: new Date(),
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             id: true,
             title: true,
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Record the signal
-    await prisma.signals.create({
+    await prisma.signal.create({
       data: {
         id: `signal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'trust_score',
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
         digitalTwinId: digitalTwin.id,
         trustScore: updatedTwin.trustScore,
         isEligibleForMint: updatedTwin.isEligibleForMint,
-        organization: updatedTwin.organizations,
-        roleTemplate: updatedTwin.role_templates,
+        organization: updatedTwin.organization,
+        roleTemplate: updatedTwin.roleTemplate,
       },
     });
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find digital twin and its trust score
-    const digitalTwin = await prisma.digital_twins.findFirst({
+    const digitalTwin = await prisma.digitalTwin.findFirst({
       where: {
         assignedToDid: did,
         ...(organizationId && { organizationId }),
@@ -132,12 +132,12 @@ export async function GET(request: NextRequest) {
         trustScore: true,
         isEligibleForMint: true,
         lastTrustCheck: true,
-        organizations: {
+        organization: {
           select: {
             name: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             title: true,
           },
@@ -159,8 +159,8 @@ export async function GET(request: NextRequest) {
         trustScore: digitalTwin.trustScore,
         isEligibleForMint: digitalTwin.isEligibleForMint,
         lastTrustCheck: digitalTwin.lastTrustCheck,
-        organization: digitalTwin.organizations,
-        roleTemplate: digitalTwin.role_templates,
+        organization: digitalTwin.organization,
+        roleTemplate: digitalTwin.roleTemplate,
       },
     });
 

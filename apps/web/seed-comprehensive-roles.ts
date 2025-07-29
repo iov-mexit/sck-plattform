@@ -1,4 +1,4 @@
-import { PrismaClient } from './generated/prisma';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,7 @@ async function seedComprehensiveRoles() {
 
   try {
     // Find the organization
-    const organization = await prisma.organizations.findUnique({
+    const organization = await prisma.organization.findUnique({
       where: { domain: 'securecodecorp.com' },
     });
 
@@ -508,7 +508,7 @@ async function seedComprehensiveRoles() {
     console.log('📝 Creating comprehensive role templates...');
     const createdRoles = await Promise.all(
       roleTemplates.map(async (role) => {
-        return await prisma.role_templates.upsert({
+        return await prisma.roleTemplate.upsert({
           where: {
             id: role.id
           },
