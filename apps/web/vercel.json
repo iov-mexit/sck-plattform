@@ -2,5 +2,20 @@
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_MAGIC_API_KEY": "@next_public_magic_api_key",
+      "NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC": "@next_public_ethereum_sepolia_rpc",
+      "DATABASE_URL": "@database_url"
+    }
+  }
 }
