@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1753347934968" clover="3.2.0">
+  <project timestamp="1753347934968" name="All files">
+    <metrics statements="8" coveredstatements="8" conditionals="8" coveredconditionals="8" methods="6" coveredmethods="6" elements="22" coveredelements="22" complexity="0" loc="8" ncloc="8" packages="1" files="1" classes="1"/>
+    <file name="WelcomeStep.tsx" path="/Users/matthiasheintze/sck_1/apps/web/app/onboarding/WelcomeStep.tsx">
+      <metrics statements="8" coveredstatements="8" conditionals="8" coveredconditionals="8" methods="6" coveredmethods="6"/>
+      <line num="22" count="8" type="stmt"/>
+      <line num="23" count="8" type="cond" truecount="2" falsecount="0"/>
+      <line num="25" count="8" type="stmt"/>
+      <line num="36" count="1" type="stmt"/>
+      <line num="37" count="1" type="stmt"/>
+      <line num="49" count="1" type="stmt"/>
+      <line num="50" count="1" type="stmt"/>
+      <line num="62" count="1" type="stmt"/>
+    </file>
+  </project>
+</coverage>

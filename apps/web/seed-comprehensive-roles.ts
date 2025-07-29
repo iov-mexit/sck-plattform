@@ -1,4 +1,4 @@
-import { PrismaClient } from '../../node_modules/@prisma/client';
+import { PrismaClient } from './generated/prisma';
 
 const prisma = new PrismaClient();
 
@@ -7,7 +7,7 @@ async function seedComprehensiveRoles() {
 
   try {
     // Find the organization
-    const organization = await prisma.organization.findUnique({
+    const organization = await prisma.organizations.findUnique({
       where: { domain: 'securecodecorp.com' },
     });
 
@@ -22,6 +22,7 @@ async function seedComprehensiveRoles() {
       // DESIGN ROLES
       // =============================================================================
       {
+        id: 'role-product-designer',
         title: 'Product Designer',
         focus: 'Design the entire product experience',
         category: 'Design',
@@ -49,9 +50,13 @@ async function seedComprehensiveRoles() {
               'Create intuitive security interfaces'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
+        id: 'role-ux-designer',
         title: 'User Experience Designer',
         focus: 'Optimises the functionality, flow, and usability of products',
         category: 'Design',
@@ -79,9 +84,13 @@ async function seedComprehensiveRoles() {
               'Make security features accessible to all users'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
+        id: 'role-ui-designer',
         title: 'User Interface Designer',
         focus: 'Aesthetically pleasing, consistent, user-friendly interfaces',
         category: 'Design',
@@ -101,436 +110,407 @@ async function seedComprehensiveRoles() {
             ]
           },
           {
-            title: 'Security UX Patterns',
+            title: 'Security Iconography',
             bullets: [
-              'Prioritise critical security warnings in ways users won\'t ignore',
-              'Design clear security state indicators',
-              'Create intuitive security feedback mechanisms'
+              'Design clear security icons and symbols',
+              'Create consistent security visual language',
+              'Ensure security elements are visually prominent'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
 
       // =============================================================================
-      // DEVELOPER ROLES
+      // PRODUCT ROLES
       // =============================================================================
       {
+        id: 'role-product-manager',
+        title: 'Product Manager',
+        focus: 'Product strategy and roadmap',
+        category: 'Product',
+        selectable: true,
+        responsibilities: [
+          'Defines product vision and strategy',
+          'Prioritises features and requirements',
+          'Coordinates between engineering, design, and business teams',
+          'Analyses market trends and user feedback'
+        ],
+        securityContributions: [
+          {
+            title: 'Security Requirements',
+            bullets: [
+              'Define security requirements for all features',
+              'Ensure privacy-by-design principles',
+              'Coordinate security testing and validation',
+              'Manage security incident response procedures'
+            ]
+          },
+          {
+            title: 'Security Roadmap',
+            bullets: [
+              'Plan security features and improvements',
+              'Balance security needs with business priorities',
+              'Coordinate security compliance requirements',
+              'Manage security documentation and policies'
+            ]
+          }
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'role-frontend-developer',
+        title: 'Frontend Developer',
+        focus: 'Client-side development and user interfaces',
+        category: 'Product',
+        selectable: true,
+        responsibilities: [
+          'Builds responsive web interfaces',
+          'Implements user interactions and animations',
+          'Optimises performance and accessibility',
+          'Ensures cross-browser compatibility'
+        ],
+        securityContributions: [
+          {
+            title: 'Frontend Security',
+            bullets: [
+              'Implement secure authentication flows',
+              'Prevent XSS and CSRF attacks',
+              'Use Content Security Policy',
+              'Sanitise user inputs and outputs'
+            ]
+          },
+          {
+            title: 'Security Best Practices',
+            bullets: [
+              'Follow OWASP security guidelines',
+              'Use HTTPS for all communications',
+              'Implement secure session management',
+              'Follow secure coding standards'
+            ]
+          }
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'role-backend-developer',
         title: 'Backend Developer',
-        focus: 'Building and maintaining the server-side logic, databases, and APIs',
-        category: 'Development',
+        focus: 'Server-side development and APIs',
+        category: 'Product',
         selectable: true,
         responsibilities: [
-          'Designs, develops, and maintains server-side applications',
-          'Manages databases and ensures data integrity',
-          'Develops and consumes APIs (RESTful, GraphQL)',
-          'Implements authentication and authorization mechanisms',
-          'Manages server infrastructure and deployment'
+          'Designs and implements APIs',
+          'Manages database operations and data integrity',
+          'Ensures system reliability and performance',
+          'Implements business logic and data processing'
         ],
         securityContributions: [
           {
-            title: 'Secure Coding Practices',
+            title: 'API Security',
             bullets: [
-              'Implement secure coding practices to prevent OWASP Top 10 vulnerabilities',
-              'Validate and sanitize all inputs to prevent injection attacks',
-              'Securely manage sensitive data with proper encryption'
+              'Implement proper authentication and authorization',
+              'Use rate limiting and input validation',
+              'Encrypt sensitive data in transit and at rest',
+              'Follow secure API design principles'
             ]
           },
           {
-            title: 'Authentication & Authorization',
+            title: 'Data Protection',
             bullets: [
-              'Implement robust authentication and authorization controls',
-              'Secure API endpoints with rate limiting and input validation',
-              'Apply security best practices for database interactions'
-            ]
-          },
-          {
-            title: 'Security Monitoring',
-            bullets: [
-              'Implement secure logging and monitoring for suspicious activities',
-              'Integrate security libraries and frameworks',
-              'Ensure secure session management'
+              'Implement proper data encryption',
+              'Use secure database connections',
+              'Follow GDPR and privacy regulations',
+              'Implement audit logging'
             ]
           }
-        ]
-      },
-      {
-        title: 'Mobile Developer',
-        focus: 'Developing applications for mobile operating systems',
-        category: 'Development',
-        selectable: true,
-        responsibilities: [
-          'Designs and builds native or cross-platform mobile applications',
-          'Integrates with backend APIs and cloud services',
-          'Manages UI/UX for mobile form factors and gestures',
-          'Optimises app performance and battery usage',
-          'Publishes and maintains apps on app stores'
         ],
-        securityContributions: [
-          {
-            title: 'Mobile Security',
-            bullets: [
-              'Implement secure data storage on devices (Keychain, Android Keystore)',
-              'Secure communication with backend APIs (HTTPS, certificate pinning)',
-              'Protect against common mobile vulnerabilities'
-            ]
-          },
-          {
-            title: 'Code Protection',
-            bullets: [
-              'Obfuscate code and apply anti-tampering techniques',
-              'Ensure third-party libraries and SDKs are secure',
-              'Adhere to platform-specific security guidelines'
-            ]
-          },
-          {
-            title: 'User Data Protection',
-            bullets: [
-              'Handle sensitive user input securely',
-              'Prevent keyboard caching and screenshot prevention',
-              'Implement robust authentication within the app'
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Web Developer (Frontend)',
-        focus: 'Building and maintaining the user-facing part of websites and web applications',
-        category: 'Development',
-        selectable: true,
-        responsibilities: [
-          'Develops user interfaces using HTML, CSS, and JavaScript',
-          'Implements client-side logic and interacts with backend APIs',
-          'Ensures cross-browser compatibility and responsive design',
-          'Optimises web performance and load times',
-          'Manages frontend build processes and dependencies'
-        ],
-        securityContributions: [
-          {
-            title: 'Client-Side Security',
-            bullets: [
-              'Implement secure coding practices to prevent XSS, CSRF, DOM-based attacks',
-              'Properly escape and sanitize all user-generated content',
-              'Implement Content Security Policy (CSP) to mitigate attacks'
-            ]
-          },
-          {
-            title: 'Session & Cookie Security',
-            bullets: [
-              'Securely handle user sessions and cookies',
-              'Protect against Cross-Site Request Forgery (CSRF)',
-              'Validate and sanitize all data before sending to backend'
-            ]
-          },
-          {
-            title: 'Third-Party Security',
-            bullets: [
-              'Manage third-party scripts and libraries securely',
-              'Ensure secure storage of sensitive data in browser',
-              'Implement secure authentication flows'
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Full Stack Developer',
-        focus: 'Developing both the frontend and backend of applications',
-        category: 'Development',
-        selectable: true,
-        responsibilities: [
-          'Possesses expertise in both frontend and backend technologies',
-          'Manages the entire web development lifecycle',
-          'Collaborates closely with design, QA, and operations teams',
-          'Understands how different layers of an application interact'
-        ],
-        securityContributions: [
-          {
-            title: 'End-to-End Security',
-            bullets: [
-              'Apply secure coding principles across the entire stack',
-              'Ensure consistent input validation and sanitization at all layers',
-              'Implement end-to-end secure data flow'
-            ]
-          },
-          {
-            title: 'Multi-Layer Security',
-            bullets: [
-              'Understand and mitigate vulnerabilities that span multiple layers',
-              'Coordinate secure API design between frontend and backend',
-              'Manage dependencies securely across the full stack'
-            ]
-          },
-          {
-            title: 'Security Monitoring',
-            bullets: [
-              'Implement comprehensive logging and monitoring',
-              'Ensure proper configuration of web servers and databases',
-              'Coordinate security events across all layers'
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Blockchain Developer',
-        focus: 'Designing, developing, and deploying decentralized applications and smart contracts',
-        category: 'Development',
-        selectable: true,
-        responsibilities: [
-          'Develops smart contracts for blockchain networks',
-          'Builds dApps that interact with smart contracts',
-          'Designs and implements blockchain architectures',
-          'Works with cryptographic principles and decentralized protocols',
-          'Manages blockchain nodes and infrastructure'
-        ],
-        securityContributions: [
-          {
-            title: 'Smart Contract Security',
-            bullets: [
-              'Write secure and audited smart contracts',
-              'Prevent common vulnerabilities (reentrancy, integer overflow)',
-              'Apply best practices for token standards securely'
-            ]
-          },
-          {
-            title: 'Cryptographic Security',
-            bullets: [
-              'Protect private keys and sensitive cryptographic material',
-              'Ensure secure communication with blockchain nodes',
-              'Understand blockchain immutability implications'
-            ]
-          },
-          {
-            title: 'dApp Security',
-            bullets: [
-              'Conduct thorough security audits and formal verification',
-              'Implement secure frontends for dApps',
-              'Stay updated on emerging blockchain security threats'
-            ]
-          }
-        ]
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
 
       // =============================================================================
-      // QA AUTOMATION ROLES
+      // QA ROLES
       // =============================================================================
       {
-        title: 'Test Automation Engineer',
-        focus: 'Automating repetitive functional tests to improve efficiency and reliability',
-        category: 'Quality Assurance',
+        id: 'role-qa-engineer',
+        title: 'QA Engineer',
+        focus: 'Quality assurance and testing',
+        category: 'QA',
         selectable: true,
         responsibilities: [
-          'Creates and maintains automated test suites',
-          'Integrates automated tests into the CI/CD pipeline',
-          'Ensures core features continue to work correctly across updates',
-          'Helps detects regressions early, improving development speed'
-        ],
-        securityContributions: [
-          {
-            title: 'Security Test Automation',
-            bullets: [
-              'Automate security regression tests for authentication flows',
-              'Incorporate challenge testing to prevent SQL injection, XSS',
-              'Integrate security scanning tools into CI/CD pipelines'
-            ]
-          },
-          {
-            title: 'Security Validation',
-            bullets: [
-              'Ensure critical access control flows are regularly tested',
-              'Catch vulnerabilities early in development process',
-              'Maintain security test coverage across updates'
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Performance Test Engineer',
-        focus: 'Validating system performance under load, stress, and scalability conditions',
-        category: 'Quality Assurance',
-        selectable: true,
-        responsibilities: [
-          'Conducts load, stress, endurance, and spike testing',
-          'Identifies bottlenecks, simulating real-world traffic',
-          'Optimises infrastructure and application performance',
-          'Ensures applications meet SLAs for response time and concurrency'
-        ],
-        securityContributions: [
-          {
-            title: 'DoS Protection Testing',
-            bullets: [
-              'Identify performance issues that could expose DoS weaknesses',
-              'Verify session expiration and rate limiting under high loads',
-              'Test system resilience against performance-based attacks'
-            ]
-          },
-          {
-            title: 'Security Performance',
-            bullets: [
-              'Ensure security mechanisms don\'t degrade performance',
-              'Test security features under load conditions',
-              'Validate rate limiting effectiveness'
-            ]
-          }
-        ]
-      },
-      {
-        title: 'Security Test Engineer',
-        focus: 'Identifying security vulnerabilities and weaknesses before attackers do',
-        category: 'Quality Assurance',
-        selectable: true,
-        responsibilities: [
-          'Integrates automated security testing and scanning into the pipeline',
-          'Conducts targeted penetration testing and vulnerability assessments',
-          'Focused on code security over network security'
+          'Designs and executes test plans',
+          'Identifies and reports bugs and issues',
+          'Ensures product quality and reliability',
+          'Collaborates with development teams'
         ],
         securityContributions: [
           {
             title: 'Security Testing',
             bullets: [
-              'Conduct automated and manual security reviews',
-              'Test security-critical functionality (MFA, SSO, session timeouts)',
-              'Enforce security scans and dependency checks in CI/CD'
-            ]
-          },
-          {
-            title: 'Vulnerability Assessment',
-            bullets: [
-              'Identify security gaps in applications',
+              'Conduct security-focused testing',
+              'Test authentication and authorization flows',
               'Validate security controls effectiveness',
-              'Ensure compliance with security standards'
-            ]
-          }
-        ]
-      },
-
-      // =============================================================================
-      // QA MANUAL TESTING ROLES
-      // =============================================================================
-      {
-        title: 'QA Analyst',
-        focus: 'Defining quality standards, test plans, and testing strategy',
-        category: 'Quality Assurance',
-        selectable: true,
-        responsibilities: [
-          'Defines test plans, cases, scripts, and acceptance criteria',
-          'Analyses defect trends and test coverage gaps',
-          'Ensure testing meets regulatory and compliance standards'
-        ],
-        securityContributions: [
-          {
-            title: 'Security Test Planning',
-            bullets: [
-              'Incorporate security testing into test plans and acceptance criteria',
-              'Ensure cases cover authentication, authorization, and data protection',
-              'Work with security teams to align testing with security standards'
+              'Test incident response procedures'
             ]
           },
           {
-            title: 'Security Defect Management',
+            title: 'Security Validation',
             bullets: [
-              'Balance prioritising security defects with functional defects',
-              'Define security testing standards and procedures',
-              'Ensure comprehensive security test coverage'
+              'Test privacy controls and compliance',
+              'Validate secure data handling',
+              'Test security incident procedures',
+              'Ensure security documentation accuracy'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        title: 'QA Tester',
-        focus: 'Manually executing test cases to find functional defects',
-        category: 'Quality Assurance',
+        id: 'role-security-qa',
+        title: 'Security QA Engineer',
+        focus: 'Security testing and validation',
+        category: 'QA',
         selectable: true,
         responsibilities: [
-          'Performs manual functional, regression, and exploratory testing',
-          'Logs detailed, reproducible bug reports',
-          'Validates UI/UX consistency, edge cases, and business logic',
-          'Works with defined test plans and scripts to ensure coverage'
+          'Conducts security testing and penetration testing',
+          'Validates security controls and compliance',
+          'Tests incident response procedures',
+          'Ensures security requirements are met'
         ],
         securityContributions: [
           {
             title: 'Security Testing',
             bullets: [
-              'Report insecure UI behaviour and sensitive data exposure',
-              'Robust challenge testing for input validation',
-              'Check for role-based access control inconsistencies'
+              'Conduct automated security testing',
+              'Perform manual penetration testing',
+              'Validate security controls effectiveness',
+              'Test incident response procedures'
             ]
           },
           {
-            title: 'Security Validation',
+            title: 'Compliance Testing',
             bullets: [
-              'Verify session handling expectations',
-              'Flag misconfigurations and weak default settings',
-              'Test security features from user perspective'
+              'Test GDPR compliance features',
+              'Validate privacy controls',
+              'Test audit logging functionality',
+              'Ensure regulatory compliance'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
+
+      // =============================================================================
+      // ARCHITECTURE ROLES
+      // =============================================================================
       {
-        title: 'UAT Tester',
-        focus: 'Ensuring the product meets business and end-user expectations',
-        category: 'Quality Assurance',
+        id: 'role-solution-architect',
+        title: 'Solution Architect',
+        focus: 'Technical solution design and architecture',
+        category: 'Architecture',
         selectable: true,
         responsibilities: [
-          'Tests real-world scenarios and validates user requirements',
-          'Ensures new features meet stakeholder expectations before release',
-          'Reports usability and functionality gaps from an end-user perspective'
+          'Designs technical solutions and architectures',
+          'Ensures scalability and performance',
+          'Defines technical standards and patterns',
+          'Coordinates between technical teams'
         ],
         securityContributions: [
           {
-            title: 'Security UX Testing',
+            title: 'Secure Architecture Design',
             bullets: [
-              'Ensure security features do not frustrate users',
-              'Highlight missed secure by default configuration opportunities',
-              'Identify confusing or unclear security flows'
+              'Design secure solution architectures',
+              'Integrate security controls in solutions',
+              'Ensure compliance in solution design',
+              'Define security integration patterns'
             ]
           },
           {
-            title: 'User Security Validation',
+            title: 'Security Integration',
             bullets: [
-              'Test security features from business user perspective',
-              'Validate security workflows meet business requirements',
-              'Ensure security doesn\'t impede business processes'
+              'Integrate security tools and controls',
+              'Design secure data flows',
+              'Ensure security in solution deployment',
+              'Define security monitoring requirements'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       },
       {
-        title: 'Release QA Engineer',
-        focus: 'Ensuring the stability and reliability of final production releases',
-        category: 'Quality Assurance',
+        id: 'role-security-architect',
+        title: 'Security Architect',
+        focus: 'Security architecture and design',
+        category: 'Architecture',
         selectable: true,
         responsibilities: [
-          'Conducts smoke tests, sanity tests, and regression tests before deployment',
-          'Validated code changes don\'t break existing functionality',
-          'Ensures release artifacts meet security, compliance, and performance standards',
-          'Approves or blocks release based on final quality checks'
+          'Designs security architectures and controls',
+          'Defines security patterns and standards',
+          'Conducts security assessments and reviews',
+          'Ensures compliance with security requirements'
         ],
         securityContributions: [
           {
-            title: 'Release Security',
+            title: 'Security Architecture Design',
             bullets: [
-              'Conducts final security smoke tests to catch last-minute vulnerabilities',
-              'Ensure no sensitive data is exposed in production',
-              'Confirms patches and security fixes are included in releases'
+              'Design zero-trust security architectures',
+              'Create security reference patterns',
+              'Define security standards and guidelines',
+              'Conduct architectural security reviews'
             ]
           },
           {
-            title: 'Security Validation',
+            title: 'Security Assessment',
             bullets: [
-              'Run sanity tests for security-critical features',
-              'Validate authentication, access control, and encryption',
-              'Ensure security compliance before release approval'
+              'Perform security architecture assessments',
+              'Conduct threat modeling exercises',
+              'Define security controls and monitoring',
+              'Create security architecture documentation'
             ]
           }
-        ]
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+
+      // =============================================================================
+      // SOLUTION DESIGN ROLES
+      // =============================================================================
+      {
+        id: 'role-solution-designer',
+        title: 'Solution Designer',
+        focus: 'Business solution design and implementation',
+        category: 'Solution Design',
+        selectable: true,
+        responsibilities: [
+          'Designs business solutions and workflows',
+          'Ensures solution meets business requirements',
+          'Coordinates implementation and deployment',
+          'Provides ongoing solution support'
+        ],
+        securityContributions: [
+          {
+            title: 'Secure Solution Design',
+            bullets: [
+              'Design security-focused business solutions',
+              'Integrate privacy controls in solutions',
+              'Ensure compliance in solution design',
+              'Create secure user workflows'
+            ]
+          },
+          {
+            title: 'Security Integration',
+            bullets: [
+              'Integrate security controls in solutions',
+              'Design secure data processing flows',
+              'Ensure audit trail in solutions',
+              'Create security monitoring integration'
+            ]
+          }
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+
+      // =============================================================================
+      // SECURITY ROLES
+      // =============================================================================
+      {
+        id: 'role-security-engineer',
+        title: 'Security Engineer',
+        focus: 'Security infrastructure and controls',
+        category: 'Security',
+        selectable: true,
+        responsibilities: [
+          'Designs and implements security controls',
+          'Conducts security assessments and monitoring',
+          'Responds to security incidents',
+          'Develops security policies and procedures'
+        ],
+        securityContributions: [
+          {
+            title: 'Security Infrastructure',
+            bullets: [
+              'Design secure system architectures',
+              'Implement zero-trust security models',
+              'Conduct threat modeling and risk assessments',
+              'Develop security controls and monitoring'
+            ]
+          },
+          {
+            title: 'Incident Response',
+            bullets: [
+              'Lead security incident investigations',
+              'Develop incident response procedures',
+              'Coordinate with stakeholders during incidents',
+              'Implement security monitoring and alerting'
+            ]
+          }
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      },
+      {
+        id: 'role-devops-engineer',
+        title: 'DevOps Engineer',
+        focus: 'Infrastructure and deployment automation',
+        category: 'DevOps',
+        selectable: true,
+        responsibilities: [
+          'Manages infrastructure and deployment pipelines',
+          'Automates deployment and monitoring processes',
+          'Ensures system reliability and performance',
+          'Implements security controls in infrastructure'
+        ],
+        securityContributions: [
+          {
+            title: 'Infrastructure Security',
+            bullets: [
+              'Implement secure container deployment',
+              'Set up automated security scanning',
+              'Configure secure CI/CD pipelines',
+              'Implement infrastructure security controls'
+            ]
+          },
+          {
+            title: 'Security Monitoring',
+            bullets: [
+              'Deploy security monitoring tools',
+              'Create security alerting systems',
+              'Implement log analysis and monitoring',
+              'Ensure infrastructure security compliance'
+            ]
+          }
+        ],
+        organizationId: organization.id,
+        createdAt: new Date(),
+        updatedAt: new Date()
       }
     ];
 
     // Create role templates
+    console.log('📝 Creating comprehensive role templates...');
     const createdRoles = await Promise.all(
       roleTemplates.map(async (role) => {
-        return await prisma.roleTemplate.upsert({
+        return await prisma.role_templates.upsert({
           where: {
-            id: role.title.toLowerCase().replace(/\s+/g, '-'),
+            id: role.id
           },
           update: {
             title: role.title,
@@ -539,38 +519,31 @@ async function seedComprehensiveRoles() {
             selectable: role.selectable,
             responsibilities: role.responsibilities,
             securityContributions: role.securityContributions,
-            updatedAt: new Date(),
+            organizationId: role.organizationId,
+            updatedAt: new Date()
           },
-          create: {
-            id: role.title.toLowerCase().replace(/\s+/g, '-'),
-            title: role.title,
-            focus: role.focus,
-            category: role.category,
-            selectable: role.selectable,
-            responsibilities: role.responsibilities,
-            securityContributions: role.securityContributions,
-          },
+          create: role
         });
       })
     );
 
     console.log('✅ Created comprehensive role templates:', createdRoles.length);
-    console.log('');
-    console.log('Role Categories:');
-    const categories = [...new Set(createdRoles.map(role => role.category))];
-    categories.forEach(category => {
-      const roles = createdRoles.filter(role => role.category === category);
-      console.log(`  ${category} (${roles.length} roles):`);
-      roles.forEach(role => {
-        console.log(`    - ${role.title}`);
-      });
-    });
+    console.log('🎉 Comprehensive role seeding completed successfully!');
 
   } catch (error) {
     console.error('❌ Error seeding comprehensive roles:', error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }
 }
 
-seedComprehensiveRoles(); 
+seedComprehensiveRoles()
+  .then(() => {
+    console.log('✅ Comprehensive role seeding completed successfully');
+    process.exit(0);
+  })
+  .catch((error) => {
+    console.error('❌ Comprehensive role seeding failed:', error);
+    process.exit(1);
+  }); 

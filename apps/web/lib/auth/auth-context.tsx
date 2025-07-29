@@ -7,6 +7,7 @@ import { RPCError, RPCErrorCode } from 'magic-sdk';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { createMagicInstance, setMagicInstance, getMagicInstance } from './magic-config';
 import { showToast } from '@/lib/utils/toast';
+import { organizationService } from '@/lib/services/organization-service';
 import {
   AuthContextType,
   User,
@@ -17,6 +18,23 @@ import {
 
 // Create the auth context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper function to extract domain from email
+const getDomainFromEmail = (email: string): string => {
+  return email.split('@')[1] || '';
+};
+
+// Helper function to fetch organization data
+const fetchOrganizationData = async (email: string) => {
+  try {
+    const domain = getDomainFromEmail(email);
+    if (!domain) return undefined;
+    return await organizationService.getByDomain(domain);
+  } catch (error) {
+    console.error('Error fetching organization data:', error);
+    return undefined;
+  }
+};
 
 // Auth provider component
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -53,10 +71,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const isLoggedIn = await magic.user.isLoggedIn();
             if (isLoggedIn) {
               const metadata = await magic.user.getInfo();
+
+              // Fetch organization data
+              const organization = (await fetchOrganizationData(metadata.email || '')) || undefined;
+
               const user: User = {
                 id: metadata.issuer || '',
                 email: metadata.email || '',
                 walletAddress: metadata.publicAddress || undefined,
+                organization,
                 createdAt: new Date(),
                 updatedAt: new Date(),
               };
@@ -84,19 +107,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     initializeMagic();
   }, []);
 
-  // Initialize Wagmi hooks with error handling
-  let wagmiAccount: any = null;
-  let wagmiConnect: any = null;
-  let wagmiDisconnect: any = null;
-
-  try {
-    wagmiAccount = useAccount();
-    wagmiConnect = useConnect();
-    wagmiDisconnect = useDisconnect();
-  } catch (error) {
-    console.warn('Wagmi hooks not available:', error);
-    // Continue without wallet functionality
-  }
+  // Initialize Wagmi hooks
+  const wagmiAccount = useAccount();
+  const wagmiConnect = useConnect();
+  const wagmiDisconnect = useDisconnect();
 
   // Sync wallet connection state with wagmi (if available)
   useEffect(() => {
@@ -131,10 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         throw new Error('Magic login failed');
       }
 
+      // Fetch organization data
+      const organization = (await fetchOrganizationData(metadata.email || '')) || undefined;
+
       const user: User = {
         id: metadata.issuer || '',
         email: metadata.email || '',
         walletAddress: metadata.publicAddress || undefined,
+        organization,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -231,8 +249,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Connect wallet (optional)
   const connectWallet = async (): Promise<void> => {
     try {
-      if (!wagmiConnect) {
-        throw new Error('Wallet connection not available');
+      if (!wagmiConnect?.connectors?.length) {
+        throw new Error('No wallet connectors available');
       }
 
       setWalletConnection(prev => ({ ...prev, isConnecting: true, error: null }));
@@ -243,6 +261,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       await wagmiConnect.connect({ connector });
+
+      // The wallet connection state will be updated by the useEffect that syncs with wagmiAccount
+      // No need to manually update it here
 
       showToast({
         message: 'Wallet connected successfully!',
@@ -268,7 +289,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Disconnect wallet
   const disconnectWallet = async (): Promise<void> => {
     try {
-      if (wagmiDisconnect) {
+      if (wagmiDisconnect?.disconnect) {
         wagmiDisconnect.disconnect();
       }
 
@@ -279,6 +300,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         chainId: null,
         error: null,
       });
+
+      // If user was only authenticated via wallet, log them out completely
+      if (!magicAuth.isLoggedIn) {
+        setMagicAuth(prev => ({
+          ...prev,
+          isLoggedIn: false,
+          user: null,
+        }));
+      }
 
       showToast({
         message: 'Wallet disconnected!',
@@ -294,8 +324,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Combined authentication state
-  const isAuthenticated = magicAuth.isLoggedIn;
-  const user = magicAuth.user;
+  const isAuthenticated = magicAuth.isLoggedIn || walletConnection.isConnected;
+
+  // Create user object from wallet connection if not logged in via Magic
+  const user = magicAuth.user || (walletConnection.isConnected && walletConnection.address ? {
+    id: walletConnection.address,
+    email: `${walletConnection.address.slice(0, 6)}...${walletConnection.address.slice(-4)}@wallet.local`,
+    walletAddress: walletConnection.address,
+    organization: undefined, // Will be set during onboarding
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } : null);
 
   const value: AuthContextType = {
     magicAuth,

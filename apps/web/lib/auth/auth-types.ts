@@ -1,11 +1,22 @@
 // Authentication Types
 
+export interface Organization {
+  id: string;
+  name: string;
+  description?: string;
+  domain: string;
+  isActive: boolean;
+  onboardingComplete: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface User {
   id: string;
   email: string;
   did?: string; // Decentralized Identifier (optional)
   walletAddress?: string; // Wallet address (optional)
-  organization?: string;
+  organization?: Organization; // Organization data including onboarding state
   role?: string;
   createdAt: Date;
   updatedAt: Date;

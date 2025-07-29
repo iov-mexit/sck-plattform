@@ -2,14 +2,15 @@
 
 import { AuthProvider, useAuth } from '@/lib/auth/auth-context';
 import { MagicLinkLogin, OptionalWalletConnection } from '@/components/auth/magic-link-login';
-import { OnboardingDashboard } from '@/components/dashboard/onboarding-dashboard';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
-import { Shield, Zap, Users, Lock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Shield, Zap, Users, Lock, CheckCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 function HomeContent() {
-  const { isAuthenticated, loading } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+  const router = useRouter();
   const [showSplash, setShowSplash] = useState(true);
   const [currentStep, setCurrentStep] = useState(0);
 
@@ -21,6 +22,28 @@ function HomeContent() {
 
     return () => clearTimeout(timer);
   }, []);
+
+  // Check onboarding state and route accordingly
+  useEffect(() => {
+    if (isAuthenticated && user && !loading && !showSplash) {
+      // If user has an organization and onboarding is complete, go to dashboard
+      if (user.organization && user.organization.onboardingComplete) {
+        router.push('/dashboard');
+      }
+      // If user has an organization but onboarding is not complete, go to onboarding
+      else if (user.organization && !user.organization.onboardingComplete) {
+        router.push('/onboarding');
+      }
+      // If user has a wallet address (indicating they've used the platform before), go to dashboard
+      else if (user.walletAddress) {
+        router.push('/dashboard');
+      }
+      // For new users without organization or wallet, go to onboarding
+      else {
+        router.push('/onboarding');
+      }
+    }
+  }, [isAuthenticated, user, loading, router, showSplash]);
 
   // Splash screen with animated steps
   useEffect(() => {
@@ -45,9 +68,16 @@ function HomeContent() {
     );
   }
 
-  // Show dashboard if authenticated
-  if (isAuthenticated) {
-    return <OnboardingDashboard />;
+  // Show loading state while checking onboarding and routing
+  if (isAuthenticated && user && !showSplash) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Welcome back! Redirecting to your dashboard...</p>
+        </div>
+      </div>
+    );
   }
 
   // Show splash screen
@@ -61,7 +91,7 @@ function HomeContent() {
               <Shield className="h-10 w-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold mb-2">Secure Code KnAIght</h1>
-            <p className="text-xl text-blue-200">Enterprise Digital Twin Platform</p>
+            <p className="text-xl text-blue-200">Enterprise Role Agent Platform</p>
           </div>
 
           {/* Loading Steps */}
@@ -72,28 +102,19 @@ function HomeContent() {
             </div>
             <div className={`flex items-center justify-center space-x-3 transition-opacity duration-500 ${currentStep >= 1 ? 'opacity-100' : 'opacity-50'}`}>
               <CheckCircle className={`h-5 w-5 ${currentStep >= 1 ? 'text-green-400' : 'text-gray-400'}`} />
-              <span>Loading blockchain integration</span>
+              <span>Loading role agent protocols</span>
             </div>
             <div className={`flex items-center justify-center space-x-3 transition-opacity duration-500 ${currentStep >= 2 ? 'opacity-100' : 'opacity-50'}`}>
               <CheckCircle className={`h-5 w-5 ${currentStep >= 2 ? 'text-green-400' : 'text-gray-400'}`} />
-              <span>Preparing authentication system</span>
+              <span>Establishing trust constellation</span>
             </div>
-            <div className={`flex items-center justify-center space-x-3 transition-opacity duration-500 ${currentStep >= 3 ? 'opacity-100' : 'opacity-50'}`}>
-              <CheckCircle className={`h-5 w-5 ${currentStep >= 3 ? 'text-green-400' : 'text-gray-400'}`} />
-              <span>Ready to secure your digital identity</span>
-            </div>
-          </div>
-
-          {/* Loading Spinner */}
-          <div className="flex justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show login page
+  // Show main landing page
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
       {/* Header */}
@@ -106,7 +127,7 @@ function HomeContent() {
               </div>
               <div>
                 <h1 className="text-xl font-bold text-gray-900">Secure Code KnAIght</h1>
-                <p className="text-sm text-gray-600">Digital Twin Platform</p>
+                <p className="text-sm text-gray-600">Role Agent Platform</p>
               </div>
             </div>
             <div className="flex items-center space-x-4">
@@ -138,7 +159,7 @@ function HomeContent() {
               Welcome to Secure Code KnAIght
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Your enterprise-grade platform for digital twin management, secure authentication,
+              Your enterprise-grade platform for role agent management, secure authentication,
               and blockchain-powered identity verification.
             </p>
           </div>
@@ -159,7 +180,7 @@ function HomeContent() {
               <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 mb-4">
                 <Users className="h-6 w-6 text-purple-600" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Digital Twin Management</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Role Agent Management</h3>
               <p className="text-gray-600">
                 Create and manage digital representations of your team members and organizations.
               </p>

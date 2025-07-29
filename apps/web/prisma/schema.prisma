@@ -112,6 +112,7 @@ model organizations {
   createdAt             DateTime                @default(now())
   updatedAt             DateTime
   isActive              Boolean                 @default(true)
+  onboardingComplete    Boolean                 @default(false)
   digital_twins         digital_twins[]
   organization_members  organization_members[]
   role_templates        role_templates[]

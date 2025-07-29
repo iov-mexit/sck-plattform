@@ -3,12 +3,13 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { WalletProvider } from '@/components/wallet-provider'
 import { AuthProvider } from '@/lib/auth/auth-context'
+import { QueryClientProviderWrapper } from '@/lib/providers/query-client-provider'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Secure Code KnAIght - Digital Twin Platform',
-  description: 'Enterprise Digital Twin Management Platform with Blockchain Integration',
+  title: 'Secure Code KnAIght - Role Agent Platform',
+description: 'Enterprise Role Agent Management Platform with Blockchain Integration',
 }
 
 export default function RootLayout({
@@ -19,11 +20,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <WalletProvider>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-        </WalletProvider>
+        <QueryClientProviderWrapper>
+          <WalletProvider>
+            <AuthProvider>
+              {children}
+            </AuthProvider>
+          </WalletProvider>
+        </QueryClientProviderWrapper>
       </body>
     </html>
   )

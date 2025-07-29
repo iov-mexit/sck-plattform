@@ -14,10 +14,8 @@ export function OptionalWalletConnect() {
     isAuthenticated
   } = useAuth();
 
-  // Don't show if user is not authenticated
-  if (!isAuthenticated) {
-    return null;
-  }
+  // Show wallet connection as primary authentication option
+  // (removed the authentication check to allow wallet-only login)
 
   // Show connected state
   if (walletConnection.isConnected && walletConnection.address) {
