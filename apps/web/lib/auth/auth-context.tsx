@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Loading state
   const [loading, setLoading] = useState(true);
 
-  // Initialize Magic Link
+  // Initialize Magic Link (with graceful fallback)
   useEffect(() => {
     const initializeMagic = async () => {
       try {
@@ -94,11 +94,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (error) {
-        console.error('Failed to initialize Magic Link:', error);
-        setMagicAuth(prev => ({
-          ...prev,
-          error: 'Failed to initialize authentication',
-        }));
+        console.warn('Magic Link initialization failed, falling back to wallet-only auth:', error);
+        // Don't set error state, just continue with wallet-only authentication
       } finally {
         setLoading(false);
       }
@@ -132,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const magic = getMagicInstance();
       if (!magic) {
-        throw new Error('Magic Link not initialized');
+        throw new Error('Magic Link not available. Please use MetaMask instead.');
       }
 
       // Send magic link email using Email OTP
@@ -172,27 +169,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error('Magic Link login failed:', error);
 
-      let errorMessage = 'Login failed';
+      let errorMessage = 'Magic Link is currently unavailable. Please use MetaMask to connect.';
 
       if (error instanceof RPCError) {
         switch (error.code) {
           case RPCErrorCode.MagicLinkFailedVerification:
-            errorMessage = 'Magic link verification failed. Please try again.';
+            errorMessage = 'Magic link verification failed. Please use MetaMask instead.';
             break;
           case RPCErrorCode.MagicLinkExpired:
-            errorMessage = 'Magic link has expired. Please request a new one.';
+            errorMessage = 'Magic link has expired. Please use MetaMask instead.';
             break;
           case RPCErrorCode.MagicLinkRateLimited:
-            errorMessage = 'Too many login attempts. Please wait before trying again.';
+            errorMessage = 'Too many login attempts. Please use MetaMask instead.';
             break;
           case RPCErrorCode.UserAlreadyLoggedIn:
             errorMessage = 'You are already logged in.';
             break;
           default:
-            errorMessage = error.message || 'Something went wrong. Please try again.';
+            errorMessage = 'Magic Link is unavailable. Please use MetaMask to connect.';
         }
       } else if (error instanceof Error) {
-        errorMessage = error.message;
+        errorMessage = 'Magic Link is unavailable. Please use MetaMask to connect.';
       }
 
       const authError: AuthError = {
