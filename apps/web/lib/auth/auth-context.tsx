@@ -129,7 +129,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       const magic = getMagicInstance();
       if (!magic) {
-        throw new Error('Magic Link not available. Please use MetaMask instead.');
+        throw new Error('Magic Link is not configured properly. Please use MetaMask to connect.');
       }
 
       // Send magic link email using Email OTP

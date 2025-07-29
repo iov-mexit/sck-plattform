@@ -8,7 +8,7 @@ export const MAGIC_CONFIG = {
 
   // Network configuration
   network: {
-    rpcUrl: process.env.NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC || 'https://sepolia.infura.io/v3/YOUR_INFURA_KEY',
+    rpcUrl: process.env.NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC || '',
     chainId: 11155111, // Sepolia testnet
   },
 
@@ -52,6 +52,11 @@ export const getChainId = () => {
 export const createMagicInstance = (): Magic<OAuthExtension[]> | null => {
   if (!MAGIC_CONFIG.apiKey) {
     console.warn('Magic API key not configured');
+    return null;
+  }
+
+  if (!MAGIC_CONFIG.network.rpcUrl) {
+    console.warn('Ethereum RPC URL not configured');
     return null;
   }
 
