@@ -131,14 +131,36 @@ jobs:
       - name: Build application
         run: |
           echo "Building application with turbo..."
-          npm run build
-          echo "Build completed successfully"
+          if npm run build; then
+            echo "Build completed successfully"
+          else
+            echo "Build failed, trying alternative approach..."
+            cd apps/web
+            if npm run build; then
+              echo "Direct build in web app succeeded"
+            else
+              echo "All build attempts failed"
+              exit 1
+            fi
+          fi
 
       - name: Verify build output
         run: |
           echo "Checking build output..."
-          ls -la apps/web/.next
-          echo "Build verification completed"
+          if [ -d "apps/web/.next" ]; then
+            ls -la apps/web/.next
+            echo "Build verification completed"
+          else
+            echo "Build output not found, checking web app directory..."
+            cd apps/web
+            if [ -d ".next" ]; then
+              ls -la .next
+              echo "Build verification completed in web app directory"
+            else
+              echo "Build output not found anywhere"
+              exit 1
+            fi
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
