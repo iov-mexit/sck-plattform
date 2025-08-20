@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "projectId": "prj_1CPyPlRgPWcYopjFbkKUUK7rAWAS",
+  "orgId": "team_YsM4jHIbaZxcoGOQ1CQY6TlS",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
   "framework": "nextjs",

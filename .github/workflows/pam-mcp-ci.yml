@@ -37,6 +37,12 @@ jobs:
       - name: Install turbo globally
         run: npm install -g turbo
 
+      - name: Generate Prisma client first
+        run: |
+          cd apps/web
+          echo "Generating Prisma client for quality gates..."
+          npx prisma generate --schema=./prisma/schema.prisma
+
       - name: TypeScript strict mode check
         run: npm run type-check
         continue-on-error: true
@@ -104,7 +110,15 @@ jobs:
       - name: Verify build output
         run: |
           echo "Checking build output..."
-          ls -la apps/web/.next
+          ls -la apps/web/
+          if [ -d "apps/web/.next" ]; then
+            echo "Build output found at apps/web/.next"
+            ls -la apps/web/.next
+          else
+            echo "Build output not found, checking for alternative locations..."
+            find . -name ".next" -type d 2>/dev/null || echo "No .next directories found"
+            exit 1
+          fi
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
