@@ -9,6 +9,10 @@ on:
 
 env:
   NODE_VERSION: '20'
+  # Set default environment variables for CI
+  DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
+  NEXT_PUBLIC_ENVIRONMENT: 'ci'
+  NEXT_PUBLIC_API_VERSION: 'v1'
 
 jobs:
   # Quality Gates
@@ -27,6 +31,16 @@ jobs:
 
       - name: Install dependencies
         run: npm install
+
+      - name: Debug environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "Package.json contents:"
+          cat package.json
 
       - name: TypeScript strict mode check
         run: npm run type-check
@@ -72,11 +86,38 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Debug build environment
+        run: |
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "Apps directory:"
+          ls -la apps/
+          echo "Web app package.json:"
+          cat apps/web/package.json
+
       - name: Generate Prisma client
-        run: cd apps/web && npx prisma generate --schema=./prisma/schema.prisma
+        run: |
+          cd apps/web
+          echo "Generating Prisma client..."
+          echo "Current directory: $(pwd)"
+          echo "Prisma schema exists: $(ls -la prisma/schema.prisma)"
+          npx prisma generate --schema=./prisma/schema.prisma
+          echo "Prisma client generated successfully"
 
       - name: Build application
-        run: npm run build
+        run: |
+          echo "Building application with turbo..."
+          npm run build
+          echo "Build completed successfully"
+
+      - name: Verify build output
+        run: |
+          echo "Checking build output..."
+          ls -la apps/web/.next
+          echo "Build verification completed"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
