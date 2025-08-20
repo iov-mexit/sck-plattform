@@ -58,7 +58,7 @@ export class SignalCollectionService {
           value: validatedData.value,
           source: validatedData.source,
           url: validatedData.url,
-          metadata: validatedData.metadata as import('@prisma/client').Prisma.InputJsonValue,
+          metadata: validatedData.metadata as any,
           roleAgentId: validatedData.digitalTwinId,
         },
         include: {
