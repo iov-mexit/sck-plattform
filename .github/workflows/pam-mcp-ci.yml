@@ -13,6 +13,8 @@ env:
   DATABASE_URL: 'postgresql://dummy:dummy@localhost:5432/dummy'
   NEXT_PUBLIC_ENVIRONMENT: 'ci'
   NEXT_PUBLIC_API_VERSION: 'v1'
+  CI: 'true'
+  NODE_ENV: 'production'
 
 jobs:
   # Quality Gates
@@ -41,6 +43,9 @@ jobs:
           ls -la
           echo "Package.json contents:"
           cat package.json
+          echo "Environment variables:"
+          echo "CI: $CI"
+          echo "NODE_ENV: $NODE_ENV"
 
       - name: TypeScript strict mode check
         run: npm run type-check
@@ -97,6 +102,9 @@ jobs:
           ls -la apps/
           echo "Web app package.json:"
           cat apps/web/package.json
+          echo "Environment variables:"
+          echo "CI: $CI"
+          echo "NODE_ENV: $NODE_ENV"
 
       - name: Generate Prisma client
         run: |
