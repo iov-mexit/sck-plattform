@@ -1,561 +1,461 @@
-# SCK System Analysis: Privacy-by-Design Architecture
+# 🔍 SCK Platform - Comprehensive System Analysis
 
-## Executive Summary
+## 🏗️ Architecture Overview
 
-Secure Code KnAIght (SCK) is a trust-based digital twin platform that enables organizations to create, manage, and validate digital identities without storing any Personally Identifiable Information (PII). The system uses blockchain technology, decentralized identifiers (DIDs), and zero-knowledge proofs to maintain privacy while ensuring trust and authenticity.
+SCK is a **trust-based credentialing platform** built as a **composable trust economy** with clear separation between private trust credentialing (SCK Platform) and public verification infrastructure (ANS Registry).
 
-## Core Principles
+### **Core Architecture Flow:**
+```
+External Signals → SCK Platform → Role Agents (L1-L5) → NFT Anchoring → ANS Auto-Registration → Public Verification
+```
 
-### Privacy-by-Design (PbD)
-- **Zero PII Storage**: No personal data is ever stored in the system
-- **DID-Only Identifiers**: All user references use decentralized identifiers
-- **Zero-Knowledge Architecture**: Server cannot access user data
-- **Client-Side Encryption**: All sensitive data encrypted before transmission
-- **Data Minimization**: Only collect what's absolutely necessary
+## 📁 File Structure Analysis
 
-### Trust-Based Credentialing
-- **Trust Score Validation**: External trust scores from verified sources
-- **Role-Based Thresholds**: Different trust requirements per role
-- **Blockchain Verification**: Immutable trust records on-chain
-- **Soulbound Tokens**: Non-transferable NFTs representing credentials
+### **Root Level Configuration**
+```
+sck_1/
+├── package.json                    # Monorepo root dependencies & scripts
+├── turbo.json                      # Turborepo build configuration
+├── tsconfig.json                   # TypeScript root configuration
+├── docker-compose.yml              # Development environment setup
+├── vercel.json                     # Vercel deployment configuration
+└── .cursorrules                    # SCK platform development rules & architecture
+```
 
-## System Architecture
+**Purpose**: Monorepo coordination, deployment, and development standards enforcement.
 
-### 1. Frontend Layer (Next.js 15)
+---
+
+## 🎯 **Core Application: `apps/web/`**
+
+### **Frontend Architecture**
 ```
 apps/web/
-├── app/                    # App Router pages
-├── components/            # React components
-├── lib/                   # Utilities and services
-└── features/             # Feature-based organization
+├── app/                            # Next.js 15 App Router
+│   ├── (authenticated)/            # Protected routes with layout
+│   │   ├── layout.tsx              # Authenticated layout with navigation
+│   │   ├── dashboard/page.tsx      # Organization dashboard with trust metrics
+│   │   ├── role-agents/page.tsx    # Role agent management (L1-L5 listing)
+│   │   ├── role-templates/page.tsx # Template management for organizations
+│   │   ├── constellation/page.tsx  # Trust constellation visualization
+│   │   ├── analytics/page.tsx      # Trust analytics and progression tracking
+│   │   ├── nft-minting/page.tsx    # NFT credential minting interface
+│   │   ├── agent-services/page.tsx # Agent lifecycle management
+│   │   └── settings/page.tsx       # Organization configuration
+│   ├── api/                        # Backend API routes
+│   ├── layout.tsx                  # Root layout with providers
+│   ├── page.tsx                    # Landing page
+│   ├── onboarding/page.tsx         # Organization setup flow
+│   └── globals.css                 # Global styles with Tailwind
 ```
 
-### 2. API Layer (Next.js API Routes)
+**Key Frontend Components:**
+- **Level-Based Display**: All role agent interfaces show L1-L5 qualification levels
+- **Traditional UX**: No wallet requirements for end users
+- **Real-Time Updates**: Trust constellation and analytics update with external signals
+
+### **Backend API Architecture**
 ```
-apps/web/app/api/
-├── v1/
-│   ├── digital-twins/     # Digital twin management
-│   ├── organizations/     # Organization management
-│   ├── signals/          # Trust signal processing
-│   ├── blockchain/       # Blockchain integration
-│   └── trust/            # Trust score validation
-```
-
-### 3. Database Layer (PostgreSQL + Prisma)
-- **Zero PII Storage**: Only DIDs, hashes, and encrypted data
-- **Audit Trails**: Complete audit logging for compliance
-- **Data Encryption**: At-rest encryption for all sensitive data
-
-### 4. Blockchain Layer
-- **Ethereum/Sepolia**: Smart contracts for trust verification
-- **Soulbound NFTs**: Non-transferable credential tokens
-- **Zero-Knowledge Proofs**: Privacy-preserving verification
-
-## API Design Specification
-
-### Authentication & Authorization
-
-#### POST `/api/v1/auth/did/verify`
-**Purpose**: Verify DID ownership without storing PII
-```typescript
-interface DIDVerificationRequest {
-  did: string;
-  challenge: string;
-  signature: string;
-  publicKey: string;
-}
-
-interface DIDVerificationResponse {
-  verified: boolean;
-  sessionToken: string; // JWT with DID only
-  expiresAt: string;
-}
+apps/web/app/api/v1/
+├── role-agents/                    # Role agent CRUD with level-based naming
+│   ├── route.ts                   # GET (list), POST (create with L{level} naming)
+│   ├── [id]/route.ts              # GET, PUT, DELETE individual agents
+│   ├── migrate/route.ts           # Database migration utilities
+│   └── update-terminology/route.ts # Terminology consistency updates
+├── role-templates/route.ts        # Role template management
+├── organizations/route.ts          # Organization management
+├── nft/                           # NFT minting (organization-controlled)
+│   └── mint/route.ts              # Backend-controlled NFT minting
+├── signals/                       # External signal processing
+│   ├── route.ts                   # Signal ingestion from external sources
+│   ├── [id]/verify/route.ts       # Signal verification
+│   ├── statistics/route.ts        # Signal analytics
+│   └── trust-score/route.ts       # Trust score updates from external signals
+└── trust/validate/route.ts        # Trust validation services
 ```
 
-#### POST `/api/v1/auth/session/refresh`
-**Purpose**: Refresh authentication session
-```typescript
-interface SessionRefreshRequest {
-  sessionToken: string;
-}
+**API Design Principles:**
+- **External Signal Funneling**: All trust scores come from external sources (SCW, ISACA, GitHub)
+- **Level Assignment**: Trust scores automatically determine L1-L5 levels
+- **ANS Auto-Registration**: Every role agent creation triggers ANS registration
+- **Organization-Controlled**: Backend handles all Web3 complexity
 
-interface SessionRefreshResponse {
-  sessionToken: string;
-  expiresAt: string;
-}
+### **Component Architecture**
+```
+apps/web/components/
+├── auth/                          # Authentication components
+│   ├── magic-link-login.tsx       # Passwordless email authentication
+│   └── magic-login.tsx            # Magic Link integration
+├── dashboard/                     # Dashboard components
+│   ├── dashboard-overview.tsx     # Trust metrics overview
+│   ├── role-agent-stats.tsx       # Level-based agent statistics
+│   └── role-analytics.tsx         # Trust progression analytics
+├── onboarding/                    # Organization setup flow
+│   ├── welcome-step.tsx           # Introduction to SCK platform
+│   ├── organization-setup-step.tsx # Organization configuration
+│   ├── role-templates-step.tsx    # Template selection and customization
+│   └── digital-twin-creation-step.tsx # Initial role agent creation
+├── common/                        # Reusable UI components
+│   ├── button.tsx, card.tsx       # Basic UI elements
+│   ├── input.tsx, select.tsx      # Form components
+│   └── tabs.tsx                   # Navigation components
+├── navigation.tsx                 # Main navigation with role-based access
+├── trust-dashboard.tsx            # Trust constellation and analytics
+├── admin-panel.tsx                # Organization administration
+└── nft-minting.tsx                # NFT credential interface
 ```
 
-### Digital Twin Management
+**Component Design:**
+- **Level-First Display**: All components prioritize L1-L5 qualification visibility
+- **External Signal Integration**: Components show signal sources and attribution
+- **Traditional Web UX**: No wallet connection UI for end users
 
-#### POST `/api/v1/digital-twins`
-**Purpose**: Create new digital twin (DID-only)
-```typescript
-interface CreateDigitalTwinRequest {
-  organizationId: string;
-  roleTemplateId: string;
-  assignedToDid: string; // DID only, no PII
-  trustScore?: number;
-}
+---
 
-interface CreateDigitalTwinResponse {
-  id: string;
-  assignedToDid: string;
-  trustScore: number;
-  isEligibleForMint: boolean;
-  createdAt: string;
-}
+## 🗄️ **Database Layer: `prisma/`**
+
+### **Database Schema**
+```
+prisma/
+├── schema.prisma                  # Main database schema with role_agents model
+├── migrations/                    # Database version control
+│   ├── 20250717151444_init/       # Initial schema creation
+│   ├── 20250719174221_add_trust_based_credentialing/ # Trust system addition
+│   └── 20250724123354_add_onboarding_complete/ # Onboarding flow
+├── seed.ts                        # Database seeding with role templates
+└── roleTemplates.seed.json        # 35+ security-focused role templates
 ```
 
-#### GET `/api/v1/digital-twins/{id}`
-**Purpose**: Retrieve digital twin by DID
-```typescript
-interface DigitalTwinResponse {
-  id: string;
-  assignedToDid: string;
-  trustScore: number;
-  roleTemplate: {
-    id: string;
-    title: string;
-    category: string;
-  };
-  organization: {
-    id: string;
-    name: string;
-    domain: string;
-  };
-  isEligibleForMint: boolean;
-  blockchainAddress?: string;
-  soulboundTokenId?: string;
-  status: string;
-  level: number;
-  createdAt: string;
-  updatedAt: string;
-}
-```
-
-#### PUT `/api/v1/digital-twins/{id}/trust-score`
-**Purpose**: Update trust score from external source
-```typescript
-interface UpdateTrustScoreRequest {
-  trustScore: number;
-  source: string; // External trust provider
-  verified: boolean;
-}
-
-interface UpdateTrustScoreResponse {
-  id: string;
-  trustScore: number;
-  isEligibleForMint: boolean;
-  lastTrustCheck: string;
-}
-```
-
-### Signal Management
-
-#### POST `/api/v1/signals`
-**Purpose**: Add trust signal to digital twin
-```typescript
-interface CreateSignalRequest {
-  digitalTwinId: string;
-  type: 'certification' | 'activity' | 'achievement';
-  title: string;
-  description?: string;
-  metadata?: Record<string, any>;
-  value?: number;
-  source: string;
-  url?: string;
-}
-
-interface CreateSignalResponse {
-  id: string;
-  type: string;
-  title: string;
-  verified: boolean;
-  createdAt: string;
-}
-```
-
-#### GET `/api/v1/digital-twins/{id}/signals`
-**Purpose**: Get all signals for a digital twin
-```typescript
-interface SignalListResponse {
-  signals: Array<{
-    id: string;
-    type: string;
-    title: string;
-    description?: string;
-    value?: number;
-    source: string;
-    url?: string;
-    verified: boolean;
-    createdAt: string;
-  }>;
-  total: number;
-  page: number;
-  limit: number;
-}
-```
-
-### Organization Management
-
-#### POST `/api/v1/organizations`
-**Purpose**: Create new organization
-```typescript
-interface CreateOrganizationRequest {
-  name: string;
-  description?: string;
-  domain: string;
-}
-
-interface CreateOrganizationResponse {
-  id: string;
-  name: string;
-  domain: string;
-  createdAt: string;
-}
-```
-
-#### GET `/api/v1/organizations/{id}/trust-thresholds`
-**Purpose**: Get trust thresholds for organization
-```typescript
-interface TrustThresholdResponse {
-  thresholds: Array<{
-    id: string;
-    roleTitle: string;
-    minTrustScore: number;
-    isActive: boolean;
-  }>;
-}
-```
-
-#### PUT `/api/v1/organizations/{id}/trust-thresholds`
-**Purpose**: Update trust thresholds
-```typescript
-interface UpdateTrustThresholdRequest {
-  thresholds: Array<{
-    roleTitle: string;
-    minTrustScore: number;
-  }>;
-}
-```
-
-### Blockchain Integration
-
-#### POST `/api/v1/blockchain/mint-nft`
-**Purpose**: Mint soulbound NFT for eligible digital twin
-```typescript
-interface MintNFTRequest {
-  digitalTwinId: string;
-  network: 'ethereum' | 'sepolia' | 'flare';
-}
-
-interface MintNFTResponse {
-  transactionHash: string;
-  tokenId: string;
-  network: string;
-  status: 'pending' | 'confirmed' | 'failed';
-}
-```
-
-#### GET `/api/v1/blockchain/transactions/{hash}`
-**Purpose**: Get blockchain transaction status
-```typescript
-interface BlockchainTransactionResponse {
-  transactionHash: string;
-  network: string; // "ethereum", "sepolia", "flare"
-  blockNumber?: number;
-  gasUsed?: string;
-  gasPrice?: string;
-  status: string;
-  createdAt: string;
-}
-```
-
-### Trust Score Validation
-
-#### POST `/api/v1/trust/validate`
-**Purpose**: Validate trust score against role requirements
-```typescript
-interface TrustValidationRequest {
-  digitalTwinId: string;
-  roleTitle: string;
-  trustScore: number;
-}
-
-interface TrustValidationResponse {
-  isValid: boolean;
-  requiredScore: number;
-  currentScore: number;
-  isEligibleForMint: boolean;
-  recommendations?: string[];
-}
-```
-
-## Database Strategy
-
-### Privacy-by-Design Schema
-
-#### Core Tables (Zero PII)
+### **Core Database Models**
 ```sql
--- Organizations (no PII)
-CREATE TABLE organizations (
-  id VARCHAR PRIMARY KEY,
-  name VARCHAR NOT NULL,
-  description TEXT,
-  domain VARCHAR UNIQUE NOT NULL,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW(),
-  is_active BOOLEAN DEFAULT TRUE
-);
-
--- Digital Twins (DID-only)
-CREATE TABLE digital_twins (
-  id VARCHAR PRIMARY KEY,
-  assigned_to_did VARCHAR NOT NULL, -- DID only, no PII
-  organization_id VARCHAR REFERENCES organizations(id),
-  role_template_id VARCHAR REFERENCES role_templates(id),
-  trust_score DECIMAL(5,2),
-  is_eligible_for_mint BOOLEAN DEFAULT FALSE,
-  blockchain_address VARCHAR,
-  soulbound_token_id VARCHAR,
-  status VARCHAR DEFAULT 'active',
-  level INTEGER DEFAULT 1,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- Signals (encrypted metadata)
-CREATE TABLE signals (
-  id VARCHAR PRIMARY KEY,
-  digital_twin_id VARCHAR REFERENCES digital_twins(id),
-  type VARCHAR NOT NULL,
-  title VARCHAR NOT NULL,
-  description TEXT,
-  metadata_encrypted TEXT, -- Encrypted JSON
-  value DECIMAL(10,2),
-  source VARCHAR NOT NULL,
-  url VARCHAR,
-  verified BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-### Encryption Strategy
-
-#### Client-Side Encryption
-```typescript
-// All sensitive data encrypted before transmission
-interface EncryptedData {
-  encrypted: string;
-  iv: string;
-  algorithm: 'AES-256-GCM';
+-- Role Agents (L1-L5 qualification system)
+model role_agents {
+  id              String   @id
+  name            String   -- Format: "L{level} {role}" (e.g., "L4 Security Engineer")
+  level           Int      -- 1-5 based on trust score
+  trustScore      Int      -- From external signals only
+  assignedToDid   String   @unique -- Decentralized identifier
+  organizationId  String   -- Organization ownership
+  roleTemplateId  String   -- Role template reference
+  isEligibleForMint Boolean -- L4+ with 750+ trust score
+  status          String   -- active, idle, transferred
+  -- ANS Integration
+  ansId           String?  -- ANS identifier: l{level}-{role}.{org}.knaight
+  ansRegistered   Boolean  @default(false)
+  -- Timestamps
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
-// Server never sees plaintext
-const encryptData = (data: any, publicKey: string): EncryptedData => {
-  // Client-side encryption implementation
-};
-```
-
-#### Database Encryption
-```sql
--- Encrypted columns use application-level encryption
-ALTER TABLE signals 
-ADD COLUMN metadata_encrypted TEXT;
-
--- Indexes on encrypted data use hash values
-CREATE INDEX idx_signals_metadata_hash 
-ON signals (md5(metadata_encrypted));
-```
-
-### Audit Trail
-```sql
-CREATE TABLE audit_logs (
-  id VARCHAR PRIMARY KEY,
-  action VARCHAR NOT NULL,
-  entity VARCHAR NOT NULL,
-  entity_id VARCHAR NOT NULL,
-  user_did VARCHAR, -- DID only
-  metadata_hash VARCHAR, -- Hash of encrypted metadata
-  created_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-## Storage Strategy
-
-### 1. Primary Database (PostgreSQL)
-- **Purpose**: Core application data, relationships, audit trails
-- **Encryption**: Application-level encryption for sensitive fields
-- **Backup**: Daily encrypted backups with point-in-time recovery
-- **Compliance**: GDPR, SOC 2, ISO 27001 ready
-
-### 2. Blockchain Storage
-- **Purpose**: Immutable trust records, soulbound NFTs
-- **Networks**: Ethereum mainnet, Sepolia testnet, Flare
-- **Smart Contracts**: 
-  - `SCKNFT.sol`: Soulbound NFT contract
-  - `TrustRegistry.sol`: Trust score verification
-  - `RoleVerifier.sol`: Role-based validation
-
-### 3. External Trust Providers
-- **Purpose**: Trust score validation without data storage
-- **APIs**: 
-  - GitHub contribution analysis
-  - LinkedIn professional verification
-  - Certifications validation
-  - Code quality metrics
-
-### 4. CDN & Static Assets
-- **Purpose**: Frontend assets, documentation
-- **Provider**: Vercel Edge Network
-- **Caching**: Aggressive caching with privacy headers
-
-## Security Architecture
-
-### 1. Authentication & Authorization
-```typescript
-// DID-based authentication
-interface AuthContext {
-  did: string;
-  sessionToken: string;
-  permissions: string[];
-  organizationId?: string;
+-- External Signals (trust data from external sources)
+model signals {
+  id              String   @id
+  roleAgentId     String   -- Link to role agent
+  signalType      String   -- SCW_TRUST_SCORE, ISACA_CERT, GITHUB_SECURITY
+  source          String   -- External source attribution
+  trustScore      Int?     -- Trust score from external signal
+  metadata        Json     -- Signal-specific data
+  verified        Boolean  @default(false)
+  verificationUrl String?  -- External verification endpoint
+  createdAt       DateTime @default(now())
 }
 
-// Zero-knowledge session management
-const createSession = (did: string): SessionToken => {
-  // JWT with DID only, no PII
-  return jwt.sign({ did, type: 'session' }, secret);
-};
-```
-
-### 2. Data Protection
-- **Encryption at Rest**: AES-256 for database
-- **Encryption in Transit**: TLS 1.3 for all communications
-- **Client-Side Encryption**: Sensitive data encrypted before transmission
-- **Zero-Knowledge Proofs**: Privacy-preserving verification
-
-### 3. Access Control
-```typescript
-// Role-based access control
-enum Permission {
-  READ_DIGITAL_TWIN = 'read:digital-twin',
-  WRITE_DIGITAL_TWIN = 'write:digital-twin',
-  MANAGE_ORGANIZATION = 'manage:organization',
-  MINT_NFT = 'mint:nft',
-  VIEW_AUDIT_LOGS = 'view:audit-logs'
-}
-
-// DID-based permissions
-const checkPermission = (did: string, permission: Permission): boolean => {
-  // Check permissions without storing user data
-};
-```
-
-### 4. Privacy Controls
-- **Data Minimization**: Only collect necessary data
-- **Purpose Limitation**: Clear data usage purposes
-- **Retention Policies**: Automatic data deletion
-- **Right to Deletion**: Complete data removal capability
-
-## Compliance & Governance
-
-### 1. GDPR Compliance
-- **Right to Access**: Users can access their DID data
-- **Right to Deletion**: Complete data removal
-- **Data Portability**: Export capability
-- **Consent Management**: Transparent consent tracking
-
-### 2. Privacy Impact Assessment
-- **Data Flow Mapping**: Clear data flow documentation
-- **Risk Assessment**: Regular privacy risk assessments
-- **Mitigation Strategies**: Proactive privacy protection
-
-### 3. Audit & Monitoring
-```typescript
-// Comprehensive audit logging
-interface AuditLog {
-  action: string;
-  entity: string;
-  entityId: string;
-  userDid?: string; // DID only
-  metadataHash: string; // Hash of encrypted metadata
-  timestamp: Date;
-  ipAddress?: string;
-  userAgent?: string;
+-- Role Templates (35+ security-focused roles)
+model role_templates {
+  id                    String @id
+  title                 String -- "Security Engineer", "Frontend Developer"
+  category              String -- "Security", "Development", "DevOps"
+  focus                 String -- Role description
+  responsibilities      String[] -- Key responsibilities
+  securityContributions Json   -- Security-specific contributions
+  selectable            Boolean @default(true)
+  organizationId        String
 }
 ```
 
-## Performance & Scalability
+**Database Design Principles:**
+- **Level-Based Naming**: All role agents use L{level} naming convention
+- **External Signal Attribution**: Every trust score traces to external source
+- **ANS Integration**: Built-in ANS registration tracking
+- **Organization Control**: Clear ownership and permission boundaries
 
-### 1. Database Optimization
-- **Indexing Strategy**: Optimized for DID-based queries
-- **Connection Pooling**: Efficient database connections
-- **Query Optimization**: Minimal query complexity
+---
 
-### 2. Caching Strategy
-- **Redis Cache**: Session management, rate limiting
-- **CDN Caching**: Static assets, API responses
-- **Browser Caching**: Client-side caching with privacy
+## ⛓️ **Blockchain Layer: `packages/contracts/backend/`**
 
-### 3. Scalability
-- **Horizontal Scaling**: Stateless API design
-- **Microservices**: Feature-based service decomposition
-- **Event-Driven**: Asynchronous processing for blockchain operations
+### **Smart Contract Architecture**
+```
+packages/contracts/backend/
+├── SCKDynamicNFT.sol              # Main NFT contract for role agents
+├── SCKNFT.sol                     # Legacy NFT contract
+├── hardhat.config.ts              # Hardhat configuration for deployment
+├── scripts/
+│   ├── deploy.js                  # Contract deployment script
+│   └── deploy-sck-dynamic.js      # Dynamic NFT deployment
+├── test/
+│   ├── SCKDynamicNFT.test.js      # Contract testing
+│   └── SCKNFT.test.js             # Legacy contract tests
+└── archive/                       # Archived contracts
+    └── SCKNFTDynamic.sol          # Previous implementation
+```
 
-## Monitoring & Observability
+### **Smart Contract Features**
+```solidity
+// SCKDynamicNFT.sol - Main contract
+contract SCKDynamicNFT is ERC721, Ownable, AccessControl {
+    struct RoleAgent {
+        string did;                 // Decentralized identifier
+        string role;               // "Security Engineer"
+        uint8 level;               // 1-5 qualification level
+        string organization;       // Organization name
+        uint256 trustScore;        // From external signals
+        uint256 createdAt;         // Creation timestamp
+        uint256 updatedAt;         // Last update timestamp
+    }
+    
+    // Organization-controlled minting (onlyOwner)
+    function mintRoleAgent(
+        address to,
+        string memory did,
+        string memory role,
+        uint8 level,
+        string memory organization,
+        uint256 trustScore
+    ) public onlyOwner returns (uint256)
+    
+    // Dynamic trust score updates from external signals
+    function updateTrustScore(uint256 tokenId, uint256 newScore) public onlyOwner
+    
+    // Achievement system for certifications
+    function addAchievement(uint256 tokenId, string memory achievement) public onlyOwner
+}
+```
 
-### 1. Application Monitoring
-- **Error Tracking**: Sentry integration (privacy-compliant)
-- **Performance Monitoring**: Response time tracking
-- **Health Checks**: Comprehensive health monitoring
+**Blockchain Design:**
+- **Organization-Controlled**: Only organization admins can mint NFTs
+- **Dynamic Updates**: Trust scores update from external signals
+- **Level Integration**: NFT metadata includes L1-L5 qualification level
+- **Soulbound Features**: Non-transferable tokens for certain achievements
 
-### 2. Privacy Monitoring
-- **Data Access Logs**: Track all data access
-- **Encryption Verification**: Ensure data encryption
-- **Audit Trail Validation**: Verify audit log integrity
+---
 
-### 3. Blockchain Monitoring
-- **Transaction Tracking**: Monitor blockchain operations
-- **Gas Optimization**: Efficient transaction management
-- **Network Health**: Multi-chain monitoring (Ethereum, Sepolia, Flare)
+## 🔧 **Service Layer: `apps/web/lib/`**
 
-## Implementation Roadmap
+### **Core Services**
+```
+apps/web/lib/
+├── auth/                          # Authentication services
+│   ├── auth-context.tsx           # React context for authentication state
+│   ├── auth-types.ts              # TypeScript types for authentication
+│   └── magic-config.ts            # Magic Link configuration
+├── services/                      # Business logic services
+│   ├── organization-service.ts    # Organization management
+│   └── mock-organization.ts       # Development mock data
+├── contracts/                     # Smart contract interaction
+│   ├── organizational-nft.ts      # NFT contract wrapper
+│   └── sck-nft.ts                 # Legacy contract wrapper
+├── integrations/                  # External integrations
+│   └── signal-to-nft.ts          # External signal to NFT mapping
+├── types/                         # TypeScript definitions
+│   ├── role-templates.ts          # Role template types
+│   ├── ethereum.d.ts              # Ethereum/Web3 types
+│   └── vis-network.d.ts           # Visualization types
+├── hooks/                         # React hooks
+├── providers/                     # React providers
+│   └── query-client-provider.tsx  # React Query setup
+├── domains.ts                     # Cross-domain utilities (CRITICAL)
+├── database.ts                    # Database interaction layer
+├── signal-collection.ts           # External signal processing
+├── blockchain-service.ts          # Blockchain interaction service
+├── sck-dynamic-nft-service.ts     # Dynamic NFT management
+└── utils.ts                       # General utilities
+```
 
-### Phase 1: Core Infrastructure
-1. **Database Setup**: PostgreSQL with privacy schema
-2. **API Development**: Core CRUD operations
-3. **Authentication**: DID-based auth system
-4. **Basic Frontend**: Digital twin management
+### **Critical Service: Domain Management**
+```typescript
+// lib/domains.ts - Cross-domain integration
+export interface DomainConfig {
+  baseUrl: string;                 // SCK Platform URL
+  ansRegistry: string;             // ANS Registry URL (knaight.site)
+  autoRegisterANS: boolean;        // Auto-register to ANS
+  isEU: boolean;                   // EU compliance mode
+  walletRequired: boolean;         // Wallet requirement for users
+  authMethod: 'magic-link' | 'web3'; // Authentication method
+}
 
-### Phase 2: Trust Integration
-1. **Trust Providers**: External trust score APIs
-2. **Signal Processing**: Trust signal management
-3. **Validation Logic**: Role-based trust validation
-4. **Blockchain Integration**: Smart contract deployment
+export function getDomainConfig(hostname?: string): DomainConfig
+export function buildANSRegistrationPayload(roleAgent: RoleAgent)
+export function generateRoleAgentName(roleTemplate: string, level: number): string
+export function assignLevel(trustScore: number): number
+export function getQualificationLevel(trustScore: number, level: number): string
+```
 
-### Phase 3: Advanced Features
-1. **NFT Minting**: Soulbound token creation
-2. **Analytics**: Privacy-preserving analytics
-3. **Advanced UI**: Trust constellation visualization
-4. **Mobile Support**: Progressive web app
+**Service Layer Principles:**
+- **Domain Isolation**: Clear separation between SCK Platform and ANS Registry
+- **External Signal Processing**: All trust data comes from external sources
+- **Level-Based Logic**: Automatic level assignment based on trust scores
+- **ANS Integration**: Automatic registration and verification services
 
-### Phase 4: Enterprise Features
-1. **Multi-tenant**: Organization management
-2. **Advanced Security**: Zero-knowledge proofs
-3. **Compliance**: Full GDPR/SOC 2 compliance
-4. **Scalability**: Enterprise-grade scaling
+---
 
-## Conclusion
+## 📊 **Features & Visualizations**
 
-The SCK platform represents a paradigm shift in digital identity management, prioritizing privacy while maintaining trust and authenticity. By using DIDs, zero-knowledge proofs, and blockchain technology, we create a system that protects user privacy while enabling verifiable credentials and trust-based credentialing.
+### **Trust Constellation**
+```
+features/trust-constellation/
+├── components/
+│   └── trust-constellation.tsx    # Interactive graph visualization
+├── trust-dashboard.tsx            # Trust metrics dashboard
+├── organization-dashboard.tsx     # Organization-wide trust view
+└── admin-panel.tsx                # Administrative controls
+```
 
-The architecture ensures that:
-- **No PII is ever stored** in the system
-- **Privacy is built-in** from the ground up
-- **Trust is verifiable** through blockchain technology
-- **Compliance is automatic** through design choices
-- **Scalability is achieved** through modern architecture
+**Visualization Features:**
+- **Level-Based Display**: Agents appear as stars, size = qualification level
+- **Real-Time Updates**: Constellation updates with external signal changes
+- **Interactive Exploration**: Click agents to view history and progression
+- **ANS Integration Status**: Visual indicators for ANS registration
 
-This system provides a foundation for the future of privacy-preserving digital identity management. 
+### **Signal Stream Processing**
+```
+features/signal-stream/
+├── components/
+│   └── signal-stream.tsx          # Real-time signal display
+├── signal-analytics.tsx           # Signal processing analytics
+└── signal-collection.tsx          # External signal ingestion
+```
+
+**Signal Processing:**
+- **External Source Attribution**: Clear display of signal sources
+- **Real-Time Processing**: Immediate trust score updates
+- **Verification Pipeline**: Signal authenticity validation
+- **Level Impact Analysis**: How signals affect L1-L5 progression
+
+---
+
+## 🔄 **Data Flow Architecture**
+
+### **1. External Signal Ingestion**
+```
+External Source → POST /api/v1/signals → Signal Validation → Trust Score Update → Level Recalculation → ANS Update
+```
+
+### **2. Role Agent Creation**
+```
+Organization → Create Role Agent → Assign Level → Generate ANS ID → Auto-Register to ANS → Return Confirmation
+```
+
+### **3. NFT Minting (Organization-Controlled)**
+```
+Organization Admin → Select L4+ Agent → Backend Minting → Blockchain Transaction → NFT Creation → ANS Metadata Update
+```
+
+### **4. Public Verification**
+```
+Third Party → ANS Query → Agent Resolution → SCK Verification Endpoint → Trust Status Response
+```
+
+---
+
+## 🌐 **Cross-Domain Integration**
+
+### **SCK Platform (secure-knaight.io)**
+- **Private Role Agent Management**: L1-L5 qualification system
+- **External Signal Processing**: Trust data from SCW, ISACA, GitHub
+- **Organization Controls**: Backend-controlled NFT minting
+- **Traditional Authentication**: Magic Link, no wallet required
+
+### **ANS Registry (knaight.site)**
+- **Public Agent Directory**: Searchable L1-L5 qualification database
+- **Verification APIs**: Third-party trust verification services
+- **Level-Based Search**: Find agents by qualification level
+- **Monetization Layer**: Future micropayments and token integration
+
+### **Auto-Registration Flow**
+```typescript
+// Every role agent creation triggers ANS registration
+1. Create role agent with level: "L4 Security Engineer"
+2. Generate ANS ID: "l4-security-engineer.securecorp.knaight"
+3. Register to ANS with verification endpoint
+4. Enable public discovery and verification
+```
+
+---
+
+## 🔒 **Security & Compliance**
+
+### **Authentication & Authorization**
+- **Magic Link Authentication**: Passwordless email-based login
+- **Organization-Based Access**: Clear role-based permissions
+- **API Key Management**: Secure external signal source authentication
+- **Cross-Domain Validation**: CORS and origin validation
+
+### **Data Privacy**
+- **EU Compliance Mode**: GDPR-compliant data handling
+- **Selective Public Data**: Only verified metadata exposed via ANS
+- **Encryption**: Sensitive data encrypted at rest and in transit
+- **Right to be Forgotten**: Complete data deletion capabilities
+
+---
+
+## 🚀 **Development & Deployment**
+
+### **Development Workflow**
+```bash
+# Local development
+npm install                        # Install dependencies
+npm run db:push                    # Update database schema
+npm run db:seed                    # Seed with role templates
+npm run dev                        # Start development server
+npm run test                       # Run test suites
+```
+
+### **Deployment Architecture**
+- **SCK Platform**: Deployed to secure-knaight.io (primary) and secure-knaight.eu (EU)
+- **ANS Registry**: Deployed to knaight.site (public)
+- **Database**: PostgreSQL with Prisma ORM
+- **Blockchain**: Sepolia testnet (development), mainnet (production)
+- **CDN**: Vercel for global distribution
+
+---
+
+## 📈 **Current Implementation Status**
+
+### **✅ Implemented Features**
+- **Role Agent System**: L1-L5 qualification naming convention
+- **External Signal Integration**: Trust score processing from external sources
+- **Database Schema**: Complete role_agents and signals models
+- **API Architecture**: CRUD operations with level-based logic
+- **Authentication**: Magic Link passwordless authentication
+- **Smart Contracts**: Organization-controlled NFT minting
+- **Trust Constellation**: Interactive visualization
+
+### **🚧 In Development**
+- **ANS Auto-Registration**: Automatic registration to knaight.site
+- **Level-Based Search**: Enhanced discovery by qualification level
+- **Signal Verification**: External source authenticity validation
+- **Cross-Domain Integration**: Secure SCK Platform ↔ ANS Registry communication
+
+### **📋 Planned Features**
+- **Public ANS Registry**: knaight.site deployment
+- **Verification-as-a-Service**: Third-party API access
+- **Micropayments Layer**: Web3-native payment for verification queries
+- **Token Economy**: Utility/governance token for platform access
+
+---
+
+## 🎯 **Strategic Architecture Impact**
+
+The SCK platform represents a **composable trust economy** with:
+
+1. **Private Trust Engine** (SCK Platform): Organization-controlled role agent creation and external signal processing
+2. **Public Verification Infrastructure** (ANS Registry): Global agent discovery and verification services
+3. **Level-Based Qualification System**: L1-L5 immediate qualification recognition
+4. **External Signal Funneling**: Trust scores from authoritative external sources
+5. **Organization-Controlled Blockchain**: Web3 complexity abstracted from end users
+
+This architecture enables **professional trust verification at scale** while maintaining **privacy**, **usability**, and **interoperability** across the global trust economy.
+
+---
+
+**🌐 The file structure reflects SCK's composable trust economy: clear separation between private credentialing and public verification, with level-based qualification as the foundation for professional trust at scale.** 

@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/database';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('Received body:', body);
 
     // Check if organization exists
-    const organization = await prisma.organization.findUnique({
+    const organization = await prisma.organizations.findUnique({
       where: { id: body.organizationId },
     });
 
@@ -23,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if role template exists
-    const roleTemplate = await prisma.roleTemplate.findUnique({
+    const roleTemplate = await prisma.role_templates.findUnique({
       where: { id: body.roleTemplateId },
     });
 
@@ -39,7 +37,7 @@ export async function POST(request: NextRequest) {
     // Simple eligibility: if trust score is provided and >= 75, eligible for NFT
     const isEligibleForMint = body.trustScore ? body.trustScore >= 75 : false;
 
-    console.log('Creating digital twin with data:', {
+    console.log('Creating role agent with data:', {
       organizationId: body.organizationId,
       roleTemplateId: body.roleTemplateId,
       assignedToDid: body.assignedToDid,
@@ -47,28 +45,28 @@ export async function POST(request: NextRequest) {
       isEligibleForMint,
     });
 
-    // Create digital twin with DID only
-    const digitalTwin = await prisma.digitalTwin.create({
+    // Create role agent with DID only
+    const roleAgent = await prisma.role_agents.create({
       data: {
-        id: `twin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        id: `agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         organizationId: body.organizationId,
         roleTemplateId: body.roleTemplateId,
         assignedToDid: body.assignedToDid,
         trustScore: body.trustScore,
         isEligibleForMint,
         lastTrustCheck: body.trustScore ? new Date() : null,
-        name: body.name || `Digital Twin ${Date.now()}`,
+        name: body.name || `Role Agent ${Date.now()}`,
         updatedAt: new Date(),
       },
       include: {
-        organization: {
+        organizations: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        roleTemplate: {
+        role_templates: {
           select: {
             id: true,
             title: true,
@@ -78,24 +76,24 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    console.log('Digital twin created:', digitalTwin);
+    console.log('Role agent created:', roleAgent);
 
     return NextResponse.json({
       success: true,
       data: {
-        id: digitalTwin.id,
-        name: digitalTwin.name,
-        assignedToDid: digitalTwin.assignedToDid,
-        trustScore: digitalTwin.trustScore,
-        isEligibleForMint: digitalTwin.isEligibleForMint,
-        organization: digitalTwin.organization,
-        roleTemplate: digitalTwin.roleTemplate,
-        createdAt: digitalTwin.createdAt,
+        id: roleAgent.id,
+        name: roleAgent.name,
+        assignedToDid: roleAgent.assignedToDid,
+        trustScore: roleAgent.trustScore,
+        isEligibleForMint: roleAgent.isEligibleForMint,
+        organization: roleAgent.organizations,
+        roleTemplate: roleAgent.role_templates,
+        createdAt: roleAgent.createdAt,
       }
     });
 
   } catch (error) {
-    console.error('Error creating digital twin:', error);
+    console.error('Error creating role agent:', error);
     return NextResponse.json(
       { success: false, error: 'Internal server error', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }

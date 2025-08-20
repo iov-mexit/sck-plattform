@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/database';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Privacy-by-design: Trust validation without PII
 const TrustValidationSchema = z.object({
@@ -16,18 +14,18 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validatedData = TrustValidationSchema.parse(body);
 
-    // Privacy: Verify digital twin exists
-    const digitalTwin = await prisma.digitalTwin.findUnique({
+    // Privacy: Verify role agent exists
+    const roleAgent = await prisma.role_agents.findUnique({
       where: { id: validatedData.digitalTwinId },
       include: {
-        organization: {
+        organizations: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        roleTemplate: {
+        role_templates: {
           select: {
             id: true,
             title: true,
@@ -37,17 +35,17 @@ export async function POST(request: Request) {
       },
     });
 
-    if (!digitalTwin) {
+    if (!roleAgent) {
       return NextResponse.json(
-        { error: 'Digital twin not found' },
+        { error: 'Role agent not found' },
         { status: 404 }
       );
     }
 
     // Get trust threshold for the role
-    const trustThreshold = await prisma.roleTrustThreshold.findFirst({
+    const trustThreshold = await prisma.role_trust_thresholds.findFirst({
       where: {
-        organizationId: digitalTwin.organizationId,
+        organizationId: roleAgent.organizationId,
         roleTitle: validatedData.roleTitle,
         isActive: true,
       },
@@ -56,9 +54,9 @@ export async function POST(request: Request) {
     const requiredScore = trustThreshold?.minTrustScore || 75;
     const isValid = validatedData.trustScore >= requiredScore;
 
-    // Update digital twin trust score if valid
+    // Update role agent trust score if valid
     if (isValid) {
-      await prisma.digitalTwin.update({
+      await prisma.role_agents.update({
         where: { id: validatedData.digitalTwinId },
         data: {
           trustScore: validatedData.trustScore,
@@ -72,21 +70,22 @@ export async function POST(request: Request) {
     const recommendations = generateRecommendations(
       validatedData.trustScore,
       requiredScore,
-      digitalTwin.roleTemplate.category
+      roleAgent.role_templates.category
     );
 
     // Audit log (privacy-compliant)
-    await prisma.auditLog.create({
+    await prisma.audit_logs.create({
       data: {
+        id: `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         action: 'validate_trust',
-        entity: 'digital_twin',
+        entity: 'role_agent',
         entityId: validatedData.digitalTwinId,
         metadata: {
           roleTitle: validatedData.roleTitle,
           trustScore: validatedData.trustScore,
           requiredScore,
           isValid,
-          organizationId: digitalTwin.organizationId,
+          organizationId: roleAgent.organizationId,
         },
       },
     });
@@ -97,20 +96,22 @@ export async function POST(request: Request) {
       currentScore: validatedData.trustScore,
       isEligibleForMint: isValid,
       recommendations,
-      digitalTwin: {
-        id: digitalTwin.id,
-        assignedToDid: digitalTwin.assignedToDid,
-        organization: digitalTwin.organization,
-        roleTemplate: digitalTwin.roleTemplate,
+      roleAgent: {
+        id: roleAgent.id,
+        name: roleAgent.name,
+        organization: roleAgent.organizations,
+        roleTemplate: roleAgent.role_templates,
+        trustScore: roleAgent.trustScore,
+        isEligibleForMint: roleAgent.isEligibleForMint,
       },
     });
 
   } catch (error) {
-    console.error('Error validating trust:', error);
+    console.error('Trust validation error:', error);
 
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid request data', details: error.issues },
+        { error: 'Invalid validation data', details: error.issues },
         { status: 400 }
       );
     }
@@ -190,7 +191,7 @@ export async function GET(request: Request) {
     }
 
     // Privacy: Verify organization exists
-    const organization = await prisma.organization.findUnique({
+    const organization = await prisma.organizations.findUnique({
       where: { id: organizationId },
     });
 
@@ -208,20 +209,20 @@ export async function GET(request: Request) {
       averageTrustScore,
       trustThresholds,
     ] = await Promise.all([
-      prisma.digitalTwin.count({
+      prisma.role_agents.count({
         where: { organizationId },
       }),
-      prisma.digitalTwin.count({
+      prisma.role_agents.count({
         where: {
           organizationId,
           isEligibleForMint: true,
         },
       }),
-      prisma.digitalTwin.aggregate({
+      prisma.role_agents.aggregate({
         where: { organizationId },
         _avg: { trustScore: true },
       }),
-      prisma.roleTrustThreshold.findMany({
+      prisma.role_trust_thresholds.findMany({
         where: {
           organizationId,
           isActive: true,

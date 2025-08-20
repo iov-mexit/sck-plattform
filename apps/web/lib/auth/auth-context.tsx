@@ -27,9 +27,23 @@ const getDomainFromEmail = (email: string): string => {
 // Helper function to fetch organization data
 const fetchOrganizationData = async (email: string) => {
   try {
-    const domain = getDomainFromEmail(email);
-    if (!domain) return undefined;
-    return await organizationService.getByDomain(domain);
+    // Only return organization data if user is actually authenticated
+    // This prevents bypassing authentication
+    if (!email) {
+      return undefined;
+    }
+
+    // MVP: Use default organization for authenticated users
+    // TODO: Implement proper multi-org logic for scaling
+    return {
+      id: 'org-securecodecorp',
+      name: 'SecureCode Corp',
+      domain: 'securecodecorp.com',
+      isActive: true,
+      onboardingComplete: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
   } catch (error) {
     console.error('Error fetching organization data:', error);
     return undefined;
@@ -69,11 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Check if user is already logged in
             const isLoggedIn = await magic.user.isLoggedIn();
-            if (isLoggedIn) {
-              const metadata = await magic.user.getInfo();
+            console.log('🔍 Magic Link session check:', isLoggedIn);
 
-              // Fetch organization data
-              const organization = (await fetchOrganizationData(metadata.email || '')) || undefined;
+            if (isLoggedIn) {
+              // User is already authenticated, get their info
+              const metadata = await magic.user.getInfo();
+              const organization = await fetchOrganizationData(metadata.email || '');
 
               const user: User = {
                 id: metadata.issuer || '',
@@ -90,12 +105,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 user,
                 error: null,
               });
+
+              console.log('🔍 User already authenticated:', user.email);
+            } else {
+              // User not authenticated, start fresh
+              setMagicAuth({
+                isLoggedIn: false,
+                isLoggingIn: false,
+                user: null,
+                error: null,
+              });
+
+              console.log('🔍 User not authenticated, showing login');
             }
           }
         }
       } catch (error) {
-        console.warn('Magic Link initialization failed, falling back to wallet-only auth:', error);
-        // Don't set error state, just continue with wallet-only authentication
+        console.warn('Magic Link initialization failed:', error);
+        setMagicAuth({
+          isLoggedIn: false,
+          isLoggingIn: false,
+          user: null,
+          error: null,
+        });
       } finally {
         setLoading(false);
       }
@@ -321,7 +353,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Combined authentication state
-  const isAuthenticated = magicAuth.isLoggedIn || walletConnection.isConnected;
+  // For MVP: Only consider Magic Link authentication, not wallet connection
+  const isAuthenticated = magicAuth.isLoggedIn;
 
   // Create user object from wallet connection if not logged in via Magic
   const user = magicAuth.user || (walletConnection.isConnected && walletConnection.address ? {

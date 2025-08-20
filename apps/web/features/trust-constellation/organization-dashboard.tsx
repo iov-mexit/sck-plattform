@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/common/card';
 import { Badge } from '@/components/common/badge';
-import { DigitalTwinCreator } from '@/components/digital-twin-creator';
+import { RoleAgentCreator } from '@/components/digital-twin-creator';
 import { TrustDashboard } from '@/components/trust-dashboard';
 
 interface DigitalTwin {
@@ -169,11 +169,8 @@ export function OrganizationDashboard() {
       {/* Trust Dashboard */}
       <TrustDashboard organizationId={organization.id} />
 
-      {/* Digital Twin Creation */}
-      <DigitalTwinCreator 
-        organizationId={organization.id}
-        onTwinCreated={handleTwinCreated}
-      />
+      {/* Role Agent Creation */}
+      <RoleAgentCreator />
 
       {/* Digital Twins List */}
       <Card>

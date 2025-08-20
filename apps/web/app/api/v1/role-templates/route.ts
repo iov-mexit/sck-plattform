@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../generated/prisma/index.js';
 
 const prisma = new PrismaClient();
 
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
       whereClause.category = category;
     }
 
-    const roleTemplates = await prisma.roleTemplate.findMany({
+    const roleTemplates = await prisma.role_templates.findMany({
       where: whereClause,
       orderBy: {
         title: 'asc',
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const roleTemplate = await prisma.roleTemplate.create({
+    const roleTemplate = await prisma.role_templates.create({
       data: {
         id: `role-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         title: body.title,
@@ -89,6 +89,63 @@ export async function POST(request: NextRequest) {
       {
         success: false,
         message: 'Failed to create role template',
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const templateId = searchParams.get('id');
+
+    if (!templateId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Template ID is required',
+        },
+        { status: 400 }
+      );
+    }
+
+    // Check if template is being used by any digital twins
+    const roleAgentsUsingTemplate = await prisma.role_agents.findFirst({
+      where: {
+        roleTemplateId: templateId,
+      },
+    });
+
+    if (roleAgentsUsingTemplate) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Cannot delete template that is being used by role agents',
+        },
+        { status: 409 }
+      );
+    }
+
+    await prisma.role_templates.delete({
+      where: {
+        id: templateId,
+      },
+    });
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: 'Role template deleted successfully',
+      },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.error('Error deleting role template:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Failed to delete role template',
       },
       { status: 500 }
     );

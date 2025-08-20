@@ -1,20 +1,24 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useAccount } from 'wagmi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
+import { ConnectWallet } from '@/components/ConnectWallet';
 import NFTMinting from '@/components/nft-minting';
 
 interface RoleAgent {
   id: string;
   name: string;
-  assignedDid: string;
+  assignedToDid: string;
+  organizationId?: string;
   trustScore?: number;
   isEligibleForMint: boolean;
   nftMinted: boolean;
   nftTokenId?: string;
   nftContractAddress?: string;
+  soulboundTokenId?: string;
   roleTemplate?: {
     title: string;
     category: string;
@@ -25,86 +29,70 @@ interface RoleAgent {
 }
 
 export default function NFTMintingPage() {
+  const { isConnected, address } = useAccount();
   const [roleAgents, setRoleAgents] = useState<RoleAgent[]>([]);
-  const [loading, setLoading] = useState(true);
   const [selectedAgent, setSelectedAgent] = useState<RoleAgent | null>(null);
   const [showOnlyEligible, setShowOnlyEligible] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    fetchRoleAgents();
-  }, []);
+    // Only load role agents if wallet is connected
+    if (isConnected) {
+      loadRoleAgents();
+    }
+  }, [isConnected]);
 
-  const fetchRoleAgents = async () => {
+  const loadRoleAgents = async () => {
     try {
-      setLoading(true);
-      const response = await fetch('/api/v1/role-agents');
+      console.log('🚀 Loading role agents...');
+
+      const response = await fetch('/api/v1/role-agents?limit=20');
       const data = await response.json();
 
-      if (data.success) {
-        setRoleAgents(data.data || []);
+      if (data.success && Array.isArray(data.data)) {
+        setRoleAgents(data.data);
+        console.log('✅ Loaded', data.data.length, 'role agents');
       } else {
-        setError(data.error || 'Failed to fetch role agents');
+        throw new Error(data.error || 'Failed to load role agents');
       }
     } catch (err) {
-      setError('Failed to fetch role agents');
-      console.error('Error fetching role agents:', err);
+      console.error('❌ Error loading role agents:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load role agents');
     } finally {
-      setLoading(false);
+      setIsLoaded(true);
     }
   };
 
-  const getEligibilityIcon = (agent: RoleAgent) => {
-    if (agent.nftMinted) {
-      return '✅'; // Already minted
-    } else if (agent.isEligibleForMint) {
-      return '🟢'; // Eligible
-    } else if (agent.trustScore && agent.trustScore > 0) {
-      return '🟡'; // Has score but not eligible
-    } else {
-      return '⚪'; // No score
-    }
+  const filteredAgents = roleAgents.filter(agent =>
+    showOnlyEligible ? agent.isEligibleForMint && !agent.nftMinted : true
+  );
+
+  const handleMintSuccess = () => {
+    // Reload agents after successful mint
+    loadRoleAgents();
+    setSelectedAgent(null);
   };
 
-  const getEligibilityText = (agent: RoleAgent) => {
-    if (agent.nftMinted) {
-      return 'NFT Minted';
-    } else if (agent.isEligibleForMint) {
-      return 'Eligible for Minting';
-    } else if (agent.trustScore && agent.trustScore > 0) {
-      return `Score: ${agent.trustScore}/1000 (needs ≥750)`;
-    } else {
-      return 'No Trust Score';
-    }
-  };
-
-  const getEligibilityBadgeVariant = (agent: RoleAgent) => {
-    if (agent.nftMinted) {
-      return 'default' as const;
-    } else if (agent.isEligibleForMint) {
-      return 'default' as const;
-    } else if (agent.trustScore && agent.trustScore > 0) {
-      return 'secondary' as const;
-    } else {
-      return 'outline' as const;
-    }
-  };
-
-  const filteredAgents = showOnlyEligible
-    ? roleAgents.filter(agent => agent.isEligibleForMint && !agent.nftMinted)
-    : roleAgents;
-
-  if (loading) {
+  // Show wallet connection requirement if not connected
+  if (!isConnected) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <div key={i} className="h-20 bg-gray-200 rounded"></div>
-              ))}
-            </div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">NFT Minting Dashboard</h1>
+
+          <div className="max-w-md mx-auto">
+            <ConnectWallet
+              required={true}
+              title="Wallet Required for NFT Minting"
+              description="Connect your MetaMask wallet to view eligible role agents and mint achievement NFTs"
+            />
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              🔒 NFT minting requires a connected wallet to ensure secure blockchain transactions
+            </p>
           </div>
         </div>
       </div>
@@ -114,80 +102,93 @@ export default function NFTMintingPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
+        <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">NFT Minting Dashboard</h1>
-          <p className="text-gray-600 mt-2">
-            Select a role agent and mint achievement NFTs using your MetaMask wallet
-          </p>
+          <div className="flex items-center space-x-2">
+            <span className="text-sm text-gray-600">Connected:</span>
+            <Badge variant="outline" className="font-mono">
+              {address?.slice(0, 6)}...{address?.slice(-4)}
+            </Badge>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Digital Twins List */}
-          <div className="lg:col-span-2">
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-red-700">❌ {error}</p>
+            <Button
+              onClick={loadRoleAgents}
+              variant="outline"
+              size="sm"
+              className="mt-2"
+            >
+              🔄 Retry
+            </Button>
+          </div>
+        )}
+
+        {!isLoaded ? (
+          <div className="text-center py-8">
+            <div className="text-gray-600">Loading role agents...</div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Role Agents List */}
             <Card>
               <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  <span>Role Agents</span>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="showOnlyEligible"
-                      checked={showOnlyEligible}
-                      onChange={(e) => setShowOnlyEligible(e.target.checked)}
-                      className="rounded border-gray-300"
-                    />
-                    <Label htmlFor="showOnlyEligible" className="text-sm">
-                      Show only eligible twins
-                    </Label>
-                  </div>
-                </CardTitle>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Available Role Agents ({filteredAgents.length})</CardTitle>
+                  <Button onClick={loadRoleAgents} variant="outline" size="sm">
+                    🔄 Refresh
+                  </Button>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="eligibleOnly"
+                    checked={showOnlyEligible}
+                    onChange={(e) => setShowOnlyEligible(e.target.checked)}
+                    className="rounded"
+                  />
+                  <label htmlFor="eligibleOnly" className="text-sm text-gray-600 cursor-pointer">
+                    Show only eligible agents
+                  </label>
+                </div>
               </CardHeader>
               <CardContent>
-                {error && (
-                  <div className="text-red-600 text-sm mb-4">{error}</div>
-                )}
-
                 {filteredAgents.length === 0 ? (
-                  <div className="text-center py-8">
-                    <div className="text-gray-500">
-                      {showOnlyEligible
-                        ? 'No eligible role agents found. Create agents with trust score ≥ 750.'
-                        : 'No role agents found. Create some role agents first.'
-                      }
-                    </div>
+                  <div className="text-center py-4 text-gray-500">
+                    {showOnlyEligible ? 'No eligible agents available' : 'No role agents found'}
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {filteredAgents.map((agent) => (
                       <div
                         key={agent.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${selectedAgent?.id === agent.id
+                        className={`p-3 border rounded-lg cursor-pointer transition-colors ${selectedAgent?.id === agent.id
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                           }`}
                         onClick={() => setSelectedAgent(agent)}
                       >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <span className="text-lg">{getEligibilityIcon(agent)}</span>
-                            <div>
-                              <div className="font-medium">{agent.name}</div>
-                              <div className="text-sm text-gray-600 font-mono">
-                                {agent.assignedDid}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {agent.roleTemplate?.title || 'Unknown Role'}
-                              </div>
-                            </div>
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <h3 className="font-medium text-gray-900">{agent.name}</h3>
+                            <p className="text-sm text-gray-600">{agent.assignedToDid}</p>
+                            {agent.roleTemplate && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                {agent.roleTemplate.title} • {agent.roleTemplate.category}
+                              </p>
+                            )}
                           </div>
-                          <div className="text-right">
-                            <Badge variant={getEligibilityBadgeVariant(agent)}>
-                              {getEligibilityText(agent)}
+                          <div className="flex flex-col items-end space-y-1">
+                            <Badge variant={agent.isEligibleForMint && !agent.nftMinted ? "default" : "secondary"}>
+                              {agent.nftMinted ? '✅ NFT Minted' :
+                                agent.isEligibleForMint ? '🎯 Eligible' : '⏳ Not Eligible'}
                             </Badge>
                             {agent.trustScore && (
-                              <div className="text-xs text-gray-500 mt-1">
-                                Score: {agent.trustScore}/1000
-                              </div>
+                              <span className="text-xs text-gray-500">
+                                Trust: {agent.trustScore}/1000
+                              </span>
                             )}
                           </div>
                         </div>
@@ -197,65 +198,30 @@ export default function NFTMintingPage() {
                 )}
               </CardContent>
             </Card>
-          </div>
-        </div>
 
-        {/* NFT Minting Panel */}
-        <div className="lg:col-span-1">
-          {selectedAgent ? (
-            <NFTMinting
-              roleAgent={selectedAgent}
-              organizationId="test-org-1" // This should come from context
-              onMintSuccess={(tokenId, transactionHash) => {
-                // Refresh the twins list after successful minting
-                fetchRoleAgents();
-                setSelectedAgent(null);
-              }}
-            />
-          ) : (
+            {/* NFT Minting Interface */}
             <Card>
               <CardHeader>
-                <CardTitle>NFT Minting</CardTitle>
+                <CardTitle>NFT Minting Interface</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-center py-8">
-                  <div className="text-gray-500">
-                    Select a role agent from the list to mint an achievement NFT
+                {selectedAgent ? (
+                  <NFTMinting
+                    selectedAgent={selectedAgent}
+                    onMintSuccess={handleMintSuccess}
+                  />
+                ) : (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>👆 Select a role agent to begin minting</p>
+                    <p className="text-sm mt-2">
+                      Choose an eligible agent from the list to mint an achievement NFT
+                    </p>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
-          )}
-        </div>
-      </div>
-
-      {/* Legend */}
-      <div className="mt-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-lg">Legend</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-              <div className="flex items-center gap-2">
-                <span>✅</span>
-                <span>NFT Already Minted</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🟢</span>
-                <span>Eligible for Minting (Score ≥ 750)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>🟡</span>
-                <span>Has Score (needs ≥ 750)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span>⚪</span>
-                <span>No Trust Score</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        )}
       </div>
     </div>
   );

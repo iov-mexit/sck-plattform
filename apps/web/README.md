@@ -1,6 +1,6 @@
 # Web Application
 
-This is a Next.js application that serves as a web interface for the Secure Knaight platform. It allows users to interact with digital twins, manage roles and trust thresholds, and view signal analytics.
+This is a Next.js application that serves as a web interface for the Secure Knaight platform. It allows users to interact with role agents, manage roles and trust thresholds, and view signal analytics.
 
 ## Getting Started
 
@@ -41,7 +41,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 The project includes several scripts to seed the database with initial data. These scripts are located in the root of the `apps/web` directory.
 
-*   `seed-data.ts`: Seeds the database with initial data for organizations, digital twins, signals, and certifications.
+*   `seed-data.ts`: Seeds the database with initial data for organizations, role agents, signals, and certifications.
 *   `seed-comprehensive-roles.ts`: Seeds the database with a comprehensive set of role templates.
 *   `seed-trust-thresholds.ts`: Seeds the database with trust thresholds for the roles created by `seed-comprehensive-roles.ts`.
 *   `seed-comprehensive-trust-thresholds.ts`: Seeds the database with a more comprehensive set of trust thresholds.
@@ -96,7 +96,7 @@ The `.env.example` file contains a list of all the environment variables used by
 *   `NEXT_PUBLIC_POLYGON_MUMBAI_RPC`: The RPC URL for the Mumbai testnet.
 *   `NEXT_PUBLIC_FLARE_MAINNET_RPC`: The RPC URL for the Flare mainnet.
 *   `NEXT_PUBLIC_FLARE_COSTON_RPC`: The RPC URL for the Coston testnet.
-*   `NEXT_PUBLIC_DIGITAL_TWIN_CONTRACT_ADDRESS`: The address of the digital twin contract.
+*   `NEXT_PUBLIC_SCK_NFT_ADDRESS`: The address of the SCK NFT credential contract.
 *   `NEXT_PUBLIC_DID_REGISTRY_CONTRACT_ADDRESS`: The address of the DID registry contract.
 *   `NEXT_PUBLIC_DAO_CONTRACT_ADDRESS`: The address of the DAO contract.
 *   `NEXT_PUBLIC_PAYMENT_CONTRACT_ADDRESS`: The address of the payment contract.

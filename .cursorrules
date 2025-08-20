@@ -1,73 +1,339 @@
-# SCK (Secure Code KnAIght) - Cursor Rules
+# SCK Platform Development Rules
 
-## 🚫 STRICT FILE TYPE RULES
+> **Trust-based credentialing platform with external signal funneling architecture**
 
-### NEVER CREATE BOTH FILE TYPES
-- **NEVER** create both `.ts` and `.js` files for the same module
-- **NEVER** create both `.tsx` and `.jsx` files for the same component/page
-- **NEVER** create both `.ts` and `.js` files for the same route
-- **ONLY** use TypeScript files (`.ts`, `.tsx`) for all source code
+## 🎯 SCK PLATFORM CORE PRINCIPLES
 
-### FILE TYPE ENFORCEMENT
-- **Pages/Routes**: Only `.tsx` files in `app/` directory
-- **API Routes**: Only `.ts` files in `app/api/` directory  
-- **Components**: Only `.tsx` files in `components/` directory
-- **Utilities**: Only `.ts` files in `lib/` directory
-- **Types**: Only `.ts` files in `types/` directory
+### Platform Vision & Architecture
+- **Role Agents**: Verifiable identities (employees, AI, systems) tied to organizational roles
+- **External Signal Funneling**: Platform receives trust scores from external sources (SCW, ISACA, GitHub)
+- **Organization-Controlled Backend**: Web3 complexity abstracted, organizations control blockchain operations  
+- **ANS Integration**: Agent Name Service for global interoperability and discoverability
+- **Traditional UX**: End users use standard web interfaces (no wallet required)
+- **Composable Trust Economy**: Clear separation between private trust credentialing and public verification infrastructure
 
-### BEFORE CREATING ANY FILE
-1. **Check if a `.ts`/`.tsx` version already exists**
-2. **If a `.js`/`.jsx` version exists, DELETE IT FIRST**
-3. **Only create `.ts`/`.tsx` files**
-4. **Never create `.js`/`.jsx` files for source code**
+### Strategic Domain Partitioning (MANDATORY)
 
-### DUPLICATE PREVENTION
-- **Before editing**: Check for existing `.js`/`.jsx` duplicates
-- **Before creating**: Ensure no `.js`/`.jsx` version exists
-- **After creating**: Verify only `.ts`/`.tsx` files exist
-- **If duplicates found**: Delete `.js`/`.jsx` files immediately
+#### 🔒 SCK Platform (Private/Backend-First)
+**Domain**: `secure-knaight.io` / `secure-knaight.eu`
+- Role agent creation and management
+- External signal ingestion and processing  
+- Organization admin panels and controls
+- Backend-controlled NFT minting
+- Traditional web UX (Magic Link auth)
 
-### ERROR PREVENTION
-- **Next.js App Router**: Only `.tsx` for pages, `.ts` for API routes
-- **Components**: Only `.tsx` files
-- **Utilities**: Only `.ts` files
-- **Types**: Only `.ts` files
+#### 🌐 ANS Registry (Public/Web3)  
+**Domain**: `knaight.site`
+- Agent Name Service (ANS) public registry
+- Verification-as-a-Service APIs
+- Future: Micropayments and token layer
+- Public agent discovery and verification
 
-## 🔒 ENFORCEMENT
-- **This rule is MANDATORY** - no exceptions
-- **Always check for duplicates** before creating files
-- **Always delete `.js`/`.jsx` duplicates** when found
-- **Only use TypeScript** for all source code
-
-## 📁 CORRECT FILE STRUCTURE
+### Signal Funneling Flow (MANDATORY)
 ```
-apps/web/
-├── app/
-│   ├── page.tsx                    # ✅ CORRECT
-│   ├── layout.tsx                  # ✅ CORRECT  
-│   ├── api/
-│   │   └── v1/
-│   │       └── digital-twins/
-│   │           └── route.ts        # ✅ CORRECT
-│   └── dashboard/
-│       └── page.tsx                # ✅ CORRECT
-├── components/
-│   └── ui/
-│       ├── button.tsx              # ✅ CORRECT
-│       └── card.tsx                # ✅ CORRECT
-└── lib/
-    ├── utils.ts                    # ✅ CORRECT
-    └── validation.ts               # ✅ CORRECT
+External Signal Source → Trust Score/Data → SCK Platform → Role Agent → NFT Anchor → ANS Registration
 ```
 
-## ❌ FORBIDDEN
-- `page.jsx` + `page.tsx` ❌
-- `route.js` + `route.ts` ❌  
-- `button.jsx` + `button.tsx` ❌
-- `utils.js` + `utils.ts` ❌
+**Examples:**
+- SCW TrustScore API → Sends score 850 → SCK stores/processes → Updates role agent → Auto-registers to ANS
+- ISACA Certification → Sends cert data → SCK validates → Triggers NFT eligibility → Updates ANS record
+- GitHub Security → Sends metrics → SCK funnels → Trust constellation updates → ANS verification endpoint
 
-## ✅ ALLOWED
-- `page.tsx` ✅
-- `route.ts` ✅
-- `button.tsx` ✅
-- `utils.ts` ✅ 
+### ANS Auto-Registration Flow (MANDATORY)
+```
+1. Role agent created in SCK Platform with level-based naming
+2. Generate ANS identifier: {level}-{role}.{org-domain}.knaight  
+3. Auto-register to knaight.site ANS registry
+4. Provide verification endpoint back to SCK Platform
+5. Enable public verification via ANS APIs
+```
+
+### Level-Based Naming Convention (MANDATORY)
+```
+Pattern: "L{level} {role}" 
+Examples: "L3 Security Engineer", "L4 DevOps Architect", "L2 Frontend Developer"
+
+Level-to-Trust Mapping:
+- L1 (Entry): 0-249 trust score
+- L2 (Basic): 250-499 trust score  
+- L3 (Intermediate): 500-749 trust score
+- L4 (Advanced): 750-899 trust score (NFT eligible)
+- L5 (Expert): 900-1000 trust score (NFT eligible)
+```
+
+## 🚫 STRICT NO MOCK DATA POLICY
+
+### NEVER USE MOCK DATA
+- **NEVER** hardcode numbers, text, or placeholder data
+- **NEVER** use static arrays or objects for display data
+- **NEVER** show "coming soon" or placeholder content
+- **ALWAYS** fetch real data from external signal sources and database APIs
+- **ALWAYS** implement proper loading and error states
+
+### MANDATORY REAL DATA REQUIREMENTS
+- All pages must fetch data from `/api/v1/*` endpoints
+- All trust scores must come from external signal sources
+- All role agent data must be real database records
+- All charts must visualize real-time external signal data
+- All forms must submit to real APIs that process external signals
+
+### FORBIDDEN PRACTICES
+- ❌ `const mockData = [...]` - Use real API calls instead
+- ❌ `trustScore: 850` hardcoded - Fetch from external signals
+- ❌ `"No data yet"` - Show loading state and fetch real external signals
+- ❌ `"Coming soon"` - Implement actual external signal integration
+- ❌ Static placeholder components - Build functional signal processing components
+
+## 🔧 BACKEND-FIRST ARCHITECTURE RULES
+
+### External Signal Integration (MANDATORY)
+- **ALL trust scores come from external sources** - Never calculate internally
+- **Platform role**: Receive, validate, store, process external trust data
+- **Signal types**: External trust scores, certifications, audit results, compliance data
+- **API design**: `/api/v1/signals` for external signal submission
+- **Validation**: Verify external signal authenticity and source
+
+### Organization-Controlled Blockchain
+- **Backend NFT minting**: Organizations control all blockchain operations via APIs
+- **No user wallets required**: Traditional web authentication (Magic Link)
+- **Private key management**: Organizations handle blockchain infrastructure
+- **Gas fees**: Organization responsibility, not user concern
+- **Contract deployment**: Organization-controlled smart contracts
+
+### Traditional UX Requirements
+- **No wallet connection UI** - Use traditional web forms and buttons
+- **Magic Link authentication** - Standard email-based login flows
+- **Familiar web patterns** - Standard navigation, forms, dashboards
+- **Progressive enhancement** - Core functionality works without Web3 knowledge
+- **Clear data flow** - Show external signal sources and trust progression
+
+## 🎨 UX/DESIGN PRINCIPLES
+
+### Signal-Centric Design
+- **Trust Constellation**: Interactive visualization of role agents as stars (size = external trust level)
+- **Signal Timeline**: Show external signal history and sources
+- **External Source Attribution**: Always show where trust data comes from
+- **Real-time Updates**: Reflect external signal changes immediately
+- **Signal Verification UI**: Show verification status of external signals
+
+### Organization-First Interface
+- **Admin Controls**: Organizations manage NFT minting and blockchain operations
+- **Role Agent Management**: Create, assign, monitor role agents
+- **External Signal Monitoring**: Dashboard for incoming signal sources
+- **Trust Analytics**: Aggregate insights from external trust data
+- **Compliance Views**: SOC2, GDPR, ISO automation interfaces
+
+### End User Experience (No Web3 Complexity)
+- **Traditional Web Flow**: Email login → Dashboard → Role management
+- **Trust Score Display**: Show external trust levels with source attribution
+- **Signal History**: Timeline of external signals received
+- **Certification View**: Display external certifications and achievements
+- **Simple Actions**: "Request NFT" button (backend handles minting)
+
+## 📡 EXTERNAL SIGNAL INTEGRATION RULES
+
+### Signal Source Requirements
+- **Authenticated Sources**: Verify external signal authenticity
+- **API Standards**: RESTful endpoints for signal submission
+- **Real-time Processing**: Process external signals immediately
+- **Source Attribution**: Always track and display signal sources
+- **Validation Pipeline**: Verify external signal integrity
+
+### Supported External Sources
+- **SCW TrustScore API**: Security training and assessment scores
+- **ISACA Certifications**: Professional security certifications
+- **GitHub Security**: Repository security analysis
+- **Compliance Systems**: SOC2, GDPR, ISO audit results
+- **Training Providers**: Course completions and scores
+
+### Signal Processing Flow
+1. **Receive**: External signal via API
+2. **Validate**: Verify source and data integrity
+3. **Store**: Save to database with source attribution
+4. **Process**: Update role agent trust level
+5. **Notify**: Trigger NFT eligibility checks
+6. **Display**: Update constellation and dashboards
+
+## 🔧 TECHNICAL IMPLEMENTATION RULES
+
+### API Integration
+- Always use real API endpoints (`/api/v1/*`)
+- Implement external signal ingestion endpoints
+- Add proper authentication for signal sources
+- Validate external signal data format
+- Handle external source failures gracefully
+- **ANS Auto-Registration**: Automatically register role agents to knaight.site when created
+- **Cross-Domain Integration**: Implement secure communication between SCK Platform and ANS Registry
+
+### Cross-Domain Architecture Requirements
+- **SCK Platform APIs**: Private, Magic Link authenticated, organization-controlled
+- **ANS Registry APIs**: Public, rate-limited, Web3-enabled verification services
+- **Auto-Registration Flow**: Every role agent creation triggers ANS registration
+- **Verification Endpoints**: Provide callback URLs for ANS verification requests
+- **Domain Utilities**: Use centralized domain configuration for cross-domain communication
+
+### Database Operations
+- Use Prisma for all database operations
+- Store external signal source attribution
+- Track signal verification status
+- Optimize queries for real-time signal processing
+- Index external signal tables for performance
+- **ANS Integration Fields**: Store ANS identifiers and registration status
+- **Cross-Domain References**: Maintain verification endpoint URLs and ANS metadata
+
+### Component Patterns
+- Use TypeScript for all components
+- Implement external signal display components
+- Add loading states for signal processing
+- Create trust constellation visualization
+- Build organization admin interfaces
+- **ANS Status Components**: Show ANS registration status and verification URLs
+- **Cross-Domain UI**: Display both internal SCK data and public ANS verification status
+
+### File Structure
+- Only create `.tsx` files for components (no `.jsx`)
+- Only create `.ts` files for utilities (no `.js`)
+- Organize by external signal types
+- Follow backend-first patterns
+- Use proper import/export statements
+
+## 🎯 CURRENT DEVELOPMENT PRIORITIES
+
+### PHASE 1: ANS Foundation & External Signal Integration
+- [ ] **External Signal APIs**: Implement `/api/v1/signals` endpoints for trust data ingestion
+- [ ] **Signal Validation**: Verify external source authenticity (SCW, ISACA, GitHub)
+- [ ] **Role Agent Integration**: Connect external signals to role agents
+- [ ] **Level-Based Naming**: Implement L1-L5 qualification naming convention
+- [ ] **ANS Auto-Registration**: Implement automatic registration to knaight.site when role agents are created
+- [ ] **Cross-Domain APIs**: Build secure communication between SCK Platform and ANS Registry
+- [ ] **Trust Constellation**: Build interactive visualization showing ANS-registered agents
+
+### PHASE 2: Public Verification Infrastructure  
+- [ ] **ANS Registry Deployment**: Deploy knaight.site as public ANS registry
+- [ ] **Level-Based Search**: Implement qualification level search and filtering
+- [ ] **Verification-as-a-Service**: Public APIs for third parties to verify agent trust/NFT state
+- [ ] **Signal Timeline**: Show external signal history with ANS integration status
+- [ ] **Source Attribution**: Display trust data sources and ANS verification endpoints
+- [ ] **Developer Documentation**: ANS integration guides and verification API docs
+
+### PHASE 3: Trust Economy & Monetization
+- [ ] **Micropayments Layer**: Web3-native payment for ANS verification queries  
+- [ ] **Rate Limiting & API Keys**: Implement usage-based access control for ANS APIs
+- [ ] **Partner Integrations**: HR platforms, security tools consuming ANS verification
+- [ ] **Token Layer**: Utility/governance token for staking, reputation, incentives
+- [ ] **Agent Marketplace**: Platform for "agent as a service" integrations
+
+## ✅ SUCCESS CRITERIA
+
+### External Signal Requirements
+- All trust scores come from external sources
+- Real-time processing of external signals
+- Source attribution for all trust data
+- Proper validation of external signal authenticity
+- No internal trust score calculation
+
+### ANS Integration Requirements
+- **Auto-Registration**: Every role agent automatically registered to ANS
+- **Cross-Domain Communication**: Secure integration between SCK Platform and knaight.site
+- **Public Verification**: Third parties can verify agent status via ANS APIs
+- **Real-time Sync**: ANS records update when SCK agents are modified
+- **Verification Endpoints**: Functional callback URLs for trust verification
+
+### Composable Architecture Requirements
+- **Security Isolation**: Private organization data separate from public ANS data
+- **Monetization Decoupling**: Different revenue models for internal platform vs external verification
+- **Integration Ease**: Third parties can use ANS without accessing internal SCK data
+- **Network Effects**: More registered agents increase ANS value and verification utility
+
+### UX Requirements
+- Traditional web experience (no wallet required) for SCK Platform users
+- Clear ANS registration status and verification URLs in organization dashboards
+- Organization-controlled blockchain operations via backend APIs
+- Real-time trust constellation updates reflecting ANS integration status
+- Mobile-responsive design across both SCK Platform and ANS interfaces
+- **Level-Based Qualification Display**: Immediate visibility of agent qualification levels (L1-L5)
+- **Enhanced Search & Discovery**: Level-based filtering and qualification-aware search
+
+### Level-Based Naming Requirements
+- **Consistent Naming**: All role agents use "L{level} {role}" pattern
+- **Automatic Level Assignment**: Trust scores automatically determine qualification levels
+- **ANS Integration**: Level information included in ANS registration and search
+- **Qualification Visibility**: Users can immediately identify agent qualification level
+- **Search Enhancement**: Level-based filtering enables precise agent discovery
+
+### Backend-First Implementation
+- Organization controls NFT minting via APIs
+- External signal processing pipeline with ANS auto-registration
+- Traditional authentication (Magic Link) for SCK Platform
+- Public API access (rate-limited) for ANS Registry
+- Real database operations only, no mock or placeholder data
+
+## 🚨 ENFORCEMENT & CODE REVIEW
+
+### Code Review Checklist
+- [ ] No internal trust score calculation
+- [ ] All data from external signals or database
+- [ ] Traditional web UX (no wallet connections)
+- [ ] Organization-controlled blockchain operations
+- [ ] External signal source attribution
+- [ ] Proper loading states for signal processing
+- [ ] TypeScript types for external signals
+- [ ] No placeholder or mock content
+
+### UX Review Checklist
+- [ ] No Web3 complexity exposed to end users
+- [ ] Clear external signal source display
+- [ ] Traditional web interaction patterns
+- [ ] Organization admin controls functional
+- [ ] Trust constellation visualization working
+- [ ] Mobile responsive design
+- [ ] Real-time external signal updates
+
+### External Signal Review
+- [ ] Signal source authentication implemented
+- [ ] Real-time signal processing working
+- [ ] Source attribution displayed
+- [ ] Signal validation pipeline functional
+- [ ] External API integrations tested
+- [ ] Error handling for signal failures
+- [ ] Database schema supports signal sources
+
+## 🌍 STRATEGIC ALIGNMENT
+
+### Vision Implementation
+- **Composable Trust Economy**: Clear separation between private trust credentialing (SCK Platform) and public verification infrastructure (ANS Registry)
+- External signal funneling architecture implemented across both domains
+- Organization-controlled backend operations for internal platform
+- Traditional UX with hidden Web3 complexity for SCK Platform users
+- ANS integration for global interoperability and public agent discovery
+- Trust constellation as primary visualization linking internal agents to public ANS records
+
+### Cross-Domain Integration Strategy
+- **SCK Platform** (secure-knaight.io): Private trust credentialing engine
+- **ANS Registry** (knaight.site): Public verification and monetization layer
+- **Auto-Registration Flow**: Role agents automatically registered to ANS when created
+- **Verification APIs**: Public endpoints for third-party trust verification
+- **Security Isolation**: Sensitive organization data stays private, verified metadata becomes public
+
+### Next UX Considerations
+**AWAITING INPUT**: UX evaluation and feedback expected for composable trust economy
+- Trust constellation interaction design showing ANS integration status
+- External signal source presentation with ANS verification endpoints
+- Organization admin interface optimization for cross-domain management
+- Public ANS registry interface for agent discovery and verification
+- Mobile experience enhancement across both private and public domains
+- Real-time update visualization for ANS auto-registration and verification
+
+### Monetization Strategy
+- **Internal Revenue**: Organizations pay for SCK Platform features (role management, signal processing, NFT minting)
+- **External Revenue**: Third parties pay for ANS verification services (micropayments, API usage)
+- **Network Effects**: More registered agents increase ANS value and ecosystem utility
+- **Future Token Economy**: Utility/governance token for staking, reputation, and platform incentives
+
+**STRATEGIC CHANGE**: All development must mirror SCK's composable trust economy architecture
+**FOUNDATION**: README.md + DOMAIN_STRATEGY.md serve as solid basis for all development decisions
+**EXPECTATION**: UX input will guide next iteration of cross-domain interface design
+
+---
+
+**🛡️ Every line of code must reflect SCK's external signal funneling architecture and organization-controlled approach.** 

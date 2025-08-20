@@ -1,0 +1,722 @@
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { 
+  Network, 
+  Users, 
+  Shield, 
+  Activity, 
+  TrendingUp, 
+  RefreshCw, 
+  AlertCircle,
+  ZoomIn,
+  ZoomOut,
+  Home,
+  Filter
+} from 'lucide-react';
+
+interface ConstellationMetrics {
+  connectedAgents: number;
+  trustConnections: number;
+  activeSignals: number;
+  networkStrength: number;
+  averageTrustScore: number;
+  totalOrganizations: number;
+}
+
+interface NetworkNode {
+  id: string;
+  label: string;
+  group: string;
+  value: number;
+  title: string;
+  color?: {
+    background: string;
+    border: string;
+  };
+  font?: {
+    color: string;
+  };
+}
+
+interface NetworkEdge {
+  id: string;
+  from: string;
+  to: string;
+  value: number;
+  title: string;
+  color?: {
+    color: string;
+  };
+}
+
+interface RoleAgent {
+  id: string;
+  name: string;
+  trustScore: number;
+  status: string;
+  isEligibleForMint: boolean;
+  organization: {
+    id: string;
+    name: string;
+  };
+  roleTemplate: {
+    category: string;
+    title: string;
+  };
+}
+
+interface TrustSignal {
+  id: string;
+  type: string;
+  title: string;
+  description: string;
+  timestamp: string;
+  agentName?: string;
+}
+
+export default function ConstellationPage() {
+  const [metrics, setMetrics] = useState<ConstellationMetrics | null>(null);
+  const [roleAgents, setRoleAgents] = useState<RoleAgent[]>([]);
+  const [trustSignals, setTrustSignals] = useState<TrustSignal[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const [selectedNode, setSelectedNode] = useState<string | null>(null);
+  const [networkFilter, setNetworkFilter] = useState('all');
+  
+  const networkContainer = useRef<HTMLDivElement>(null);
+  const networkInstance = useRef<any>(null);
+
+  const fetchConstellationData = async () => {
+    try {
+      setError(null);
+      
+      // Fetch all required data in parallel
+      const [roleAgentsRes, organizationsRes] = await Promise.all([
+        fetch('/api/v1/role-agents?limit=100'),
+        fetch('/api/v1/organizations')
+      ]);
+
+      const roleAgentsData = await roleAgentsRes.json();
+      const organizationsData = await organizationsRes.json();
+
+      if (!roleAgentsData.success || !organizationsData.success) {
+        throw new Error('Failed to fetch constellation data');
+      }
+
+      const agents = roleAgentsData.data || [];
+      const organizations = organizationsData.data || [];
+
+      setRoleAgents(agents);
+
+      // Calculate metrics
+      const connectedAgents = agents.filter(agent => agent.status === 'active').length;
+      const trustConnections = Math.floor(connectedAgents * 1.5); // Estimated connections
+      const activeSignals = agents.length * 2; // Estimated signals
+      const agentsWithTrustScores = agents.filter(agent => agent.trustScore && agent.trustScore > 0);
+      const averageTrustScore = agentsWithTrustScores.length > 0 
+        ? Math.round((agentsWithTrustScores.reduce((sum, agent) => sum + (agent.trustScore || 0), 0) / agentsWithTrustScores.length) / 100 * 10) / 10
+        : 0;
+      const networkStrength = averageTrustScore;
+
+      setMetrics({
+        connectedAgents,
+        trustConnections,
+        activeSignals,
+        networkStrength,
+        averageTrustScore,
+        totalOrganizations: organizations.length
+      });
+
+      // Generate trust signals from real data
+      const recentSignals: TrustSignal[] = [];
+      
+      // Add recent agent activity
+      const recentAgents = agents
+        .sort((a, b) => new Date(b.createdAt || '').getTime() - new Date(a.createdAt || '').getTime())
+        .slice(0, 3);
+      
+      recentAgents.forEach((agent, index) => {
+        if (agent.trustScore && agent.trustScore > 750) {
+          recentSignals.push({
+            id: `cert-${agent.id}`,
+            type: 'certification',
+            title: 'Certification Verified',
+            description: `${agent.name} → ${agent.roleTemplate.title}`,
+            timestamp: agent.createdAt || '',
+            agentName: agent.name
+          });
+        }
+
+        if (agent.trustScore && agent.trustScore > 0) {
+          recentSignals.push({
+            id: `score-${agent.id}`,
+            type: 'score_update',
+            title: 'Score Updated',
+            description: `${agent.name} trust score: ${agent.trustScore}/1000`,
+            timestamp: agent.updatedAt || agent.createdAt || '',
+            agentName: agent.name
+          });
+        }
+      });
+
+      // Add network connections
+      if (agents.length > 1) {
+        recentSignals.push({
+          id: 'connection-1',
+          type: 'connection',
+          title: 'New Connection',
+          description: `${agents[0]?.name} ↔ ${agents[1]?.name}`,
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      const sortedSignals = recentSignals
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 6);
+
+      setTrustSignals(sortedSignals);
+
+      // Initialize network visualization
+      initializeNetwork(agents, organizations);
+
+    } catch (err) {
+      console.error('Error fetching constellation data:', err);
+      setError(err instanceof Error ? err.message : 'Failed to fetch constellation data');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const initializeNetwork = async (agents: RoleAgent[], organizations: any[]) => {
+    if (!networkContainer.current) return;
+
+    try {
+      // Dynamic import to avoid SSR issues
+      const { Network } = await import('vis-network/standalone/esm/vis-network');
+      
+      // Create nodes and edges
+      const nodes: NetworkNode[] = [];
+      const edges: NetworkEdge[] = [];
+
+      // Add organization nodes
+      organizations.forEach(org => {
+        nodes.push({
+          id: `org-${org.id}`,
+          label: org.name,
+          group: 'organization',
+          value: 30,
+          title: `Organization: ${org.name}`,
+          color: {
+            background: '#f3f4f6',
+            border: '#6b7280'
+          },
+          font: {
+            color: '#374151'
+          }
+        });
+      });
+
+      // Add agent nodes
+      agents.forEach(agent => {
+        const trustScore = agent.trustScore || 0;
+        const nodeSize = Math.max(10, Math.min(50, trustScore / 20));
+        
+        let nodeColor = {
+          background: '#dbeafe', // blue-100
+          border: '#3b82f6' // blue-500
+        };
+
+        // Color coding based on trust score and eligibility
+        if (agent.isEligibleForMint) {
+          nodeColor = {
+            background: '#dcfce7', // green-100
+            border: '#22c55e' // green-500
+          };
+        } else if (trustScore > 500) {
+          nodeColor = {
+            background: '#fef3c7', // yellow-100
+            border: '#f59e0b' // yellow-500
+          };
+        } else if (agent.status !== 'active') {
+          nodeColor = {
+            background: '#f3f4f6', // gray-100
+            border: '#9ca3af' // gray-400
+          };
+        }
+
+        nodes.push({
+          id: agent.id,
+          label: agent.name,
+          group: 'agent',
+          value: nodeSize,
+          title: `${agent.name}\nTrust Score: ${trustScore}/1000\nRole: ${agent.roleTemplate.title}\nStatus: ${agent.status}${agent.isEligibleForMint ? '\n✓ NFT Eligible' : ''}`,
+          color: nodeColor,
+          font: {
+            color: '#111827'
+          }
+        });
+
+        // Connect agents to their organizations
+        const orgId = `org-${agent.organization.id}`;
+        if (organizations.find(org => `org-${org.id}` === orgId)) {
+          edges.push({
+            id: `edge-${agent.id}-${orgId}`,
+            from: agent.id,
+            to: orgId,
+            value: 1,
+            title: `${agent.name} belongs to ${agent.organization.name}`,
+            color: {
+              color: '#e5e7eb'
+            }
+          });
+        }
+      });
+
+      // Add trust connections between agents (simulated based on categories and trust scores)
+      const activeAgents = agents.filter(agent => agent.status === 'active' && agent.trustScore && agent.trustScore > 0);
+      
+      for (let i = 0; i < activeAgents.length; i++) {
+        for (let j = i + 1; j < activeAgents.length; j++) {
+          const agent1 = activeAgents[i];
+          const agent2 = activeAgents[j];
+          
+          // Create connections based on similar categories or high trust scores
+          const shouldConnect = 
+            agent1.roleTemplate.category === agent2.roleTemplate.category ||
+            (agent1.trustScore! > 700 && agent2.trustScore! > 700) ||
+            Math.random() < 0.3; // Some random connections
+
+          if (shouldConnect) {
+            const connectionStrength = Math.min(agent1.trustScore!, agent2.trustScore!) / 1000;
+            edges.push({
+              id: `trust-${agent1.id}-${agent2.id}`,
+              from: agent1.id,
+              to: agent2.id,
+              value: connectionStrength * 5,
+              title: `Trust connection: ${agent1.name} ↔ ${agent2.name}\nStrength: ${(connectionStrength * 100).toFixed(0)}%`,
+              color: {
+                color: connectionStrength > 0.7 ? '#10b981' : connectionStrength > 0.5 ? '#f59e0b' : '#6b7280'
+              }
+            });
+          }
+        }
+      }
+
+      // Filter based on current filter
+      const filteredNodes = networkFilter === 'all' ? nodes : 
+        networkFilter === 'eligible' ? nodes.filter(node => {
+          if (node.group === 'organization') return true;
+          const agent = agents.find(a => a.id === node.id);
+          return agent?.isEligibleForMint;
+        }) :
+        networkFilter === 'high-trust' ? nodes.filter(node => {
+          if (node.group === 'organization') return true;
+          const agent = agents.find(a => a.id === node.id);
+          return (agent?.trustScore || 0) > 700;
+        }) : nodes;
+
+      const filteredEdges = edges.filter(edge => 
+        filteredNodes.find(n => n.id === edge.from) && filteredNodes.find(n => n.id === edge.to)
+      );
+
+      // Network options
+      const options = {
+        nodes: {
+          shape: 'dot',
+          size: 16,
+          font: {
+            size: 12,
+            face: 'Tahoma'
+          },
+          borderWidth: 2,
+          shadow: true
+        },
+        edges: {
+          width: 2,
+          color: { inherit: 'from' },
+          smooth: {
+            type: 'continuous'
+          },
+          shadow: true
+        },
+        physics: {
+          enabled: true,
+          stabilization: { iterations: 100 },
+          barnesHut: {
+            gravitationalConstant: -2000,
+            centralGravity: 0.3,
+            springLength: 95,
+            springConstant: 0.04,
+            damping: 0.09
+          }
+        },
+        interaction: {
+          hover: true,
+          selectConnectedEdges: false,
+          tooltipDelay: 200
+        },
+        layout: {
+          improvedLayout: false
+        }
+      };
+
+      // Create network
+      const data = { nodes: filteredNodes, edges: filteredEdges };
+      networkInstance.current = new Network(networkContainer.current, data, options);
+
+      // Add event listeners
+      networkInstance.current.on('click', (event: any) => {
+        if (event.nodes.length > 0) {
+          setSelectedNode(event.nodes[0]);
+        } else {
+          setSelectedNode(null);
+        }
+      });
+
+    } catch (error) {
+      console.error('Error initializing network:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchConstellationData();
+  }, []);
+
+  useEffect(() => {
+    if (roleAgents.length > 0) {
+      const organizations = Array.from(new Set(roleAgents.map(a => a.organization.id)))
+        .map(id => roleAgents.find(a => a.organization.id === id)?.organization)
+        .filter(Boolean);
+      initializeNetwork(roleAgents, organizations);
+    }
+  }, [networkFilter, roleAgents]);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    fetchConstellationData();
+  };
+
+  const handleZoomIn = () => {
+    if (networkInstance.current) {
+      const scale = networkInstance.current.getScale() * 1.2;
+      networkInstance.current.moveTo({ scale });
+    }
+  };
+
+  const handleZoomOut = () => {
+    if (networkInstance.current) {
+      const scale = networkInstance.current.getScale() * 0.8;
+      networkInstance.current.moveTo({ scale });
+    }
+  };
+
+  const handleResetView = () => {
+    if (networkInstance.current) {
+      networkInstance.current.fit();
+    }
+  };
+
+  const getSignalIcon = (type: string) => {
+    switch (type) {
+      case 'certification':
+        return <Shield className="h-4 w-4 text-green-600" />;
+      case 'score_update':
+        return <Activity className="h-4 w-4 text-blue-600" />;
+      case 'connection':
+        return <Network className="h-4 w-4 text-purple-600" />;
+      default:
+        return <Activity className="h-4 w-4 text-gray-600" />;
+    }
+  };
+
+  const getSignalBgColor = (type: string) => {
+    switch (type) {
+      case 'certification':
+        return 'bg-green-50';
+      case 'score_update':
+        return 'bg-blue-50';
+      case 'connection':
+        return 'bg-purple-50';
+      default:
+        return 'bg-gray-50';
+    }
+  };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInHours = Math.floor((now.getTime() - time.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Just now';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Trust Constellation</h1>
+          <p className="text-gray-600 mt-2">
+            Visual graph of agent-score-signal network and trust relationships
+          </p>
+        </div>
+        
+        <div className="bg-white rounded-lg shadow p-8">
+          <div className="flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">Loading constellation data...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900">Trust Constellation</h1>
+            <p className="text-gray-600 mt-2">
+              Visual graph of agent-score-signal network and trust relationships
+            </p>
+          </div>
+          <div className="flex items-center space-x-4">
+            <select
+              value={networkFilter}
+              onChange={(e) => setNetworkFilter(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-md text-sm"
+            >
+              <option value="all">All Agents</option>
+              <option value="eligible">NFT Eligible</option>
+              <option value="high-trust">High Trust (&gt;700)</option>
+            </select>
+            <button
+              onClick={handleRefresh}
+              disabled={refreshing}
+              className="flex items-center px-3 py-2 text-sm text-gray-600 hover:text-gray-900 disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Error State */}
+      {error && (
+        <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-400 mr-3" />
+            <div>
+              <h3 className="text-sm font-medium text-red-800">Error loading constellation data</h3>
+              <p className="text-sm text-red-700 mt-1">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Network Stats */}
+      {metrics && (
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+            <div className="flex items-center">
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Connected Agents</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.connectedAgents}</p>
+                <p className="text-xs text-gray-500">active in network</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+            <div className="flex items-center">
+              <div className="p-2 bg-green-100 rounded-lg">
+                <Shield className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Trust Connections</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.trustConnections}</p>
+                <p className="text-xs text-gray-500">relationships</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+            <div className="flex items-center">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Activity className="h-6 w-6 text-purple-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Active Signals</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.activeSignals}</p>
+                <p className="text-xs text-gray-500">trust events</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
+            <div className="flex items-center">
+              <div className="p-2 bg-orange-100 rounded-lg">
+                <TrendingUp className="h-6 w-6 text-orange-600" />
+              </div>
+              <div className="ml-4">
+                <p className="text-sm font-medium text-gray-600">Network Strength</p>
+                <p className="text-2xl font-bold text-gray-900">{metrics.networkStrength}</p>
+                <p className="text-xs text-gray-500">/10 scale</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Constellation Graph */}
+      <div className="bg-white rounded-lg shadow p-6 border border-gray-200 mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">Trust Network Visualization</h3>
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={handleZoomIn}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+              title="Zoom In"
+            >
+              <ZoomIn className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleZoomOut}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+              title="Zoom Out"
+            >
+              <ZoomOut className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleResetView}
+              className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+              title="Reset View"
+            >
+              <Home className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+        <div 
+          ref={networkContainer} 
+          className="h-96 border border-gray-200 rounded-lg"
+          style={{ height: '500px' }}
+        />
+        <div className="mt-4 flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span>NFT Eligible</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+            <span>Building Trust</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+            <span>Active Agent</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+            <span>Organization</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Network Details */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Connected Agents */}
+        <div className="bg-white rounded-lg shadow border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Connected Agents {selectedNode && '- Selected'}
+            </h3>
+          </div>
+          <div className="p-6">
+            {roleAgents.length > 0 ? (
+              <div className="space-y-4">
+                {roleAgents
+                  .filter(agent => !selectedNode || agent.id === selectedNode)
+                  .filter(agent => agent.status === 'active')
+                  .slice(0, 6)
+                  .map((agent) => {
+                    const trustScore = agent.trustScore || 0;
+                    const connections = Math.floor(Math.random() * 5) + 1;
+                    
+                    let statusColor = 'bg-blue-500';
+                    if (agent.isEligibleForMint) statusColor = 'bg-green-500';
+                    else if (trustScore > 500) statusColor = 'bg-yellow-500';
+                    else if (agent.status !== 'active') statusColor = 'bg-gray-500';
+
+                    return (
+                      <div key={agent.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-3 h-3 ${statusColor} rounded-full`}></div>
+                          <div>
+                            <p className="font-medium text-gray-900">{agent.name}</p>
+                            <p className="text-sm text-gray-500">Trust Score: {trustScore}/1000</p>
+                            <p className="text-xs text-gray-400">{agent.roleTemplate.title}</p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-medium text-gray-900">{connections} connections</p>
+                          <p className="text-xs text-gray-500">{agent.status}</p>
+                          {agent.isEligibleForMint && (
+                            <p className="text-xs text-green-600 font-medium">NFT Eligible</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Users className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500">No connected agents</p>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Trust Signals */}
+        <div className="bg-white rounded-lg shadow border border-gray-200">
+          <div className="px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Trust Signals</h3>
+          </div>
+          <div className="p-6">
+            {trustSignals.length > 0 ? (
+              <div className="space-y-4">
+                {trustSignals.map((signal) => (
+                  <div key={signal.id} className={`flex items-center space-x-3 p-3 ${getSignalBgColor(signal.type)} rounded-lg`}>
+                    <div className={`p-1 ${signal.type === 'certification' ? 'bg-green-100' : signal.type === 'score_update' ? 'bg-blue-100' : 'bg-purple-100'} rounded`}>
+                      {getSignalIcon(signal.type)}
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-medium text-gray-900">{signal.title}</p>
+                      <p className="text-xs text-gray-500">{signal.description}</p>
+                    </div>
+                    <span className="text-xs text-gray-500">{formatTimeAgo(signal.timestamp)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <Activity className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500">No recent signals</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+} 

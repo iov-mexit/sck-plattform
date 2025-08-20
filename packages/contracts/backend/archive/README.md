@@ -10,9 +10,9 @@ This directory contains archived smart contracts that are no longer actively use
 
 ### Contract Overview
 
-The SCKNFTDynamic contract was an enhanced ERC721 implementation for the Secure Code KnAIght Digital Twin & Dynamic Achievement System. It featured:
+The SCKNFTDynamic contract was an enhanced ERC721 implementation for the Secure Code KnAIght Role Agent & Dynamic Achievement System. It featured:
 
-- **Digital Twin Management**: Minting and updating digital twin NFTs
+- **Role Agent Management**: Minting and updating role agent NFTs
 - **Dynamic Achievements**: Achievement system with metadata updates
 - **Soulbound Tokens**: Non-transferable tokens for certain achievements
 - **Achievement Templates**: Template-based achievement creation
@@ -20,7 +20,7 @@ The SCKNFTDynamic contract was an enhanced ERC721 implementation for the Secure 
 
 ### Key Features
 
-1. **Digital Twin Structure**:
+1. **Role Agent Structure**:
    - Decentralized Identifier (DID)
    - Role assignment (Developer, Security Expert, etc.)
    - Organization association

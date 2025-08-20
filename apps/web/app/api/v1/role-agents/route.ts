@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../../../generated/prisma/index.js';
 import { z } from 'zod';
 
 const prisma = new PrismaClient();
@@ -27,32 +27,41 @@ export async function GET(request: NextRequest) {
 
     const whereClause = organizationId ? { organizationId } : {};
 
-    const [digitalTwins, total] = await Promise.all([
-      prisma.digitalTwin.findMany({
+    const [roleAgents, total] = await Promise.all([
+      prisma.role_agents.findMany({
         where: whereClause,
         include: {
-          organization: true,
-          roleTemplate: true,
+          organizations: true,
+          role_templates: true,
         },
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.digitalTwin.count({ where: whereClause }),
+      prisma.role_agents.count({ where: whereClause }),
     ]);
+
+    // Map database results to include computed fields for frontend compatibility
+    const mappedRoleAgents = roleAgents.map(agent => ({
+      ...agent,
+      nftMinted: !!agent.soulboundTokenId,
+      assignedDid: agent.assignedToDid, // Legacy compatibility
+      organization: agent.organizations, // Map snake_case to camelCase for frontend
+      roleTemplate: agent.role_templates, // Map snake_case to camelCase for frontend
+    }));
 
     return NextResponse.json({
       success: true,
-      data: digitalTwins,
+      data: mappedRoleAgents,
       count: total,
       page,
       limit,
       totalPages: Math.ceil(total / limit),
     });
   } catch (error) {
-    console.error('Error fetching digital twins:', error);
+    console.error('Error fetching role agents:', error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch digital twins' },
+      { success: false, error: 'Failed to fetch role agents' },
       { status: 500 }
     );
   }
@@ -64,12 +73,12 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateRoleAgentSchema.parse(body);
 
     // Check for duplicate DID
-    const existingRoleAgent = await prisma.digitalTwin.findFirst({
+    const existingRoleAgent = await prisma.role_agents.findFirst({
       where: {
         assignedToDid: validatedData.assignedToDid,
       },
       include: {
-        organization: true,
+        organizations: true,
       },
     });
 
@@ -103,10 +112,10 @@ export async function POST(request: NextRequest) {
     });
 
     // Generate a unique ID
-    const uniqueId = `twin-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const uniqueId = `agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-    // Create digital twin with DID only - manually provide the id
-    const roleAgent = await prisma.digitalTwin.create({
+    // Create role agent with DID only - manually provide the id
+    const roleAgent = await prisma.role_agents.create({
       data: {
         id: uniqueId,
         organizationId: validatedData.organizationId,
@@ -115,7 +124,7 @@ export async function POST(request: NextRequest) {
         trustScore: validatedData.trustScore, // From Secure Code Warrior signal
         isEligibleForMint,
         lastTrustCheck: validatedData.trustScore ? new Date() : null,
-        name: validatedData.name || `Digital Twin ${Date.now()}`,
+        name: validatedData.name || `Role Agent ${Date.now()}`,
         description: validatedData.description,
         updatedAt: new Date(),
       },

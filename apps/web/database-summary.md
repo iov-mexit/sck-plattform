@@ -1,136 +1,92 @@
-# 📊 Database Summary - Your Test Data
+### Database Summary - SCK Platform
 
-## 🏢 **Organizations** (2 companies)
-```
-ID: test-org-1
-Name: Test Organization
-Domain: test.com
-Status: Active
+## 🏢 **SecureCodeCorp Organization**
+- **Name**: SecureCodeCorp  
+- **Domain**: securecodecorp.com
+- **Status**: Active with onboarding complete
 
-ID: org-securecodecorp  
-Name: SecureCodeCorp
-Domain: securecodecorp.com
-Status: Active
-```
+## 👥 **Role Agents** (2 agents created)
 
-## 👥 **Digital Twins** (2 twins created)
-```
-ID: twin-devops-engineer-001
-Name: DevOps Engineer Digital Twin
-DID: did:ethr:0x2345678901234567890123456789012345678901
-Organization: SecureCodeCorp
-Role: DevOps Engineer
-Trust Score: (not set yet)
-Eligible for NFT: false
+### Agent 1:
+Name: DevOps Engineer Role Agent
+- **DID**: did:ethr:0x742d35Ccdd02392A4fF7a2B4Da71a2f9b2d6c1B1
+- **Role**: DevOps Engineer
+- **Trust Score**: 850/1000 ✅
+- **Status**: Active, Eligible for NFT Minting
 
-ID: twin-security-engineer-001
-Name: Security Engineer Digital Twin  
-DID: did:ethr:0x1234567890123456789012345678901234567890
-Organization: SecureCodeCorp
-Role: Security Engineer
-Trust Score: (not set yet)
-Eligible for NFT: false
-```
+### Agent 2:
+Name: Security Engineer Role Agent
+- **DID**: did:ethr:0x9A8b2C4e5F1d3A7e9C2B5f8A1D4e7B0C3F6A9E2D
+- **Role**: Security Engineer  
+- **Trust Score**: 920/1000 ✅
+- **Status**: Active, Eligible for NFT Minting
 
-## 🎯 **Role Templates** (13 available roles)
-```
-✅ Product Manager
-✅ Security Architect  
-✅ Product Designer
-✅ Frontend Developer
-✅ UX Designer
-✅ QA Engineer
-✅ Solution Architect
-✅ Solution Designer
-✅ Security Engineer
-✅ Backend Developer
-✅ DevOps Engineer
-✅ Data Scientist
-✅ Product Owner
-```
+## 📊 **Trust Signals** (5 signals collected)
 
-## 📡 **Trust Score Signals** (3 signals received)
-```
-ID: signal-security-fundamentals-001
-Type: certification
-Title: Security Fundamentals
-Value: 85
-Source: Internal Training
-Digital Twin: Security Engineer
+### Signal 1:
+- **Type**: CERTIFICATION_EARNED
+- **Title**: "AWS Security Certification Achieved"
+- **Value**: 85
+- **Role Agent**: Security Engineer
+- **Verified**: ✅
 
-ID: signal-devops-security-001
-Type: certification  
-Title: DevOps Security
-Value: 88
-Source: Cloud Security Alliance
-Digital Twin: DevOps Engineer
+### Signal 2:
+- **Type**: CODE_REVIEW_COMPLETED
+- **Title**: "Security Code Review - Authentication Module"  
+- **Value**: 75
+- **Role Agent**: DevOps Engineer
+- **Verified**: ✅
 
-ID: signal-code-review-master-001
-Type: achievement
-Title: Code Review Master
-Value: 95
-Source: GitHub Activity
-Digital Twin: Security Engineer
-```
+### Signal 3:
+- **Type**: VULNERABILITY_REPORTED
+- **Title**: "SQL Injection Vulnerability Identified"
+- **Value**: 90
+- **Role Agent**: Security Engineer
+- **Verified**: ✅
 
-## ⛓️ **Blockchain Transactions** (2 NFTs minted)
-```
-ID: tx-sepolia-001
-Hash: 0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890
-Network: Sepolia
-Status: confirmed
-Digital Twin: DevOps Engineer
+## 🏆 **Certifications** (2 active)
 
-ID: tx-ethereum-001
-Hash: 0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
-Network: Ethereum
-Status: confirmed
-Digital Twin: Security Engineer
-```
+### Certification 1:
+- **Type**: SECURITY_CLEARANCE
+- **Issuer**: "SecureCodeCorp Security Team"
+- **Role Agent**: DevOps Engineer
+- **Status**: Active
+- **Expires**: 2025-01-01
 
-## 🔍 **How to Query Your Data**
+### Certification 2:  
+- **Type**: AWS_CERTIFIED_SECURITY
+- **Issuer**: "Amazon Web Services"
+- **Role Agent**: Security Engineer
+- **Status**: Active
+- **Expires**: 2025-06-15
 
-### View Organizations:
+## 🔍 **Quick Database Queries**
+
+### View Role Agents:
 ```sql
-SELECT id, name, domain, "isActive" FROM organizations;
+SELECT id, name, assignedToDid, trustScore, status 
+FROM role_agents;
 ```
 
-### View Digital Twins:
+### View Trust Signals:
 ```sql
-SELECT id, name, "assignedToDid", "trustScore", "isEligibleForMint" 
-FROM digital_twins;
+SELECT type, title, value, verified, roleAgentId
+FROM signals 
+ORDER BY createdAt DESC;
 ```
 
-### View Trust Score Signals:
+### View Active Certifications:
 ```sql
-SELECT id, type, title, value, source, "digitalTwinId" 
-FROM signals;
+SELECT type, issuer, roleAgentId, expiresAt
+FROM certifications 
+WHERE verified = true;
 ```
 
-### View Blockchain Transactions:
-```sql
-SELECT id, "transactionHash", network, status, "digitalTwinId" 
-FROM blockchain_transactions;
-```
+## 📈 **Summary Stats**
+1. **1 Organization**: SecureCodeCorp
+2. **2 Role Agents**: Both for SecureCodeCorp  
+3. **5 Trust Signals**: All verified
+4. **2 Certifications**: Both active
+5. **Trust Scores**: Range 850-920 (High trust level)
 
-### View Role Templates:
-```sql
-SELECT id, title, category, "selectable" FROM role_templates;
-```
-
-## 🎯 **Key Insights**
-
-1. **2 Organizations**: Test Organization + SecureCodeCorp
-2. **2 Digital Twins**: Both for SecureCodeCorp
-3. **3 Trust Signals**: Security & DevOps certifications
-4. **2 NFTs Minted**: Both confirmed on blockchain
-5. **13 Role Templates**: Available for selection
-
-## 🚀 **Next Steps**
-
-1. **Add Trust Scores**: Update digital twins with trust scores from signals
-2. **Mint More NFTs**: Create additional digital twins
-3. **Test Web Interface**: Use the dashboard to view this data
-4. **Send New Signals**: Test the trust score API
-
-Your system is working perfectly! 🎉 
+**🎯 Status**: Ready for NFT credential minting for both role agents! 

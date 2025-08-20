@@ -1,240 +1,277 @@
 'use client';
 
-import React from 'react';
+import { useState, useEffect } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
-  Plus,
-  Coins,
-  Network,
   Users,
   Shield,
   TrendingUp,
-  Activity,
+  Zap,
+  Target,
+  Clock,
+  AlertCircle,
+  CheckCircle,
   BarChart3,
-  ArrowRight,
-  Star
+  Network,
+  Coins,
+  Bot,
+  Activity,
+  Home,
+  Settings,
+  Lock
 } from 'lucide-react';
-import Link from 'next/link';
+import { ServiceCarousel } from '@/components/dashboard/service-carousel';
+// import { QuickActions } from '@/components/dashboard/quick-actions';
+// import { ActivityFeed } from '@/components/dashboard/activity-feed';
+
+interface DashboardStats {
+  totalAgents: number;
+  eligibleAgents: number;
+  totalOrganizations: number;
+  totalTemplates: number;
+  totalPolicies: number;
+  pendingApprovals: number;
+  activeMCPs: number;
+}
 
 export default function DashboardPage() {
+  const [stats, setStats] = useState<DashboardStats>({
+    totalAgents: 0,
+    eligibleAgents: 0,
+    totalOrganizations: 0,
+    totalTemplates: 0,
+    totalPolicies: 0,
+    pendingApprovals: 0,
+    activeMCPs: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [userType, setUserType] = useState<'new' | 'active' | 'advanced'>('active');
+
+  useEffect(() => {
+    loadDashboardData();
+  }, []);
+
+  const loadDashboardData = async () => {
+    try {
+      // Load organizations
+      const orgsResponse = await fetch('/api/v1/organizations');
+      const orgsData = await orgsResponse.json();
+
+      // Load role agents
+      const agentsResponse = await fetch('/api/v1/role-agents?limit=100');
+      const agentsData = await agentsResponse.json();
+
+      // Load role templates
+      const templatesResponse = await fetch('/api/v1/role-templates');
+      const templatesData = await templatesResponse.json();
+
+      // Load LoA policies
+      const loaResponse = await fetch('/api/v1/loa/policies');
+      const loaData = await loaResponse.json();
+
+      // Load MCP policies
+      const mcpResponse = await fetch('/api/v1/mcp/policies');
+      const mcpData = await mcpResponse.json();
+
+      // Load pending approvals (we'll need to create this endpoint)
+      let pendingApprovals = 0;
+      try {
+        const approvalsResponse = await fetch('/api/v1/approvals?status=pending');
+        const approvalsData = await approvalsResponse.json();
+        if (approvalsData.success) {
+          pendingApprovals = approvalsData.data.length;
+        }
+      } catch (error) {
+        console.log('Approvals endpoint not yet implemented');
+      }
+
+      if (orgsData.success && agentsData.success && templatesData.success) {
+        const eligibleCount = agentsData.data.filter((agent: any) =>
+          agent.isEligibleForMint && !agent.nftMinted
+        ).length;
+
+        setStats({
+          totalAgents: agentsData.data.length,
+          eligibleAgents: eligibleCount,
+          totalOrganizations: orgsData.data.length,
+          totalTemplates: templatesData.data.length,
+          totalPolicies: loaData.success ? loaData.data.length : 0,
+          pendingApprovals,
+          activeMCPs: mcpData.success ? mcpData.data.filter((mcp: any) => mcp.status === 'active').length : 0
+        });
+
+        // Determine user type based on activity
+        if (agentsData.data.length === 0) {
+          setUserType('new');
+        } else if (eligibleCount > 0 || agentsData.data.length > 5) {
+          setUserType('advanced');
+        } else {
+          setUserType('active');
+        }
+      }
+    } catch (error) {
+      console.error('Error loading dashboard data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const painPoints = [
+    {
+      icon: AlertCircle,
+      title: "Manual Role Tracking",
+      problem: "Spending hours in status meetings and spreadsheets",
+      solution: "Automated role monitoring with real-time updates",
+      color: "red"
+    },
+    {
+      icon: Clock,
+      title: "Trust Verification Delays",
+      problem: "Waiting days for trust score verification",
+      solution: "Instant trust evaluation with external signals",
+      color: "yellow"
+    },
+    {
+      icon: Shield,
+      title: "Access Control Complexity",
+      problem: "Complex role-based access control management",
+      solution: "Simplified PAM with trust-gated MCPs",
+      color: "blue"
+    }
+  ];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Welcome Header */}
+    <div className="container mx-auto px-4 py-8">
+      {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Welcome back, Agent Commander</h1>
-        <p className="text-gray-600 mt-2">
-          Your command center for managing role agents and trust-based credentialing
-        </p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
+        <p className="text-gray-600">Welcome to your PAM + Trust-Gated MCP platform</p>
       </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Link href="/role-agents" className="bg-white rounded-lg shadow p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Plus className="h-6 w-6 text-blue-600" />
+      {/* Stats Overview */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Users className="h-8 w-8 text-blue-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Agents</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalAgents}</p>
+              </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Create Role Agent</h3>
-          <p className="text-gray-600 text-sm">Add a new digital twin to your network</p>
-        </Link>
+          </CardContent>
+        </Card>
 
-        <Link href="/nft-minting" className="bg-white rounded-lg shadow p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Coins className="h-6 w-6 text-green-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Shield className="h-8 w-8 text-green-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Active Policies</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.totalPolicies}</p>
+              </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">Mint NFT</h3>
-          <p className="text-gray-600 text-sm">Create achievement tokens for your agents</p>
-        </Link>
+          </CardContent>
+        </Card>
 
-        <Link href="/constellation" className="bg-white rounded-lg shadow p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Network className="h-6 w-6 text-purple-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <TrendingUp className="h-8 w-8 text-purple-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">Trust Score</p>
+                <p className="text-2xl font-bold text-gray-900">L{userType === 'new' ? '1' : userType === 'active' ? '3' : '5'}</p>
+              </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">View Signals</h3>
-          <p className="text-gray-600 text-sm">Monitor trust constellation network</p>
-        </Link>
+          </CardContent>
+        </Card>
 
-        <Link href="/analytics" className="bg-white rounded-lg shadow p-6 border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <BarChart3 className="h-6 w-6 text-orange-600" />
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center space-x-3">
+              <Zap className="h-8 w-8 text-orange-600" />
+              <div>
+                <p className="text-sm font-medium text-gray-600">NFT Eligible</p>
+                <p className="text-2xl font-bold text-gray-900">{stats.eligibleAgents}</p>
+              </div>
             </div>
-            <ArrowRight className="h-5 w-5 text-gray-400" />
-          </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">View Analytics</h3>
-          <p className="text-gray-600 text-sm">Track performance and metrics</p>
-        </Link>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Users className="h-6 w-6 text-blue-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Role Agents</p>
-              <p className="text-2xl font-bold text-gray-900">12</p>
-            </div>
-          </div>
-        </div>
+      {/* Service Carousel */}
+      <div className="mb-12">
+        <ServiceCarousel userType={userType} stats={stats} />
+      </div>
 
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Coins className="h-6 w-6 text-green-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Minted NFTs</p>
-              <p className="text-2xl font-bold text-gray-900">5</p>
-            </div>
-          </div>
-        </div>
+      {/* Simplified Content */}
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-4">Additional Services</h2>
+        <p className="text-gray-600 mb-6">Access your PAM and MCP services directly</p>
 
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Shield className="h-6 w-6 text-purple-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Trust Average</p>
-              <p className="text-2xl font-bold text-gray-900">8.4</p>
-            </div>
-          </div>
-        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <Card>
+            <CardContent className="p-6">
+              <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">PAM Services</h3>
+              <p className="text-gray-600 mb-4">Level of Assurance policies and approval workflows</p>
+              <a href="/services/pam" className="text-blue-600 hover:text-blue-800 font-medium">Go to PAM →</a>
+            </CardContent>
+          </Card>
 
-        <div className="bg-white rounded-lg shadow p-6 border border-gray-200">
-          <div className="flex items-center">
-            <div className="p-2 bg-orange-100 rounded-lg">
-              <Activity className="h-6 w-6 text-orange-600" />
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Recent Signals</p>
-              <p className="text-2xl font-bold text-gray-900">47</p>
-            </div>
-          </div>
+          <Card>
+            <CardContent className="p-6">
+              <Lock className="h-12 w-12 text-purple-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">MCP Services</h3>
+              <p className="text-gray-600 mb-4">Management Control Plane policies with OPA/Rego</p>
+              <a href="/services/mcp" className="text-purple-600 hover:text-purple-800 font-medium">Go to MCP →</a>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-6">
+              <TrendingUp className="h-12 w-12 text-green-600 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-2">Analytics</h3>
+              <p className="text-gray-600 mb-4">Trust evaluation and performance insights</p>
+              <a href="/analytics" className="text-green-600 hover:text-green-800 font-medium">Go to Analytics →</a>
+            </CardContent>
+          </Card>
         </div>
       </div>
 
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Activity Feed */}
-        <div className="bg-white rounded-lg shadow border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="h-4 w-4 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">New role agent created</p>
-                  <p className="text-sm text-gray-500">"Cybersecured Vibing" added to system</p>
-                </div>
-                <span className="text-sm text-gray-500">2 hours ago</span>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Coins className="h-4 w-4 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">NFT minted successfully</p>
-                  <p className="text-sm text-gray-500">Achievement token for "Security Expert"</p>
-                </div>
-                <span className="text-sm text-gray-500">4 hours ago</span>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <Shield className="h-4 w-4 text-purple-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Trust score updated</p>
-                  <p className="text-sm text-gray-500">Agent "Code Guardian" score increased to 8.2</p>
-                </div>
-                <span className="text-sm text-gray-500">6 hours ago</span>
-              </div>
-
-              <div className="flex items-center space-x-4 p-4 bg-gray-50 rounded-lg">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Activity className="h-4 w-4 text-orange-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-900">Signal received</p>
-                  <p className="text-sm text-gray-500">New security certification signal processed</p>
-                </div>
-                <span className="text-sm text-gray-500">8 hours ago</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Eligibility Highlights */}
-        <div className="bg-white rounded-lg shadow border border-gray-200">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">Eligibility Highlights</h3>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4">
-              <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-green-900">Ready for NFT Minting</h4>
-                  <Star className="h-4 w-4 text-green-600" />
-                </div>
-                <p className="text-sm text-green-700 mb-2">Agents close to achievement threshold</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-green-700">Cybersecured Vibing</span>
-                    <span className="font-medium text-green-900">8.7/9.0</span>
+      {/* Pain Points */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">How We Solve Your Problems</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {painPoints.map((point, index) => {
+            const Icon = point.icon;
+            return (
+              <Card key={index} className="border-l-4 border-l-red-500">
+                <CardContent className="p-6">
+                  <div className="flex items-start space-x-3">
+                    <Icon className={`h-8 w-8 text-${point.color}-600 mt-1`} />
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">{point.title}</h3>
+                      <p className="text-gray-600 mb-3">{point.problem}</p>
+                      <p className="text-green-600 font-medium">{point.solution}</p>
+                    </div>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-green-700">Security Expert</span>
-                    <span className="font-medium text-green-900">8.4/9.0</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-blue-900">Trust Score Milestones</h4>
-                  <TrendingUp className="h-4 w-4 text-blue-600" />
-                </div>
-                <p className="text-sm text-blue-700 mb-2">Agents making significant progress</p>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-700">Code Guardian</span>
-                    <span className="font-medium text-blue-900">+0.3 this week</span>
-                  </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-blue-700">Network Defender</span>
-                    <span className="font-medium text-blue-900">+0.2 this week</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-4 bg-purple-50 rounded-lg border border-purple-200">
-                <div className="flex items-center justify-between mb-2">
-                  <h4 className="font-medium text-purple-900">Signal Map Preview</h4>
-                  <Network className="h-4 w-4 text-purple-600" />
-                </div>
-                <p className="text-sm text-purple-700">Events flowing into system</p>
-                <div className="mt-2 text-xs text-purple-600">
-                  47 active signals • 12 pending verification • 3 new connections
-                </div>
-              </div>
-            </div>
-          </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

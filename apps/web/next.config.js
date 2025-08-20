@@ -16,8 +16,6 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: false,
   },
-  // Vercel-compatible configuration
-  serverExternalPackages: ['@prisma/client']
 }
 
 module.exports = nextConfig 

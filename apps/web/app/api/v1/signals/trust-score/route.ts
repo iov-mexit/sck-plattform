@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/database';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 // Simple schema for receiving trust scores from Secure Code Warrior
 const TrustScoreSignalSchema = z.object({
@@ -18,17 +16,17 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = TrustScoreSignalSchema.parse(body);
 
-    // Find the digital twin by DID
-    const digitalTwin = await prisma.digitalTwin.findFirst({
+    // Find the role agent by DID
+    const roleAgent = await prisma.role_agents.findFirst({
       where: {
         assignedToDid: validatedData.did,
         ...(validatedData.organizationId && { organizationId: validatedData.organizationId }),
       },
     });
 
-    if (!digitalTwin) {
+    if (!roleAgent) {
       return NextResponse.json(
-        { success: false, error: 'Digital twin not found for this DID' },
+        { success: false, error: 'Role agent not found for this DID' },
         { status: 404 }
       );
     }
@@ -36,23 +34,23 @@ export async function POST(request: NextRequest) {
     // Simple eligibility: trust score >= 75 means eligible for NFT
     const isEligibleForMint = validatedData.trustScore >= 75;
 
-    // Update the digital twin with the new trust score
-    const updatedTwin = await prisma.digitalTwin.update({
-      where: { id: digitalTwin.id },
+    // Update the role agent with the new trust score
+    const updatedAgent = await prisma.role_agents.update({
+      where: { id: roleAgent.id },
       data: {
         trustScore: validatedData.trustScore,
         isEligibleForMint,
         lastTrustCheck: new Date(),
       },
       include: {
-        organization: {
+        organizations: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        roleTemplate: {
+        role_templates: {
           select: {
             id: true,
             title: true,
@@ -63,14 +61,14 @@ export async function POST(request: NextRequest) {
     });
 
     // Record the signal
-    await prisma.signal.create({
+    await prisma.signals.create({
       data: {
         id: `signal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'trust_score',
         title: `Trust Score Update: ${validatedData.trustScore}%`,
         description: `Trust score received from ${validatedData.source}`,
         verified: true,
-        digitalTwinId: digitalTwin.id,
+        roleAgentId: roleAgent.id,
         source: validatedData.source,
         updatedAt: new Date(),
         metadata: {
@@ -83,11 +81,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: {
-        digitalTwinId: digitalTwin.id,
-        trustScore: updatedTwin.trustScore,
-        isEligibleForMint: updatedTwin.isEligibleForMint,
-        organization: updatedTwin.organization,
-        roleTemplate: updatedTwin.roleTemplate,
+        roleAgentId: roleAgent.id,
+        trustScore: updatedAgent.trustScore,
+        isEligibleForMint: updatedAgent.isEligibleForMint,
+        organization: updatedAgent.organizations,
+        roleTemplate: updatedAgent.role_templates,
       },
     });
 
@@ -102,7 +100,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: 'Failed to process trust score signal' },
       { status: 500 }
     );
   }
@@ -122,7 +120,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find digital twin and its trust score
-    const digitalTwin = await prisma.digitalTwin.findFirst({
+    const roleAgent = await prisma.role_agents.findFirst({
       where: {
         assignedToDid: did,
         ...(organizationId && { organizationId }),
@@ -132,12 +130,12 @@ export async function GET(request: NextRequest) {
         trustScore: true,
         isEligibleForMint: true,
         lastTrustCheck: true,
-        organization: {
+        organizations: {
           select: {
             name: true,
           },
         },
-        roleTemplate: {
+        role_templates: {
           select: {
             title: true,
           },
@@ -145,9 +143,9 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    if (!digitalTwin) {
+    if (!roleAgent) {
       return NextResponse.json(
-        { success: false, error: 'Digital twin not found' },
+        { success: false, error: 'Role agent not found' },
         { status: 404 }
       );
     }
@@ -156,11 +154,11 @@ export async function GET(request: NextRequest) {
       success: true,
       data: {
         did,
-        trustScore: digitalTwin.trustScore,
-        isEligibleForMint: digitalTwin.isEligibleForMint,
-        lastTrustCheck: digitalTwin.lastTrustCheck,
-        organization: digitalTwin.organization,
-        roleTemplate: digitalTwin.roleTemplate,
+        trustScore: roleAgent.trustScore,
+        isEligibleForMint: roleAgent.isEligibleForMint,
+        lastTrustCheck: roleAgent.lastTrustCheck,
+        organization: roleAgent.organizations,
+        roleTemplate: roleAgent.role_templates,
       },
     });
 

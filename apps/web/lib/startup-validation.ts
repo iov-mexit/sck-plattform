@@ -6,7 +6,7 @@
  */
 
 import { validateEnvironment, getEnvironmentConfig, logValidationResults } from './env-validation';
-import { getCurrentDomain, logDomainInfo } from './domains';
+import { getDomainConfig, debugDomainInfo } from './domains';
 import { validatePaymentConfig, logPaymentConfig } from './payment-validation';
 
 /**
@@ -33,8 +33,8 @@ export function initializeEnvironmentValidation(): void {
 
       // Log domain info in development
       if (process.env.NODE_ENV === 'development') {
-        const currentDomain = getCurrentDomain();
-        logDomainInfo(currentDomain);
+        const domainConfig = getDomainConfig();
+        debugDomainInfo();
         logPaymentConfig();
       }
 

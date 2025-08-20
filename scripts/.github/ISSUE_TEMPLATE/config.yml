@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Discussion Forum
+    url: https://github.com/your-org/sck-platform/discussions
+    about: Ask questions and discuss the SCK Platform with the community
+  - name: 📚 Documentation
+    url: https://secure-knaight.org
+    about: Read the official SCK Platform documentation
+  - name: 🔐 Security Issues
+    url: mailto:security@secure-knaight.io
+    about: Report security vulnerabilities privately

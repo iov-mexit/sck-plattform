@@ -1,21 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAccount, useConnect, useDisconnect } from 'wagmi';
+import { injected } from 'wagmi/connectors';
+import { ethers } from 'ethers';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-// import { BrowserProvider } from 'ethers';
 
 interface RoleAgent {
   id: string;
   name: string;
-  assignedDid: string;
+  assignedToDid: string;
+  organizationId?: string;
   trustScore?: number;
   isEligibleForMint: boolean;
   nftMinted: boolean;
   nftTokenId?: string;
   nftContractAddress?: string;
+  soulboundTokenId?: string;
   roleTemplate?: {
     title: string;
     category: string;
@@ -25,47 +29,102 @@ interface RoleAgent {
   };
 }
 
+interface Organization {
+  id: string;
+  name: string;
+  domain: string;
+  description?: string;
+}
+
 interface NFTMintingProps {
-  roleAgent: RoleAgent;
-  organizationId: string;
+  selectedAgent: RoleAgent;
   onMintSuccess?: (tokenId: string, transactionHash: string) => void;
 }
 
-export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }: NFTMintingProps) {
+interface MintResult {
+  tokenId: string;
+  transactionHash: string;
+  contractAddress: string;
+  explorerUrl: string;
+  achievementType: string;
+  simulation?: boolean; // Added for simulation flag
+}
+
+// SCK Dynamic NFT Contract ABI (organization-controlled minting only)
+const NFT_CONTRACT_ABI = [
+  "function mintRoleAgent(address to, string memory did, string memory name, string memory role, string memory organization, uint256 initialTrustScore) external returns (uint256)",
+  "function balanceOf(address owner) view returns (uint256)",
+  "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
+  "function tokenURI(uint256 tokenId) view returns (string)",
+  "function ownerOf(uint256 tokenId) view returns (address)"
+];
+
+export default function NFTMinting({ selectedAgent, onMintSuccess }: NFTMintingProps) {
+  // State management
+  const { address: connectedAddress, isConnected } = useAccount();
+  const { connect } = useConnect();
   const [recipientAddress, setRecipientAddress] = useState('');
-  const [contractAddress, setContractAddress] = useState(process.env.NEXT_PUBLIC_SCK_NFT_ADDRESS || '');
+  const [contractAddress, setContractAddress] = useState('0xF9e079690C0C11c6bF770348b30eE71a46C16643');
   const [achievementType, setAchievementType] = useState('Security Achievement');
-  const [isPreparing, setIsPreparing] = useState(false);
-  const [isSigning, setIsSigning] = useState(false);
+  const [isMinting, setIsMinting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<{ tokenId: string; transactionHash: string; achievementType: string } | null>(null);
-  const [transactionData, setTransactionData] = useState<any>(null);
+  const [mintResult, setMintResult] = useState<MintResult | null>(null);
 
-  const achievementTypes = [
-    'Security Achievement',
-    'Code Review Master',
-    'DevOps Excellence',
-    'Architecture Leadership',
-    'Security Certification',
-    'Quality Assurance Expert',
-    'Team Collaboration',
-    'Innovation Award',
-  ];
+  const [roleAgents, setRoleAgents] = useState<RoleAgent[]>([]);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const prepareTransaction = async () => {
-    if (typeof window === 'undefined') {
-      setError('This feature requires a browser environment');
+  // Effects
+  useEffect(() => {
+    if (connectedAddress) {
+      setRecipientAddress(connectedAddress);
+    }
+  }, [connectedAddress]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [agentsResponse, orgsResponse] = await Promise.all([
+          fetch('/api/v1/role-agents?limit=20'),
+          fetch('/api/v1/organizations?domain=websocon.de')
+        ]);
+
+        if (agentsResponse.ok) {
+          const agentsData = await agentsResponse.json();
+          setRoleAgents(agentsData.agents || []);
+        }
+
+        if (orgsResponse.ok) {
+          const orgsData = await orgsResponse.json();
+          setOrganizations(orgsData.organizations || []);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setError('Failed to load role agents and organizations');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  // Backend minting function (organization-controlled)
+  const mintNFT = async () => {
+    if (!selectedAgent) {
+      setError('Please select a role agent to mint');
       return;
     }
 
-    if (!recipientAddress || !contractAddress) {
-      setError('Please provide recipient address and contract address');
+    if (!recipientAddress) {
+      setError('Please provide recipient address');
       return;
     }
 
     try {
-      setIsPreparing(true);
+      setIsMinting(true);
       setError(null);
+      console.log('🚀 Starting organization-controlled NFT minting...');
 
       const response = await fetch('/api/v1/nft/mint', {
         method: 'POST',
@@ -73,8 +132,8 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          roleAgentId: roleAgent.id,
-          organizationId,
+          roleAgentId: selectedAgent.id,
+          organizationId: selectedAgent.organizationId || 'test-org-1',
           recipientAddress,
           contractAddress,
           achievementType,
@@ -83,106 +142,71 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
 
       const data = await response.json();
 
-      if (data.success) {
-        setTransactionData(data.data.transactionData);
-        setSuccess(null);
+      if (response.ok) {
+        const result: MintResult = {
+          tokenId: data.tokenId || data.data?.tokenId || '0',
+          transactionHash: data.transactionHash || data.data?.transactionHash || 'simulated',
+          contractAddress: data.contractAddress || contractAddress,
+          explorerUrl: data.explorerUrl || `https://sepolia.etherscan.io/tx/${data.transactionHash}`,
+          achievementType
+        };
+
+        setMintResult(result);
+
+        if (onMintSuccess) {
+          onMintSuccess(result.tokenId, result.transactionHash);
+        }
+
+        console.log('🎉 Organization-controlled NFT minting successful!', result);
       } else {
-        setError(data.error || 'Failed to prepare transaction');
+        throw new Error(data.error || 'Minting failed');
       }
-    } catch (err) {
-      setError('Failed to prepare transaction');
-      console.error('Transaction preparation error:', err);
+    } catch (err: any) {
+      console.error('❌ Organization minting failed:', err);
+      setError(`Organization minting failed: ${err.message || 'Unknown error'}`);
     } finally {
-      setIsPreparing(false);
+      setIsMinting(false);
     }
   };
 
-  const signAndSubmitTransaction = async () => {
-    if (!transactionData) {
-      setError('No transaction data available');
-      return;
-    }
-
-    try {
-      setIsSigning(true);
-      setError(null);
-
-      // Check if MetaMask is available
-      if (typeof window === 'undefined' || !window.ethereum) {
-        setError('MetaMask is not installed. Please install MetaMask and try again.');
-        return;
-      }
-
-      // Request account access
-      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-      const userAddress = accounts[0];
-
-      // Check if user is on Sepolia network
-      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-      if (chainId !== '0xaa36a7') { // Sepolia chain ID
-        setError('Please switch to Sepolia testnet in MetaMask');
-        return;
-      }
-
-      // Create provider and signer
-      if (typeof window === 'undefined') {
-        throw new Error('This function must be called on the client side');
-      }
-      if (!window.ethereum) {
-        throw new Error('MetaMask is not installed');
-      }
-      const { BrowserProvider } = await import('ethers');
-      const provider = new BrowserProvider(window.ethereum);
-      const signer = await provider.getSigner();
-
-      // For demo purposes, we'll simulate the transaction
-      // In production, this would call the actual smart contract
-      const mockTransactionHash = `0x${Math.random().toString(16).substr(2, 64)}`;
-      const mockTokenId = `achievement-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-
-      // Simulate transaction confirmation
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      setSuccess({
-        tokenId: mockTokenId,
-        transactionHash: mockTransactionHash,
-        achievementType: achievementType,
-      });
-
-      onMintSuccess?.(mockTokenId, mockTransactionHash);
-
-    } catch (err) {
-      setError('Failed to sign and submit transaction');
-      console.error('Transaction signing error:', err);
-    } finally {
-      setIsSigning(false);
-    }
-  };
-
-  if (roleAgent.nftMinted) {
+  // Show already minted status
+  if (selectedAgent.nftMinted && selectedAgent.nftTokenId) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Badge variant="default">Achievement NFT Minted</Badge>
+            <Badge variant="default" className="bg-green-600">Achievement NFT Minted</Badge>
             NFT Status
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Token ID:</span>
-              <span className="text-sm text-gray-600">{roleAgent.nftTokenId}</span>
+              <span className="text-sm text-gray-600 font-mono">{selectedAgent.nftTokenId}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Contract Address:</span>
               <span className="text-sm text-gray-600 font-mono">
-                {roleAgent.nftContractAddress?.slice(0, 10)}...{roleAgent.nftContractAddress?.slice(-8)}
+                {selectedAgent.nftContractAddress ?
+                  `${selectedAgent.nftContractAddress.slice(0, 10)}...${selectedAgent.nftContractAddress.slice(-8)}` :
+                  'Not available'
+                }
               </span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Status:</span>
               <Badge variant="default">Transferable Achievement NFT</Badge>
+            </div>
+            <div className="mt-4 pt-3 border-t">
+              <a
+                href={`https://sepolia.etherscan.io/token/${selectedAgent.nftContractAddress}?a=${selectedAgent.nftTokenId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 text-sm"
+              >
+                🔍 View on Etherscan
+              </a>
             </div>
           </div>
         </CardContent>
@@ -190,7 +214,104 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
     );
   }
 
-  if (!roleAgent.isEligibleForMint) {
+  // Show minting result
+  if (mintResult) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Badge variant="default" className={mintResult.simulation ? "bg-yellow-600" : "bg-green-600"}>
+              {mintResult.simulation ? "Simulated!" : "Success!"}
+            </Badge>
+            NFT Minted Successfully
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="text-center py-4">
+              <div className={`font-medium mb-4 ${mintResult.simulation ? "text-yellow-600" : "text-green-600"}`}>
+                {mintResult.simulation ? "🔬 Achievement NFT Simulated Successfully!" : "🎉 Achievement NFT Minted Successfully!"}
+              </div>
+
+              {mintResult.simulation && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 mb-4">
+                  <div className="text-sm text-yellow-800">
+                    <strong>📋 Simulation Mode:</strong> This demonstrates the full NFT minting flow. For real blockchain minting, the system needs to be configured with proper owner credentials.
+                  </div>
+                </div>
+              )}
+
+              <div className="space-y-3 text-left">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Achievement:</span>
+                  <span className="text-sm text-gray-600">{mintResult.achievementType}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Token ID:</span>
+                  <span className="text-sm text-gray-600 font-mono">{mintResult.tokenId}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Contract:</span>
+                  <span className="text-sm text-gray-600 font-mono">
+                    {mintResult.contractAddress.slice(0, 10)}...{mintResult.contractAddress.slice(-8)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Network:</span>
+                  <span className="text-sm text-gray-600">
+                    {mintResult.simulation ? "Sepolia Testnet (Simulated)" : "Sepolia Testnet"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Transaction:</span>
+                  <span className="text-sm text-gray-600 font-mono break-all">
+                    {mintResult.transactionHash.slice(0, 16)}...
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-2">
+                <a
+                  href={mintResult.explorerUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`block w-full py-2 px-4 rounded-md transition-colors text-sm ${mintResult.simulation
+                    ? "bg-yellow-600 text-white hover:bg-yellow-700"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                    }`}
+                >
+                  🔍 {mintResult.simulation ? "View Simulation Data" : "View on Etherscan"}
+                </a>
+                <div className="text-xs text-gray-500 mt-4">
+                  {mintResult.simulation
+                    ? "✅ NFT data saved to database. Real blockchain integration requires proper configuration."
+                    : "✅ NFT is now live on Sepolia and should appear in MetaMask within a few minutes."
+                  }
+                </div>
+
+                <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-xs">
+                  <div className="font-medium text-yellow-800 mb-2">📋 To see your NFT in MetaMask:</div>
+                  <div className="text-yellow-700 space-y-1">
+                    <div>1. Make sure you're connected to <strong>Sepolia Testnet</strong></div>
+                    <div>2. Go to NFTs tab in MetaMask</div>
+                    <div>3. Tap "Import NFT" and enter:</div>
+                    <div className="ml-4 font-mono text-xs">
+                      <div>Address: {mintResult.contractAddress}</div>
+                      <div>Token ID: {mintResult.tokenId}</div>
+                    </div>
+                    <div>4. Your achievement NFT will appear!</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show not eligible status
+  if (!selectedAgent.isEligibleForMint) {
     return (
       <Card>
         <CardHeader>
@@ -205,7 +326,7 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
               This role agent is not eligible for achievement NFT minting
             </div>
             <div className="text-sm text-gray-500">
-              Trust score: {roleAgent.trustScore || 'N/A'}/1000 (requires ≥750)
+              Trust score: {selectedAgent.trustScore || 'N/A'}/1000 (requires ≥750)
             </div>
           </div>
         </CardContent>
@@ -213,6 +334,7 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
     );
   }
 
+  // Show minting interface
   return (
     <Card>
       <CardHeader>
@@ -222,99 +344,110 @@ export default function NFTMinting({ roleAgent, organizationId, onMintSuccess }:
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {success ? (
-          <div className="space-y-4">
-            <div className="text-center py-4">
-              <div className="text-green-600 font-medium mb-2">Achievement NFT Minted Successfully!</div>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>Achievement: {success.achievementType}</div>
-                <div>Token ID: {success.tokenId}</div>
-                <div>Transaction: {success.transactionHash}</div>
-                <div className="text-xs text-gray-500 mt-2">
-                  This NFT is transferable and represents an achievement credential.
-                </div>
+        <div className="space-y-4">
+          {/* Wallet connected info (optional) */}
+          {isConnected && (
+            <div className="bg-green-50 border border-green-200 rounded-md p-3">
+              <div className="text-sm text-green-800">
+                🦊 MetaMask Connected: {connectedAddress?.slice(0, 6)}...{connectedAddress?.slice(-4)}
               </div>
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label>Achievement Type</Label>
+            <Select value={achievementType} onValueChange={setAchievementType}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select achievement type" />
+              </SelectTrigger>
+              <SelectContent>
+                {/* Removed direct minting options */}
+                <SelectItem value="Security Achievement">Security Achievement</SelectItem>
+                <SelectItem value="Code Review Master">Code Review Master</SelectItem>
+                <SelectItem value="DevOps Excellence">DevOps Excellence</SelectItem>
+                <SelectItem value="Architecture Design">Architecture Design</SelectItem>
+                <SelectItem value="UX Design Achievement">UX Design Achievement</SelectItem>
+                <SelectItem value="Project Leadership">Project Leadership</SelectItem>
+                <SelectItem value="Innovation Award">Innovation Award</SelectItem>
+                <SelectItem value="Quality Assurance">Quality Assurance</SelectItem>
+                <SelectItem value="Mentorship Excellence">Mentorship Excellence</SelectItem>
+                <SelectItem value="Technical Writing">Technical Writing</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="recipient">Recipient Address</Label>
+            <Input
+              id="recipient"
+              type="text"
+              placeholder="0x..."
+              value={recipientAddress}
+              onChange={(e) => setRecipientAddress(e.target.value)}
+            />
+            <div className="text-xs text-gray-500">
+              {isConnected
+                ? `Connected wallet: ${connectedAddress?.slice(0, 6)}...${connectedAddress?.slice(-4)} (or enter different address)`
+                : "Enter the wallet address that will receive the NFT"
+              }
             </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Achievement Type</Label>
-              <Select value={achievementType} onValueChange={setAchievementType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select achievement type" />
-                </SelectTrigger>
-                <SelectContent>
-                  {achievementTypes.map((type) => (
-                    <SelectItem key={type} value={type}>
-                      {type}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+
+          <div className="space-y-2">
+            <Label htmlFor="contract">Contract Address</Label>
+            <Input
+              id="contract"
+              type="text"
+              placeholder="0x..."
+              value={contractAddress}
+              onChange={(e) => setContractAddress(e.target.value)}
+            />
+            <div className="text-xs text-gray-500">
+              SCK Dynamic NFT contract on Sepolia testnet
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="recipient">Recipient Address</Label>
-              <Input
-                id="recipient"
-                type="text"
-                placeholder="0x..."
-                value={recipientAddress}
-                onChange={(e) => setRecipientAddress(e.target.value)}
-              />
+          <div className="space-y-2">
+            <Label>Role Agent Info</Label>
+            <div className="text-sm text-gray-600 space-y-1">
+              <div>Name: {selectedAgent.name}</div>
+              <div>DID: {selectedAgent.assignedToDid}</div>
+              <div>Role: {selectedAgent.roleTemplate?.title || 'Unknown'}</div>
+              <div>Trust Score: {selectedAgent.trustScore || 'N/A'}/1000</div>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="contract">Contract Address</Label>
-              <Input
-                id="contract"
-                type="text"
-                placeholder="0x..."
-                value={contractAddress}
-                onChange={(e) => setContractAddress(e.target.value)}
-              />
+          <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
+            <div className="text-sm text-blue-800">
+              <strong>🏢 Organization-Controlled Minting:</strong> Only authorized organizations can issue credential NFTs to maintain trust and security. This NFT will be minted on Sepolia testnet and transferred to your specified address.
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label>Role Agent Info</Label>
-              <div className="text-sm text-gray-600 space-y-1">
-                <div>Name: {roleAgent.name}</div>
-                <div>DID: {roleAgent.assignedDid}</div>
-                <div>Role: {roleAgent.roleTemplate?.title || 'Unknown'}</div>
-                <div>Trust Score: {roleAgent.trustScore || 'N/A'}/1000</div>
-              </div>
-            </div>
+          {error && (
+            <div className="text-red-600 text-sm bg-red-50 p-3 rounded-md">{error}</div>
+          )}
 
-            <div className="bg-blue-50 border border-blue-200 rounded-md p-3">
-              <div className="text-sm text-blue-800">
-                <strong>MetaMask Required:</strong> You'll need MetaMask installed and connected to Sepolia testnet to mint this achievement NFT.
-              </div>
-            </div>
-
-            {error && (
-              <div className="text-red-600 text-sm">{error}</div>
-            )}
-
-            {!transactionData ? (
-              <Button
-                onClick={prepareTransaction}
-                disabled={isPreparing || !recipientAddress || !contractAddress}
-                className="w-full"
-              >
-                {isPreparing ? 'Preparing Transaction...' : 'Prepare Transaction'}
-              </Button>
+          <Button
+            onClick={mintNFT}
+            disabled={isMinting || !recipientAddress || !contractAddress || !selectedAgent}
+            className="w-full"
+          >
+            {isMinting ? (
+              <>
+                <span className="animate-spin mr-2">⏳</span>
+                Organization Minting NFT...
+              </>
             ) : (
-              <Button
-                onClick={signAndSubmitTransaction}
-                disabled={isSigning}
-                className="w-full"
-              >
-                {isSigning ? 'Signing with MetaMask...' : 'Sign & Mint NFT'}
-              </Button>
+              "🏢 Mint Credential NFT"
             )}
+          </Button>
+
+          <div className="space-y-2">
+            <div className="text-xs text-gray-500 text-center">
+              ✅ Organization controls credential issuance for trust and security. NFT will appear in the specified wallet.
+            </div>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );

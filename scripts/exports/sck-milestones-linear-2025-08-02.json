@@ -1,0 +1,354 @@
+{
+  "teams": [
+    {
+      "name": "SCK Platform",
+      "key": "SCK",
+      "description": "SCK Platform Development Team"
+    }
+  ],
+  "projects": [
+    {
+      "name": "Milestone 1: ANS Foundation",
+      "key": "M1",
+      "description": "Core ANS integration and security"
+    },
+    {
+      "name": "Milestone 2: Public Verification",
+      "key": "M2",
+      "description": "External verification APIs and widgets"
+    },
+    {
+      "name": "Milestone 3: Signal Processing",
+      "key": "M3",
+      "description": "Trust policy and external signal funnel"
+    },
+    {
+      "name": "Milestone 4: NFT Integration",
+      "key": "M4",
+      "description": "Advanced NFT minting and versioning"
+    },
+    {
+      "name": "Milestone 5: Platform Stability",
+      "key": "M5",
+      "description": "Documentation and health monitoring"
+    }
+  ],
+  "issues": [
+    {
+      "title": "Milestone 1: Define & Implement Zod Schema for ANS Registration Payload",
+      "description": "Define a strict Zod schema for the ANS auto-registration payload, including required fields, qualification metadata, trust score, and signing metadata. Add unit tests to validate acceptance/rejection and document the schema.\n\n**Acceptance Criteria:**\n- [ ] Zod schema covers all ANS registration fields\n- [ ] Unit tests for valid/invalid payloads\n- [ ] Documentation with examples\n- [ ] Integration with existing role agent creation flow\n\n**Definition of Done:**\n- [ ] Code reviewed and approved\n- [ ] Tests passing (unit + integration)\n- [ ] Documentation updated\n- [ ] No security vulnerabilities introduced",
+      "priority": 1,
+      "estimate": 2,
+      "labels": [
+        "milestone:1",
+        "backend",
+        "schema",
+        "high-priority"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-1",
+      "createdAt": "2025-08-02T14:57:49.930Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 1: Implement Signed & Idempotent ANS Registration",
+      "description": "Add HMAC or DID-based signing for payloads sent from SCK Platform to knaight.site. Ensure ANS registration is idempotent (upsert behavior) and verify signatures on the registry side. Prevent replay attacks.\n\n**Acceptance Criteria:**\n- [ ] HMAC signing implementation for ANS payloads\n- [ ] Signature verification on knaight.site\n- [ ] Idempotent registration (safe to retry)\n- [ ] Replay attack prevention\n- [ ] Error handling for signature failures\n\n**Definition of Done:**\n- [ ] Security review completed\n- [ ] End-to-end tests for signing flow\n- [ ] Documentation for cross-domain security\n- [ ] Performance impact assessed",
+      "priority": 1,
+      "estimate": 3,
+      "labels": [
+        "milestone:1",
+        "security",
+        "integration",
+        "high-priority"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-2",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 1: Build Retry Queue for Failed ANS Registrations",
+      "description": "Create a persistent retry mechanism with exponential backoff for failed ANS registrations. Surface failures with reason and timestamps. Store status and allow manual re-trigger from UI.\n\n**Acceptance Criteria:**\n- [ ] Persistent queue for failed registrations\n- [ ] Exponential backoff retry logic\n- [ ] Failure reason tracking and storage\n- [ ] Manual retry trigger from admin UI\n- [ ] Queue status monitoring\n\n**Definition of Done:**\n- [ ] Queue resilience tested under load\n- [ ] Admin UI shows queue status\n- [ ] Alerting for persistent failures\n- [ ] Database migration for queue storage",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:1",
+        "backend",
+        "resilience"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-3",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 1: Add Visibility Flag to Role Agents and Respect in ANS Publishing",
+      "description": "Introduce `public`/`internal`/`hidden` visibility controls on Role Agents. Update auto-ANS registration logic to skip or hide agents based on this flag. Expose visibility toggles in admin UI.\n\n**Acceptance Criteria:**\n- [ ] Database schema updated with visibility field\n- [ ] ANS registration respects visibility settings\n- [ ] Admin UI toggle for visibility control\n- [ ] Migration script for existing agents\n- [ ] API filtering based on visibility\n\n**Definition of Done:**\n- [ ] Database migration tested\n- [ ] UI components updated\n- [ ] API documentation updated\n- [ ] Backward compatibility maintained",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:1",
+        "feature",
+        "backend",
+        "frontend"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-4",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 1: UI Component - ANS Publish Status with Retry",
+      "description": "Build a React component showing current ANS registration status for a Role Agent (published, pending, failed). Provide manual retry and error detail display. Include correlation ID for tracing.\n\n**Acceptance Criteria:**\n- [ ] Status component with published/pending/failed states\n- [ ] Manual retry button with loading state\n- [ ] Error details display with correlation ID\n- [ ] Real-time status updates\n- [ ] Accessible design (WCAG compliance)\n\n**Definition of Done:**\n- [ ] Component tested with Storybook\n- [ ] Integration tests for retry flow\n- [ ] UX review completed\n- [ ] Mobile responsive design",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:1",
+        "frontend",
+        "ux"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-5",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 1: Add Audit Correlation IDs Across Role Agent → ANS Flow",
+      "description": "Ensure role agent creation, signal ingestion, ANS registration, and verification all carry and log a shared correlation ID for debugging and traceability. Expose relevant logs in internal admin dashboard.\n\n**Acceptance Criteria:**\n- [ ] Correlation ID generated at role agent creation\n- [ ] ID propagated through entire ANS flow\n- [ ] Structured logging with correlation ID\n- [ ] Admin dashboard log search by correlation ID\n- [ ] API responses include correlation ID\n\n**Definition of Done:**\n- [ ] End-to-end tracing verified\n- [ ] Log aggregation configured\n- [ ] Admin dashboard functional\n- [ ] Documentation for debugging workflow",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:1",
+        "observability",
+        "backend"
+      ],
+      "projectId": 1,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-6",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 2: Build Embeddable Verification Widget",
+      "description": "Design and implement a lightweight embeddable 'Trust Badge' widget that external sites can drop in to verify a Role Agent by ANS ID. Fetch trust status, show provenance, and degrade gracefully on failure.\n\n**Acceptance Criteria:**\n- [ ] Lightweight JavaScript widget (< 50KB)\n- [ ] Trust badge with ANS ID verification\n- [ ] Provenance display (external signal sources)\n- [ ] Graceful degradation on API failures\n- [ ] Customizable styling options\n\n**Definition of Done:**\n- [ ] Widget tested on multiple sites\n- [ ] Performance benchmarking completed\n- [ ] Integration documentation published\n- [ ] CDN deployment configured",
+      "priority": 2,
+      "estimate": 3,
+      "labels": [
+        "milestone:2",
+        "frontend",
+        "integration"
+      ],
+      "projectId": 2,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-7",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 2: Public Verification API with Rate Limiting & Caching",
+      "description": "Expose a public API for third parties to verify Role Agent trust status. Implement rate limiting to protect the endpoint and caching for performance. Support free vs gated access (stub micropayment later).\n\n**Acceptance Criteria:**\n- [ ] Public verification API endpoint\n- [ ] Rate limiting by IP and API key\n- [ ] Response caching for performance\n- [ ] Free tier vs premium access tiers\n- [ ] API key management system\n\n**Definition of Done:**\n- [ ] Load testing completed\n- [ ] API documentation published\n- [ ] Monitoring and alerting configured\n- [ ] Billing integration stubbed",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:2",
+        "backend",
+        "api",
+        "performance"
+      ],
+      "projectId": 2,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-8",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 2: Documentation for Embed Widget & Verification Flow",
+      "description": "Write clear docs for how to consume the embeddable verification widget and the public verification API. Include example integrations, expected payloads, and failure handling.\n\n**Acceptance Criteria:**\n- [ ] Widget integration guide with examples\n- [ ] API documentation with OpenAPI spec\n- [ ] Error handling best practices\n- [ ] Example implementations (React, vanilla JS)\n- [ ] Troubleshooting guide\n\n**Definition of Done:**\n- [ ] Documentation review by external developer\n- [ ] Examples tested and validated\n- [ ] Published to secure-knaight.org\n- [ ] Developer onboarding flow tested",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:2",
+        "documentation"
+      ],
+      "projectId": 2,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-9",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 3: Finalize Minimal External Signal Funnel Schema & Retire Overengineered Version",
+      "description": "Lock down the simplified signal schema (external trust score + certification metadata), migrate consumers to it, and archive the previous overengineered signal collection service. Ensure backward compatibility if needed.\n\n**Acceptance Criteria:**\n- [ ] Simplified signal schema finalized\n- [ ] Migration script for existing signals\n- [ ] Overengineered service archived\n- [ ] Backward compatibility layer if needed\n- [ ] Performance improvement metrics\n\n**Definition of Done:**\n- [ ] All consumers migrated successfully\n- [ ] Legacy code moved to /archive\n- [ ] Performance benchmarks met\n- [ ] Schema documentation updated",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:3",
+        "backend",
+        "cleanup"
+      ],
+      "projectId": 3,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-10",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 3: Implement Trust Policy Editor UI",
+      "description": "Enable admins to define trust thresholds for level assignment (L1–L5) and NFT eligibility. Provide live previews showing how incoming signals would influence level promotions.\n\n**Acceptance Criteria:**\n- [ ] Admin UI for trust threshold configuration\n- [ ] Live preview of level assignments\n- [ ] Validation of threshold logic\n- [ ] Impact analysis for threshold changes\n- [ ] Role-based access control\n\n**Definition of Done:**\n- [ ] UI tested with real data\n- [ ] Admin workflow documented\n- [ ] Access control implemented\n- [ ] Change audit trail functional",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:3",
+        "frontend",
+        "ux"
+      ],
+      "projectId": 3,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-11",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 3: Automatic Level Assignment & Promotion Logic",
+      "description": "Implement and test `assignLevel` and `canPromoteLevel` logic based solely on external trust scores. Ensure promotions are suggested and surfaced in the UI with explanation.\n\n**Acceptance Criteria:**\n- [ ] Level assignment logic implemented\n- [ ] Promotion suggestions in UI\n- [ ] Explanation of promotion rationale\n- [ ] Batch processing for level updates\n- [ ] Notification system for promotions\n\n**Definition of Done:**\n- [ ] Logic tested with edge cases\n- [ ] UI shows promotion explanations\n- [ ] Batch processing optimized\n- [ ] Audit trail for level changes",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:3",
+        "business-logic",
+        "backend"
+      ],
+      "projectId": 3,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-12",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 4: Enforce NFT Minting Eligibility Rules",
+      "description": "Ensure backend minting endpoint only allows credential minting for Role Agents meeting NFT eligibility (e.g., L4+ with threshold). Add rejection reasons and audit logging.\n\n**Acceptance Criteria:**\n- [ ] Eligibility validation in minting endpoint\n- [ ] Clear rejection reasons returned\n- [ ] Audit logging for minting attempts\n- [ ] UI shows eligibility status\n- [ ] Gas cost optimization\n\n**Definition of Done:**\n- [ ] Security review of minting logic\n- [ ] Edge cases tested\n- [ ] Audit system functional\n- [ ] Performance benchmarks met",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:4",
+        "blockchain",
+        "backend",
+        "security"
+      ],
+      "projectId": 4,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-13",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 4: Role Agent Decoupling / Idle State Management",
+      "description": "Support setting Role Agents to idle, decoupling from DID without deletion, and reflecting this in UI and ANS (optionally retracting public listing).\n\n**Acceptance Criteria:**\n- [ ] Idle state in database schema\n- [ ] UI for setting agents idle\n- [ ] ANS retraction on idle state\n- [ ] Re-activation workflow\n- [ ] Audit trail for state changes\n\n**Definition of Done:**\n- [ ] State machine tested\n- [ ] UI workflow validated\n- [ ] ANS integration working\n- [ ] Data integrity maintained",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:4",
+        "feature",
+        "backend"
+      ],
+      "projectId": 4,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-14",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 4: Versioned Anchor / Re-mint Workflow",
+      "description": "Allow re-anchoring (versioned NFT) when trust state changes significantly. Track prior anchors, show diffs, and enable admin-triggered refresh with audit trail.\n\n**Acceptance Criteria:**\n- [ ] Versioned NFT contract support\n- [ ] Re-mint trigger logic\n- [ ] Version history tracking\n- [ ] Diff visualization in UI\n- [ ] Admin approval workflow\n\n**Definition of Done:**\n- [ ] Contract security audited\n- [ ] Version migration tested\n- [ ] UI shows clear version history\n- [ ] Gas cost analysis completed",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:4",
+        "blockchain",
+        "frontend"
+      ],
+      "projectId": 4,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-15",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 5: Archive Legacy Code & Enforce No-Hardcoded-Domain Rule",
+      "description": "Move deprecated code (old NFT contract, overengineered signal service, duplicate routes) into `/archive`, add README tags. Add lint/pre-commit rule rejecting hardcoded domain strings in source.\n\n**Acceptance Criteria:**\n- [ ] Legacy code moved to /archive\n- [ ] Archive README documentation\n- [ ] Linting rules for hardcoded domains\n- [ ] Pre-commit hooks configured\n- [ ] CI/CD pipeline updated\n\n**Definition of Done:**\n- [ ] All legacy code archived\n- [ ] Linting rules active\n- [ ] CI pipeline validates rules\n- [ ] Documentation updated",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:5",
+        "cleanup",
+        "devops"
+      ],
+      "projectId": 5,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-16",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 5: Health Check Endpoint & Admin Health UI",
+      "description": "Expose an aggregated health endpoint summarizing: ANS sync status, signal freshness, NFT anchor validity, domain configuration drift. Build a small admin UI panel displaying these with alerts.\n\n**Acceptance Criteria:**\n- [ ] Health check endpoint with metrics\n- [ ] ANS sync status monitoring\n- [ ] Signal freshness validation\n- [ ] NFT anchor validity checks\n- [ ] Admin UI health dashboard\n\n**Definition of Done:**\n- [ ] Health checks comprehensive\n- [ ] UI shows actionable alerts\n- [ ] Monitoring integration complete\n- [ ] Performance impact minimal",
+      "priority": 2,
+      "estimate": 2,
+      "labels": [
+        "milestone:5",
+        "observability",
+        "frontend"
+      ],
+      "projectId": 5,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-17",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    },
+    {
+      "title": "Milestone 5: README & Onboarding Update to Reflect Current Reality",
+      "description": "Update README, onboarding checklist, and developer docs to match implemented flows (ANS signing, visibility flags, widget usage, role agent naming). Validate that a fresh clone can complete Day 1 setup.\n\n**Acceptance Criteria:**\n- [ ] README reflects current architecture\n- [ ] Onboarding checklist updated\n- [ ] Developer setup guide accurate\n- [ ] Fresh clone validation test\n- [ ] Troubleshooting section updated\n\n**Definition of Done:**\n- [ ] External developer can onboard\n- [ ] Documentation review completed\n- [ ] Setup automation tested\n- [ ] Community feedback incorporated",
+      "priority": 2,
+      "estimate": 1,
+      "labels": [
+        "milestone:5",
+        "documentation",
+        "onboarding"
+      ],
+      "projectId": 5,
+      "teamId": "SCK",
+      "state": "backlog",
+      "identifier": "SCK-18",
+      "createdAt": "2025-08-02T14:57:49.982Z",
+      "updatedAt": "2025-08-02T14:57:49.982Z"
+    }
+  ],
+  "metadata": {
+    "exportedAt": "2025-08-02T14:57:49.982Z",
+    "format": "linear",
+    "totalIssues": 18,
+    "source": "SCK Platform Milestones"
+  }
+}

@@ -1,369 +1,423 @@
 /**
- * SCK Domain Management
- * Handles domain configuration for local development and production environments
+ * SCK Platform Cross-Domain Integration
+ * 
+ * Implements composable trust economy architecture:
+ * - SCK Platform (Private): Role agent creation, external signal processing
+ * - ANS Registry (Public): Agent discovery, verification APIs
+ * 
+ * Local Development:
+ * - SCK Platform: localhost:3000
+ * - ANS Registry: localhost:3001 (simulation)
+ * 
+ * Production:
+ * - SCK Platform: sck-plattform.vercel.app (Vercel)
+ * - ANS Registry: knaight.site
  */
 
-import { getEnvironmentConfig, shouldEnablePrivacyFeatures, shouldEnableAnalytics } from './env-validation';
-
-// =============================================================================
-// DOMAIN CONFIGURATION
-// =============================================================================
-
-export const PRIMARY_DOMAIN = 'secure-knaight.io';
-export const EU_DOMAIN = 'secure-knaight.eu';
-export const ORG_DOMAIN = 'secure-knaight.org';
-
-export const PRODUCTION_DOMAINS = [
-  PRIMARY_DOMAIN,
-  EU_DOMAIN,
-  ORG_DOMAIN,
-] as const;
-
-export const LEGACY_DOMAINS = [
-  'secure-knaight.site',
-] as const;
-
-export const ALLOWED_DOMAINS = [
-  'localhost',
-  'localhost:3000',
-  'localhost:3001',
-  '127.0.0.1',
-  '127.0.0.1:3000',
-  '127.0.0.1:3001',
-  ...PRODUCTION_DOMAINS,
-  ...LEGACY_DOMAINS,
-] as const;
-
-export type ProductionDomain = typeof PRODUCTION_DOMAINS[number];
-export type AllowedDomain = typeof ALLOWED_DOMAINS[number];
-
-// =============================================================================
-// ENVIRONMENT DETECTION
-// =============================================================================
-
-export function isDevelopment(): boolean {
-  return process.env.NODE_ENV === 'development';
+export interface DomainConfig {
+  baseUrl: string;
+  ansRegistry: string;
+  autoRegisterANS: boolean;
+  isEU: boolean;
+  isANSRegistry: boolean;
+  walletRequired: boolean;
+  authMethod: 'magic-link' | 'web3';
+  isDevelopment: boolean;
 }
 
-export function isProduction(): boolean {
-  return process.env.NODE_ENV === 'production';
-}
-
-export function isTest(): boolean {
-  return process.env.NODE_ENV === 'test';
-}
-
-// =============================================================================
-// BASE URL MANAGEMENT
-// =============================================================================
-
-export function getBaseUrl(): string {
-  // Runtime detection for client-side
-  if (typeof window !== 'undefined' && window?.location?.origin) {
-    return window.location.origin;
-  }
-
-  // Environment variable fallback
-  const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  if (envBaseUrl) {
-    return envBaseUrl;
-  }
-
-  // Default fallbacks based on environment
-  if (isDevelopment()) {
-    return 'http://localhost:3000';
-  }
-
-  return `https://${PRIMARY_DOMAIN}`;
-}
-
-export function getApiBaseUrl(): string {
-  const baseUrl = getBaseUrl();
-  const apiVersion = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
-  return `${baseUrl}/api/${apiVersion}`;
-}
-
-// =============================================================================
-// DOMAIN VALIDATION
-// =============================================================================
-
-export function getCurrentDomain(): string {
-  // Runtime detection for client-side
-  if (typeof window !== 'undefined' && window?.location?.hostname) {
-    return window.location.hostname;
-  }
-
-  // Environment variable fallback
-  const envDomain = process.env.NEXT_PUBLIC_PRIMARY_DOMAIN;
-  if (envDomain) {
-    return envDomain;
-  }
-
-  // Default fallback
-  return PRIMARY_DOMAIN;
-}
-
-export function isValidDomain(hostname: string): boolean {
-  return ALLOWED_DOMAINS.includes(hostname as AllowedDomain);
-}
-
-export function isProductionDomain(hostname: string): boolean {
-  return PRODUCTION_DOMAINS.includes(hostname as ProductionDomain);
-}
-
-export function isLocalDomain(hostname: string): boolean {
-  return hostname.startsWith('localhost') || hostname.startsWith('127.0.0.1');
-}
-
-export function getDomainType(hostname: string): 'local' | 'production' | 'invalid' {
-  if (isLocalDomain(hostname)) {
-    return 'local';
-  }
-  if (isProductionDomain(hostname)) {
-    return 'production';
-  }
-  return 'invalid';
-}
-
-// =============================================================================
-// DOMAIN-SPECIFIC CONFIGURATION
-// =============================================================================
-
-export function getDomainConfig(hostname: string) {
-  const domainType = getDomainType(hostname);
-  const envConfig = getEnvironmentConfig();
-
-  switch (domainType) {
-    case 'local':
-      return {
-        isLocal: true,
-        isProduction: false,
-        isEU: false,
-        isOrg: false,
-        analytics: false,
-        sentry: false,
-        featureFlags: false,
-        cookieConsent: false,
-        gdpr: false,
-        web3: envConfig.enableWeb3,
-        payments: envConfig.paymentStrategy !== 'none',
-      };
-
-    case 'production':
-      return {
-        isLocal: false,
-        isProduction: true,
-        isEU: hostname === EU_DOMAIN,
-        isOrg: hostname === ORG_DOMAIN,
-        analytics: shouldEnableAnalytics(hostname),
-        sentry: shouldEnableAnalytics(hostname),
-        featureFlags: true,
-        cookieConsent: !shouldEnablePrivacyFeatures(hostname),
-        gdpr: hostname === EU_DOMAIN,
-        web3: envConfig.enableWeb3,
-        payments: envConfig.paymentStrategy !== 'none',
-      };
-
-    default:
-      return {
-        isLocal: false,
-        isProduction: false,
-        isEU: false,
-        isOrg: false,
-        analytics: false,
-        sentry: false,
-        featureFlags: false,
-        cookieConsent: false,
-        gdpr: false,
-        web3: envConfig.enableWeb3,
-        payments: envConfig.paymentStrategy !== 'none',
-      };
-  }
-}
-
-// =============================================================================
-// URL BUILDING UTILITIES
-// =============================================================================
-
-export function buildUrl(path: string, domain?: string): string {
-  const baseUrl = domain ? `https://${domain}` : getBaseUrl();
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `${baseUrl}${cleanPath}`;
-}
-
-export function buildApiUrl(endpoint: string): string {
-  const apiBaseUrl = getApiBaseUrl();
-  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
-  return `${apiBaseUrl}${cleanEndpoint}`;
-}
-
-export function buildWalletCallbackUrl(provider: string): string {
-  return buildApiUrl(`/auth/${provider}/callback`);
-}
-
-export function buildWebhookUrl(service: string): string {
-  return buildApiUrl(`/webhooks/${service}`);
-}
-
-// =============================================================================
-// SEO & METADATA UTILITIES
-// =============================================================================
-
-export function getCanonicalUrl(path: string): string {
-  return buildUrl(path, PRIMARY_DOMAIN);
-}
-
-export function getAlternateUrls(path: string): Record<string, string> {
-  return {
-    'en': buildUrl(path, PRIMARY_DOMAIN),
-    'en-EU': buildUrl(path, EU_DOMAIN),
-    'x-default': buildUrl(path, PRIMARY_DOMAIN),
+export interface ANSRegistrationPayload {
+  ansId: string;
+  did: string;
+  role: string;
+  level: number;
+  qualificationLevel: string;
+  organization: string;
+  trustLevel: string;
+  nftContract?: string;
+  tokenId?: string;
+  verificationEndpoint: string;
+  publicMetadata: {
+    role: string;
+    level: number;
+    qualificationLevel: string;
+    organization: string;
+    certifications?: string[];
+    trustScore: number;
+    lastUpdated: string;
   };
 }
 
-// =============================================================================
-// SECURITY & VALIDATION
-// =============================================================================
+/**
+ * Get current domain configuration based on hostname
+ */
+export function getDomainConfig(hostname?: string): DomainConfig {
+  const host = hostname || (typeof window !== 'undefined' ? window.location.hostname : 'localhost');
+  const isDev = process.env.NODE_ENV === 'development' || host === 'localhost';
 
-export function validateOrigin(origin: string): boolean {
+  // Local Development Configuration
+  if (isDev || host === 'localhost') {
+    return {
+      baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
+      ansRegistry: process.env.NEXT_PUBLIC_ANS_REGISTRY_URL || 'http://localhost:3001',
+      autoRegisterANS: true,
+      isEU: false,
+      isANSRegistry: false,
+      walletRequired: false,
+      authMethod: 'magic-link',
+      isDevelopment: true
+    };
+  }
+
+  // Vercel Production Deployment
+  if (host.includes('vercel.app') || host.includes('sck-plattform')) {
+    return {
+      baseUrl: process.env.NEXT_PUBLIC_BASE_URL || `https://${host}`,
+      ansRegistry: process.env.NEXT_PUBLIC_ANS_REGISTRY_URL || 'https://knaight.site',
+      autoRegisterANS: true,
+      isEU: false,
+      isANSRegistry: false,
+      walletRequired: false,
+      authMethod: 'magic-link',
+      isDevelopment: false
+    };
+  }
+
+  // EU Compliance Domain
+  if (host.includes('secure-knaight.eu')) {
+    return {
+      baseUrl: 'https://secure-knaight.eu',
+      ansRegistry: 'https://knaight.site',
+      autoRegisterANS: true,
+      isEU: true,
+      isANSRegistry: false,
+      walletRequired: false,
+      authMethod: 'magic-link',
+      isDevelopment: false
+    };
+  }
+
+  // ANS Registry Domain
+  if (host.includes('knaight.site')) {
+    return {
+      baseUrl: 'https://knaight.site',
+      ansRegistry: 'https://knaight.site',
+      autoRegisterANS: false,
+      isEU: false,
+      isANSRegistry: true,
+      walletRequired: true,
+      authMethod: 'web3',
+      isDevelopment: false
+    };
+  }
+
+  // Default: SCK Platform
+  return {
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || `https://${host}`,
+    ansRegistry: process.env.NEXT_PUBLIC_ANS_REGISTRY_URL || 'https://knaight.site',
+    autoRegisterANS: true,
+    isEU: false,
+    isANSRegistry: false,
+    walletRequired: false,
+    authMethod: 'magic-link',
+    isDevelopment: false
+  };
+}
+
+/**
+ * Get base URL for current environment
+ */
+export function getBaseUrl(): string {
+  if (process.env.NEXT_PUBLIC_BASE_URL) {
+    return process.env.NEXT_PUBLIC_BASE_URL;
+  }
+
+  if (typeof window !== 'undefined') {
+    return window.location.origin;
+  }
+
+  return 'http://localhost:3000';
+}
+
+/**
+ * Build API URL with proper domain and version
+ */
+export function buildApiUrl(path: string): string {
+  const baseUrl = getBaseUrl();
+  const version = process.env.NEXT_PUBLIC_API_VERSION || 'v1';
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+
+  return `${baseUrl}/api/${version}${cleanPath}`;
+}
+
+/**
+ * Level-based role agent naming convention
+ * Pattern: "L{level} {role}"
+ */
+export function generateRoleAgentName(roleTemplate: string, level: number): string {
+  return `L${level} ${roleTemplate}`;
+}
+
+/**
+ * Assign level based on trust score
+ */
+export function assignLevel(trustScore: number): number {
+  if (trustScore >= 900) return 5;  // Expert
+  if (trustScore >= 750) return 4;  // Advanced  
+  if (trustScore >= 500) return 3;  // Intermediate
+  if (trustScore >= 250) return 2;  // Basic
+  return 1;                         // Entry
+}
+
+/**
+ * Get qualification level from trust score and level
+ */
+export function getQualificationLevel(trustScore: number, level: number): string {
+  if (trustScore >= 900) return 'Expert';
+  if (trustScore >= 750) return 'Advanced';
+  if (trustScore >= 500) return 'Intermediate';
+  if (trustScore >= 250) return 'Basic';
+  return 'Entry';
+}
+
+/**
+ * Check if agent can be promoted to higher level
+ */
+export function canPromoteLevel(currentLevel: number, newTrustScore: number): boolean {
+  const suggestedLevel = assignLevel(newTrustScore);
+  return suggestedLevel > currentLevel;
+}
+
+/**
+ * Get trust level classification for ANS
+ */
+export function getTrustLevel(trustScore: number): string {
+  if (trustScore >= 900) return 'EXPERT';
+  if (trustScore >= 750) return 'HIGHLY_TRUSTED';
+  if (trustScore >= 500) return 'TRUSTED';
+  if (trustScore >= 250) return 'BASIC_TRUST';
+  return 'UNVERIFIED';
+}
+
+/**
+ * Build ANS registration payload for role agent
+ */
+export function buildANSRegistrationPayload(roleAgent: {
+  id: string;
+  name: string;
+  level: number;
+  trustScore: number;
+  assignedToDid: string;
+  organization: { name: string; domain: string };
+  roleTemplate: { title: string };
+  certifications?: string[];
+}): ANSRegistrationPayload {
+  const config = getDomainConfig();
+
+  // Generate ANS identifier: l{level}-{role}.{org-domain}.knaight
+  const roleName = roleAgent.roleTemplate.title.toLowerCase().replace(/\s+/g, '-');
+  const orgDomain = roleAgent.organization.domain.toLowerCase();
+  const ansId = `l${roleAgent.level}-${roleName}.${orgDomain}.knaight`;
+
+  return {
+    ansId,
+    did: roleAgent.assignedToDid,
+    role: roleAgent.roleTemplate.title,
+    level: roleAgent.level,
+    qualificationLevel: getQualificationLevel(roleAgent.trustScore, roleAgent.level),
+    organization: roleAgent.organization.name,
+    trustLevel: getTrustLevel(roleAgent.trustScore),
+    verificationEndpoint: buildApiUrl(`/verify/${roleAgent.id}`),
+    publicMetadata: {
+      role: roleAgent.roleTemplate.title,
+      level: roleAgent.level,
+      qualificationLevel: getQualificationLevel(roleAgent.trustScore, roleAgent.level),
+      organization: roleAgent.organization.name,
+      certifications: roleAgent.certifications || [],
+      trustScore: roleAgent.trustScore,
+      lastUpdated: new Date().toISOString()
+    }
+  };
+}
+
+/**
+ * Register role agent to ANS Registry
+ */
+export async function registerToANS(payload: ANSRegistrationPayload): Promise<{
+  success: boolean;
+  ansId?: string;
+  error?: string;
+  correlationId: string;
+}> {
+  const config = getDomainConfig();
+  const correlationId = generateCorrelationId();
+
+  if (!config.autoRegisterANS) {
+    return {
+      success: false,
+      error: 'ANS auto-registration disabled for this domain',
+      correlationId
+    };
+  }
+
   try {
-    const url = new URL(origin);
-    return isValidDomain(url.hostname);
-  } catch {
-    return false;
+    console.log(`🔗 ANS Registration [${correlationId}]:`, {
+      ansId: payload.ansId,
+      level: payload.level,
+      organization: payload.organization,
+      ansRegistry: config.ansRegistry
+    });
+
+    // In development, simulate ANS registration
+    if (config.isDevelopment) {
+      console.log(`🏠 [LOCAL] Simulating ANS registration to ${config.ansRegistry}`);
+      // TODO: When localhost:3001 ANS registry is set up, make real request
+      return {
+        success: true,
+        ansId: payload.ansId,
+        correlationId
+      };
+    }
+
+    // Production ANS registration
+    const response = await fetch(`${config.ansRegistry}/api/ans/register`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Correlation-ID': correlationId,
+        'Origin': config.baseUrl
+      },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) {
+      throw new Error(`ANS registration failed: ${response.status} ${response.statusText}`);
+    }
+
+    const result = await response.json();
+
+    return {
+      success: true,
+      ansId: result.ansId || payload.ansId,
+      correlationId
+    };
+
+  } catch (error) {
+    console.error(`❌ ANS Registration failed [${correlationId}]:`, error);
+
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+      correlationId
+    };
   }
 }
 
-export function getCorsOrigins(): string[] {
-  if (isDevelopment()) {
-    return [
+/**
+ * Generate correlation ID for tracking requests across services
+ */
+export function generateCorrelationId(): string {
+  return `sck-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
+
+/**
+ * Validate cross-domain request origin
+ */
+export function validateOrigin(origin: string): boolean {
+  const config = getDomainConfig();
+
+  const allowedOrigins = [
+    config.baseUrl,
+    config.ansRegistry,
+    'https://secure-knaight.io',
+    'https://secure-knaight.eu',
+    'https://knaight.site'
+  ];
+
+  // Allow localhost in development
+  if (config.isDevelopment) {
+    allowedOrigins.push(
       'http://localhost:3000',
       'http://localhost:3001',
       'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-    ];
+      'http://127.0.0.1:3001'
+    );
   }
 
-  return [
-    `https://${PRIMARY_DOMAIN}`,
-    `https://${EU_DOMAIN}`,
-    `https://${ORG_DOMAIN}`,
+  return allowedOrigins.includes(origin);
+}
+
+/**
+ * Get CORS origins for API configuration
+ */
+export function getCorsOrigins(): string[] {
+  const config = getDomainConfig();
+
+  const origins = [
+    config.ansRegistry,
+    'https://secure-knaight.io',
+    'https://secure-knaight.eu',
+    'https://knaight.site'
   ];
-}
 
-// =============================================================================
-// REDIRECT UTILITIES
-// =============================================================================
-
-export function getRedirectUrl(fromDomain: string, toDomain: string, path: string): string {
-  const cleanPath = path.startsWith('/') ? path : `/${path}`;
-  return `https://${toDomain}${cleanPath}`;
-}
-
-export function shouldRedirect(fromDomain: string): { should: boolean; target: string } {
-  // Don't redirect from primary domain
-  if (fromDomain === PRIMARY_DOMAIN) {
-    return { should: false, target: '' };
+  if (config.isDevelopment) {
+    origins.push(
+      'http://localhost:3000',
+      'http://localhost:3001',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:3001'
+    );
   }
 
-  // Redirect legacy .site domain to primary
-  if (fromDomain === 'secure-knaight.site') {
-    return { should: true, target: `https://${PRIMARY_DOMAIN}` };
-  }
-
-  // Redirect .org to docs subdomain
-  if (fromDomain === ORG_DOMAIN) {
-    return { should: true, target: `https://docs.${PRIMARY_DOMAIN}` };
-  }
-
-  // Redirect .eu to primary unless EU-specific features are needed
-  if (fromDomain === EU_DOMAIN) {
-    // Check if EU-specific features are required
-    const requiresEU = process.env.NEXT_PUBLIC_EU_COMPLIANCE === 'true';
-    if (!requiresEU) {
-      return { should: true, target: `https://${PRIMARY_DOMAIN}` };
-    }
-  }
-
-  return { should: false, target: '' };
+  return origins;
 }
 
-// =============================================================================
-// ENVIRONMENT-SPECIFIC HELPERS
-// =============================================================================
+/**
+ * Debug helper for local development
+ */
+export function debugDomainInfo(hostname?: string) {
+  if (process.env.NODE_ENV !== 'development') return;
 
-export function getEnvironmentName(): string {
-  if (isDevelopment()) return 'development';
-  if (isTest()) return 'test';
-  return 'production';
+  const config = getDomainConfig(hostname);
+  console.log('🌐 Domain Configuration:', {
+    hostname: hostname || 'current',
+    config,
+    baseUrl: getBaseUrl(),
+    corsOrigins: getCorsOrigins()
+  });
 }
 
-export function getEnvironmentColor(): string {
-  switch (getEnvironmentName()) {
-    case 'development': return '#10b981'; // green
-    case 'test': return '#f59e0b'; // yellow
-    case 'production': return '#ef4444'; // red
-    default: return '#6b7280'; // gray
+/**
+ * Test ANS integration in development
+ */
+export async function testANSIntegration() {
+  if (process.env.NODE_ENV !== 'development') {
+    console.warn('⚠️  ANS integration testing only available in development');
+    return;
   }
-}
 
-export function getDomainTheme(hostname: string): 'default' | 'eu' | 'org' {
-  if (hostname === EU_DOMAIN) return 'eu';
-  if (hostname === ORG_DOMAIN) return 'org';
-  return 'default';
-}
+  console.log('🧪 Testing ANS Integration...');
 
-export function getDomainThemeConfig(hostname: string) {
-  const theme = getDomainTheme(hostname);
+  const testAgent = {
+    id: 'agent-test-123',
+    name: 'L4 Security Engineer',
+    level: 4,
+    trustScore: 825,
+    assignedToDid: 'did:ethr:0xtest123...',
+    organization: { name: 'TestCorp', domain: 'testcorp' },
+    roleTemplate: { title: 'Security Engineer' },
+    certifications: ['CISSP', 'CEH']
+  };
 
-  switch (theme) {
-    case 'eu':
-      return {
-        primaryColor: '#2563eb', // EU blue
-        secondaryColor: '#1e40af',
-        accentColor: '#3b82f6',
-        logo: '/images/logo-eu.svg',
-        favicon: '/favicon-eu.ico',
-      };
-    case 'org':
-      return {
-        primaryColor: '#059669', // Open source green
-        secondaryColor: '#047857',
-        accentColor: '#10b981',
-        logo: '/images/logo-org.svg',
-        favicon: '/favicon-org.ico',
-      };
-    default:
-      return {
-        primaryColor: '#7c3aed', // SCK purple
-        secondaryColor: '#5b21b6',
-        accentColor: '#8b5cf6',
-        logo: '/images/logo.svg',
-        favicon: '/favicon.ico',
-      };
+  try {
+    const payload = buildANSRegistrationPayload(testAgent);
+    console.log('📋 ANS Payload:', payload);
+
+    const result = await registerToANS(payload);
+    console.log('✅ ANS Registration Result:', result);
+
+    return result;
+  } catch (error) {
+    console.error('❌ ANS Integration Test Failed:', error);
+    return { success: false, error: error instanceof Error ? error.message : 'Unknown error', correlationId: 'test-failed' };
   }
-}
-
-// =============================================================================
-// DEBUGGING & LOGGING
-// =============================================================================
-
-export function logDomainInfo(hostname: string): void {
-  if (isDevelopment()) {
-    console.log('🌐 Domain Info:', {
-      hostname,
-      domainType: getDomainType(hostname),
-      config: getDomainConfig(hostname),
-      baseUrl: getBaseUrl(),
-      apiBaseUrl: getApiBaseUrl(),
-      environment: getEnvironmentName(),
-    });
-  }
-}
-
-// =============================================================================
-// TYPE EXPORTS
-// =============================================================================
-
-export type DomainConfig = ReturnType<typeof getDomainConfig>;
-export type Environment = 'development' | 'production' | 'test'; 
+} 

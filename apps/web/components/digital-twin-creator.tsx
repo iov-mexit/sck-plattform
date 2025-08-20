@@ -1,4 +1,6 @@
-import React, { useState, useEffect } from 'react';
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 interface RoleTemplate {
   id: string;
@@ -15,180 +17,129 @@ interface RoleTemplate {
   focus: string;
 }
 
-interface DigitalTwin {
+interface Organization {
   id: string;
   name: string;
-  assignedDid: string;
-  trustScore?: number;
-  isEligibleForMint: boolean;
-  nftMinted: boolean;
-  nftTokenId?: string;
-  nftContractAddress?: string;
+  domain: string;
+}
+
+interface FormData {
+  name: string;
+  description: string;
+  assignedToDid: string;
   roleTemplateId: string;
   organizationId: string;
-  status: "active" | "inactive";
-  createdAt: string;
-  roleTemplate?: {
-    title: string;
-    category: string;
-  };
-  organization?: {
-    name: string;
-  };
+  trustScore: string;
 }
 
-interface DigitalTwinCreatorProps {
-  organizationId: string;
-  onTwinCreated?: (twin: DigitalTwin) => void;
-}
-
-export function DigitalTwinCreator({ organizationId, onTwinCreated }: DigitalTwinCreatorProps) {
-  const [formData, setFormData] = useState({
+export function RoleAgentCreator() {
+  const [formData, setFormData] = useState<FormData>({
     name: '',
-    assignedDid: '',
-    roleTemplateId: '',
     description: '',
-    trustScore: '',
+    assignedToDid: '',
+    roleTemplateId: '',
+    organizationId: '',
+    trustScore: '500'
   });
 
   const [roleTemplates, setRoleTemplates] = useState<RoleTemplate[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [organizations, setOrganizations] = useState<Organization[]>([]);
   const [creating, setCreating] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [createdTwin, setCreatedTwin] = useState<DigitalTwin | null>(null);
-  const [duplicateWarning, setDuplicateWarning] = useState<{
-    message: string;
-    existingDigitalTwin: any;
-  } | null>(null);
-
-  // NFT Minting Options
-  const [nftOptions, setNftOptions] = useState({
-    autoMintIfEligible: false,
-    addToReviewQueue: false,
-  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRoleTemplates();
-  }, []);
+    const fetchData = async () => {
+      try {
+        const [templatesRes, orgsRes] = await Promise.all([
+          fetch('/api/v1/role-templates'),
+          fetch('/api/v1/organizations')
+        ]);
 
-  const fetchRoleTemplates = async () => {
-    try {
-      const response = await fetch('/api/v1/role-templates');
-      const data = await response.json();
+        if (templatesRes.ok) {
+          const templatesData = await templatesRes.json();
+          setRoleTemplates(templatesData.templates || []);
+        }
 
-      if (data.success) {
-        setRoleTemplates(data.data);
-      } else {
-        console.error('Failed to fetch role templates:', data.error);
+        if (orgsRes.ok) {
+          const orgsData = await orgsRes.json();
+          setOrganizations(orgsData.organizations || []);
+        }
+      } catch (err) {
+        console.error('Failed to fetch data:', err);
+        setError('Failed to load required data');
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Error fetching role templates:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    fetchData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!formData.name || !formData.assignedDid || !formData.roleTemplateId) {
-      setError('Please fill in all required fields');
-      return;
-    }
+    setCreating(true);
+    setError(null);
+    setSuccess(false);
 
     try {
-      setCreating(true);
-      setError(null);
-      setDuplicateWarning(null);
+      const payload = {
+        ...formData,
+        trustScore: parseInt(formData.trustScore, 10)
+      };
 
-      // Parse trust score if provided
-      const trustScore = formData.trustScore ? parseInt(formData.trustScore) : undefined;
-
-      const response = await fetch('/api/v1/digital-twins', {
+      const response = await fetch('/api/v1/role-agents', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          organizationId,
-          roleTemplateId: formData.roleTemplateId,
-          assignedToDid: formData.assignedDid,
-          name: formData.name,
-          description: formData.description,
-          trustScore, // From Secure Code Warrior (or test input)
-          nftOptions: {
-            autoMintIfEligible: nftOptions.autoMintIfEligible,
-            addToReviewQueue: nftOptions.addToReviewQueue,
-          },
-        }),
+        body: JSON.stringify(payload),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setCreatedTwin(data.data);
-        onTwinCreated?.(data.data);
-
-        // Reset form
+      if (response.ok) {
+        setSuccess(true);
         setFormData({
           name: '',
-          assignedDid: '',
-          roleTemplateId: '',
           description: '',
-          trustScore: '',
-        });
-        setNftOptions({
-          autoMintIfEligible: false,
-          addToReviewQueue: false,
-        });
-      } else if (data.error === 'DUPLICATE_DID') {
-        // Show duplicate warning instead of error
-        setDuplicateWarning({
-          message: data.message,
-          existingDigitalTwin: data.existingDigitalTwin,
+          assignedToDid: '',
+          roleTemplateId: '',
+          organizationId: '',
+          trustScore: '500'
         });
       } else {
-        setError(data.error || 'Failed to create digital twin');
+        setError(data.error || 'Failed to create role agent');
       }
     } catch (err) {
-      setError('Failed to create digital twin');
-      console.error('Digital twin creation error:', err);
+      setError('Failed to create role agent');
+      console.error('Role agent creation error:', err);
     } finally {
       setCreating(false);
     }
   };
 
-  const handleDidChange = (did: string) => {
-    setFormData({ ...formData, assignedDid: did });
-    // Clear duplicate warning when DID changes
-    setDuplicateWarning(null);
-  };
-
-  const handleMintSuccess = (tokenId: string, transactionHash: string) => {
-    if (createdTwin) {
-      setCreatedTwin({
-        ...createdTwin,
-        nftMinted: true,
-        nftTokenId: tokenId,
-        nftContractAddress: process.env.NEXT_PUBLIC_NFT_CONTRACT_ADDRESS,
-      });
-    }
+  const generateDid = () => {
+    const randomHex = Math.random().toString(16).substr(2, 40);
+    setFormData(prev => ({
+      ...prev,
+      assignedToDid: `did:ethr:0x${randomHex}`
+    }));
   };
 
   if (loading) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Create Digital Twin</CardTitle>
+          <CardTitle>Create Role Agent</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="animate-pulse">
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-4"></div>
-            <div className="space-y-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-10 bg-gray-200 rounded"></div>
-              ))}
-            </div>
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-10 bg-gray-200 rounded"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-10 bg-gray-200 rounded"></div>
           </div>
         </CardContent>
       </Card>
@@ -196,59 +147,119 @@ export function DigitalTwinCreator({ organizationId, onTwinCreated }: DigitalTwi
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <span>Create Digital Twin</span>
-            <Badge variant="secondary">DID-Based Identity</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Digital Twin Name</Label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="e.g., Security Engineer Digital Twin"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  required
-                />
-              </div>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <span>Create Role Agent</span>
+          {success && (
+            <Badge variant="secondary" className="bg-green-100 text-green-800">
+              <CheckCircle className="w-3 h-3 mr-1" />
+              Created Successfully
+            </Badge>
+          )}
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-2 text-red-800">
+              <AlertCircle className="w-4 h-4" />
+              <span className="font-medium">Error</span>
+            </div>
+            <p className="text-red-600 text-sm mt-1">{error}</p>
+          </div>
+        )}
 
-              <div className="space-y-2">
-                <Label htmlFor="did">DID (Decentralized Identifier)</Label>
-                <Input
-                  id="did"
-                  type="text"
-                  placeholder="did:ethr:0x..."
-                  value={formData.assignedDid}
-                  onChange={(e) => handleDidChange(e.target.value)}
-                  required
-                />
-                <p className="text-xs text-gray-500">
-                  DID represents the human identity (no personal data stored)
-                </p>
-              </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Basic Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Basic Information</h3>
+
+            <div className="space-y-2">
+              <Label htmlFor="name">Role Agent Name</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                placeholder="e.g., Security Engineer Agent"
+                required
+              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="role">Role Template</Label>
-              <Select value={formData.roleTemplateId} onValueChange={(value) => setFormData({ ...formData, roleTemplateId: value })}>
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
+                value={formData.description}
+                onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                placeholder="Brief description of this role agent's purpose..."
+                rows={3}
+              />
+            </div>
+          </div>
+
+          {/* Identity Assignment */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Identity Assignment</h3>
+
+            <div className="space-y-2">
+              <Label htmlFor="assignedToDid">Assigned DID</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="assignedToDid"
+                  value={formData.assignedToDid}
+                  onChange={(e) => setFormData(prev => ({ ...prev, assignedToDid: e.target.value }))}
+                  placeholder="did:ethr:0x..."
+                  required
+                />
+                <Button type="button" variant="outline" onClick={generateDid}>
+                  Generate
+                </Button>
+              </div>
+              <p className="text-xs text-gray-500">
+                Decentralized Identifier for privacy-preserving assignment
+              </p>
+            </div>
+          </div>
+
+          {/* Role Configuration */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Role Configuration</h3>
+
+            <div className="space-y-2">
+              <Label htmlFor="organizationId">Organization</Label>
+              <Select
+                value={formData.organizationId}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, organizationId: value }))}
+              >
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a role template" />
+                  <SelectValue placeholder="Select organization" />
+                </SelectTrigger>
+                <SelectContent>
+                  {organizations.map((org) => (
+                    <SelectItem key={org.id} value={org.id}>
+                      {org.name} ({org.domain})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="roleTemplateId">Role Template</Label>
+              <Select
+                value={formData.roleTemplateId}
+                onValueChange={(value) => setFormData(prev => ({ ...prev, roleTemplateId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role template" />
                 </SelectTrigger>
                 <SelectContent>
                   {roleTemplates.map((template) => (
                     <SelectItem key={template.id} value={template.id}>
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-col items-start">
                         <span>{template.title}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {template.category}
-                        </Badge>
+                        <span className="text-xs text-gray-500">{template.category}</span>
                       </div>
                     </SelectItem>
                   ))}
@@ -257,142 +268,46 @@ export function DigitalTwinCreator({ organizationId, onTwinCreated }: DigitalTwi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="description">Description (Optional)</Label>
-              <Textarea
-                id="description"
-                placeholder="Brief description of this digital twin's purpose..."
-                value={formData.description}
-                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={3}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="trustScore">Trust Score (0-1000)</Label>
+              <Label htmlFor="trustScore">Initial Trust Score</Label>
               <Input
                 id="trustScore"
                 type="number"
                 min="0"
                 max="1000"
-                placeholder="e.g., 850"
                 value={formData.trustScore}
-                onChange={(e) => setFormData({ ...formData, trustScore: e.target.value })}
+                onChange={(e) => setFormData(prev => ({ ...prev, trustScore: e.target.value }))}
+                required
               />
               <p className="text-xs text-gray-500">
-                Trust score from Secure Code Warrior or other sources (≥750 enables NFT minting)
+                Score from 0-1000. Scores ≥750 are eligible for NFT minting.
               </p>
             </div>
+          </div>
 
-            {/* NFT Minting Options */}
-            <div className="space-y-3 border-t pt-4">
-              <Label className="text-base font-medium">NFT Minting Options</Label>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="autoMint"
-                    checked={nftOptions.autoMintIfEligible}
-                    onChange={(e) =>
-                      setNftOptions({ ...nftOptions, autoMintIfEligible: (e.target as HTMLInputElement).checked })
-                    }
-                  />
-                  <Label htmlFor="autoMint" className="text-sm font-normal">
-                    Mint NFT immediately if trust score ≥ 750
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="reviewQueue"
-                    checked={nftOptions.addToReviewQueue}
-                    onChange={(e) =>
-                      setNftOptions({ ...nftOptions, addToReviewQueue: (e.target as HTMLInputElement).checked })
-                    }
-                  />
-                  <Label htmlFor="reviewQueue" className="text-sm font-normal">
-                    Add to "Eligible for Minting" review queue
-                  </Label>
-                </div>
-              </div>
-              <p className="text-xs text-gray-500">
-                Leave both unchecked to create twin only (no NFT minting)
-              </p>
-            </div>
-
-            {duplicateWarning && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-yellow-800">
-                      DID Already Exists
-                    </h3>
-                    <div className="mt-2 text-sm text-yellow-700">
-                      <p>{duplicateWarning.message}</p>
-                      <p className="mt-1">
-                        Existing twin: <strong>{duplicateWarning.existingDigitalTwin.name}</strong>
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {error && (
-              <div className="text-red-600 text-sm">{error}</div>
-            )}
-
+          {/* Submit Button */}
+          <div className="pt-4 border-t">
             <Button
               type="submit"
-              disabled={creating}
+              disabled={creating || !formData.name || !formData.assignedToDid || !formData.roleTemplateId || !formData.organizationId}
               className="w-full"
             >
-              {creating ? 'Creating Digital Twin...' : 'Create Digital Twin'}
+              {creating ? 'Creating Role Agent...' : 'Create Role Agent'}
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </div>
+        </form>
 
-      {createdTwin && (
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <span>Digital Twin Created Successfully</span>
-                <Badge variant="default">✅</Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Name:</span>
-                  <span className="text-sm text-gray-600">{createdTwin.name}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">DID:</span>
-                  <span className="text-sm text-gray-600 font-mono">{createdTwin.assignedDid}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Role:</span>
-                  <span className="text-sm text-gray-600">{createdTwin.roleTemplate?.title || 'Unknown'}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Trust Score:</span>
-                  <span className="text-sm text-gray-600">{createdTwin.trustScore || 'N/A'}/1000</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">NFT Eligibility:</span>
-                  <Badge variant={createdTwin.isEligibleForMint ? "default" : "secondary"}>
-                    {createdTwin.isEligibleForMint ? "Eligible" : "Not Eligible"}
-                  </Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-    </div>
+        {success && (
+          <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div className="flex items-center gap-2 text-green-800">
+              <CheckCircle className="w-4 h-4" />
+              <span>Role Agent Created Successfully</span>
+            </div>
+            <p className="text-green-600 text-sm mt-1">
+              The role agent has been created and is ready for signal collection.
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 } 

@@ -1,235 +1,282 @@
-# SCK NFT Contract Implementation Summary
+# 🎯 SCK NFT Contract Implementation
 
-## 🎯 What We Built
+## Overview
 
-We successfully implemented a **single, unified NFT contract system** for the SCK (Secure Code KnAIght) platform that handles both digital twins and achievements in one contract.
+We successfully implemented a **single, unified NFT contract system** for the SCK (Secure Code KnAIght) platform that handles both role agents and achievements in one contract.
 
-## 📁 Contract Structure
+## Contract Architecture
 
-### Core Contract: `SCKNFT.sol`
-- **Location**: `packages/contracts/backend/SCKNFT.sol`
-- **Type**: Single ERC-721 contract
-- **Purpose**: Digital twin NFTs with achievement tracking
+### 🏗️ Unified Contract Design
 
-### Key Features Implemented:
+- **Contract Name**: `SCKDynamicNFT`
+- **Token Standard**: ERC-721 
+- **Purpose**: Role agent NFTs with achievement tracking
+- **Network**: Sepolia Testnet (for development)
 
-#### 1. Digital Twin Management
+#### 1. Role Agent Management
 ```solidity
-struct DigitalTwin {
-    string did;              // Decentralized Identifier
-    string role;             // Role (Developer, Security Expert, etc.)
-    string organization;     // Organization name
-    uint256 createdAt;       // Creation timestamp
-    bool isActive;           // Active status
+struct RoleAgent {
+    string did;                      // Decentralized Identifier
+    string name;                     // Agent name
+    string role;                     // Role category (e.g., "Security Engineer")
+    string organization;             // Organization name
+    uint256 trustScore;              // Trust score (0-1000)
+    TrustLevel trustLevel;           // Derived from trust score
+    uint256 createdAt;              // Creation timestamp
+    uint256 lastUpdated;            // Last update timestamp
+    bool isActive;                  // Active status
+    bool isEligibleForAchievements; // Can mint achievements
+    uint256 totalSignals;           // Number of trust signals
+    uint256 achievementCount;       // Number of achievements earned
 }
 ```
 
 #### 2. Achievement System
 ```solidity
 struct Achievement {
-    string achievementType;  // Type (certification, activity, milestone)
-    string title;            // Achievement title
-    string metadata;         // Additional metadata (JSON)
-    uint256 earnedAt;        // Timestamp when earned
-    bool isSoulbound;        // Whether this achievement is soulbound
+    string achievementType;          // Category
+    string title;                   // Achievement title
+    string description;             // Description
+    string metadata;                // JSON metadata
+    uint256 trustScoreAtEarning;    // Trust score when earned
+    uint256 earnedAt;              // Timestamp
+    bool isSoulbound;              // Cannot be transferred
+    string imageURI;               // Achievement image
 }
 ```
 
-#### 3. Soulbound Functionality
-- Achievements can be marked as soulbound
-- Soulbound tokens cannot be transferred
-- Maintains integrity of important achievements
+#### 3. Trust Signal Processing
+```solidity
+struct TrustSignal {
+    SignalType signalType;          // Signal category
+    int256 scoreImpact;            // Score change (-100 to +100)
+    string source;                 // Signal source
+    string metadata;               // Additional data
+    uint256 timestamp;             // When recorded
+    address reporter;              // Who reported
+    bool isVerified;               // Verification status
+}
+```
 
-## 🛠️ Development Infrastructure
-
-### 1. Hardhat Configuration
-- **File**: `packages/contracts/backend/hardhat.config.js`
-- **Networks**: Localhost, Sepolia, Mainnet
-- **Optimization**: Enabled with 200 runs
-- **Gas Reporting**: Enabled
-
-### 2. Deployment Script
-- **File**: `packages/contracts/backend/scripts/deploy.js`
-- **Features**: Automatic deployment and verification
-- **Networks**: Supports all configured networks
-
-### 3. Comprehensive Testing
-- **File**: `packages/contracts/backend/test/SCKNFT.test.js`
-- **Coverage**: 100% function coverage
-- **Scenarios**: All major contract functions tested
-
-## 🔗 Web Application Integration
-
-### 1. TypeScript Interface
-- **File**: `apps/web/lib/contracts/sck-nft.ts`
-- **Purpose**: Type-safe contract interaction
-- **Features**: Full contract function mapping
-
-### 2. Signal-to-NFT Integration
-- **File**: `apps/web/lib/integrations/signal-to-nft.ts`
-- **Purpose**: Connect signal collection with NFT minting
-- **Features**: Automatic achievement minting based on signals
-
-## 📊 Contract Functions
+## 📋 Function Reference
 
 ### Core Functions
-| Function | Description | Access |
-|----------|-------------|---------|
-| `mintDigitalTwin()` | Mint new digital twin NFT | Owner only |
-| `mintAchievement()` | Mint achievement for digital twin | Owner only |
 
-### View Functions
+| Function | Description | Access Level |
+|----------|-------------|--------------|
+| `mintRoleAgent()` | Mint new role agent NFT | Owner only |
+| `mintAchievement()` | Mint achievement for role agent | Owner only |
+| `processTrustSignal()` | Update trust score | Signal updater |
+| `batchProcessSignals()` | Process multiple signals | Signal updater |
+| `updateRoleAgentData()` | Update agent information | Owner only |
+| `deactivateRoleAgent()` | Deactivate role agent | Owner only |
+
+### Query Functions
+
 | Function | Description |
 |----------|-------------|
-| `getDigitalTwinData()` | Get digital twin information |
-| `getAchievements()` | Get all achievements for a token |
-| `getTokenIdByDID()` | Find token ID by DID |
-| `isSoulbound()` | Check if token is soulbound |
-| `getAchievementCount()` | Get number of achievements |
-| `totalDigitalTwins()` | Get total number of digital twins |
-| `doesDIDExist()` | Check if DID exists |
+| `getRoleAgentData()` | Get role agent information |
+| `getAchievement()` | Get achievement details |
+| `getTrustSignals()` | Get all signals for agent |
+| `getPlatformStats()` | Get platform-wide statistics |
+| `isEligibleForAchievements()` | Check achievement eligibility |
+| `totalRoleAgents()` | Get total number of role agents |
 
-### Admin Functions
-| Function | Description | Access |
-|----------|-------------|---------|
-| `setBaseURI()` | Set metadata base URI | Owner only |
-| `setSoulboundStatus()` | Set soulbound status | Owner only |
-| `deactivateDigitalTwin()` | Deactivate digital twin | Owner only |
+### Role Agent Metadata
 
-## 🎨 Metadata Structure
-
-### Digital Twin Metadata
 ```json
 {
-  "name": "SCK Digital Twin #1",
-  "description": "Secure Code KnAIght Digital Identity",
-  "image": "https://api.securecodeknight.com/images/digital-twin/1.png",
+  "name": "SCK Role Agent #1",
+  "description": "Security Engineer at SecureCorp",
+  "image": "https://api.securecodeknight.com/images/role-agent/1.png",
   "attributes": [
     {
-      "trait_type": "DID",
-      "value": "did:sck:123456789"
-    },
-    {
       "trait_type": "Role",
-      "value": "Developer"
+      "value": "Security Engineer"
     },
     {
-      "trait_type": "Organization",
+      "trait_type": "Organization", 
       "value": "SecureCorp"
     },
     {
+      "trait_type": "Trust Score",
+      "value": 850
+    },
+    {
+      "trait_type": "Trust Level",
+      "value": "Highly Trusted"
+    },
+    {
+      "trait_type": "Active",
+      "value": "Yes"
+    },
+    {
       "trait_type": "Achievements",
-      "value": "5"
+      "value": 3
     }
-  ]
+  ],
+  "properties": {
+    "did": "did:ethr:0x123...",
+    "created_at": "2024-01-15T10:30:00Z",
+    "last_updated": "2024-01-20T14:45:00Z",
+    "total_signals": 42,
+    "eligible_for_achievements": true
+  }
 }
 ```
 
-## 🔄 Integration Flow
+## 🚀 Deployment Information
 
-### Signal Collection → NFT Achievement
-1. **Signal Collected**: User completes certification or activity
-2. **Signal Processing**: Integration service processes the signal
-3. **Achievement Check**: Validates if signal qualifies for achievement
-4. **NFT Minting**: Automatically mints achievement NFT
-5. **Metadata Storage**: Stores signal data in achievement metadata
+### Contract Addresses
+- **Sepolia Testnet**: `0x741619748382c07566BefCC986d8fBbB8EC7168e`
+- **Etherscan**: [View Contract](https://sepolia.etherscan.io/address/0x741619748382c07566BefCC986d8fBbB8EC7168e)
 
-### Example Flow:
-```
-User completes SecureCodeWarrior certification
-↓
-Signal collected: { type: 'certification', title: 'Security Expert', ... }
-↓
-Integration checks eligibility
-↓
-Achievement NFT minted with soulbound status
-↓
-Metadata includes certification details
+### Deployment Configuration
+```javascript
+module.exports = {
+  name: "SCK Role Agents",
+  symbol: "SCKRA", 
+  baseTokenURI: "https://api.securecodeknight.com/metadata/",
+  contractURI: "https://api.securecodeknight.com/contract-metadata.json"
+};
 ```
 
-## 🚀 Deployment Ready
-
-### Local Development
-```bash
-cd packages/contracts/backend
-npm install
-npm run compile
-npm test
-npm run deploy:local
-```
-
-### Testnet Deployment
-```bash
-# Set environment variables
-export PRIVATE_KEY=your_private_key
-export SEPOLIA_URL=your_sepolia_rpc_url
-
-# Deploy
-npm run deploy:testnet
-```
-
-## 🔒 Security Features
+## 🔐 Security Features
 
 ### Access Control
-- Only contract owner can mint digital twins and achievements
-- Owner can deactivate digital twins
-- Soulbound tokens prevent unauthorized transfers
 
-### Data Validation
-- DIDs must be non-empty and unique
-- Achievement types must be non-empty
-- Token existence is validated before operations
+- Only contract owner can mint role agents and achievements
+- Signal updater role can process trust signals
+- Owner can deactivate role agents
+- Soulbound achievements cannot be transferred
 
-### Gas Optimization
-- Contract uses efficient data structures
-- View functions are optimized for read operations
-- Events are used for important state changes
+### Trust System
 
-## 📈 Next Steps
+1. **Trust Levels** (based on score 0-1000):
+   - `UNVERIFIED` (0-249)
+   - `BASIC` (250-499) 
+   - `TRUSTED` (500-749)
+   - `HIGHLY_TRUSTED` (750-899)
+   - `ELITE` (900-1000)
 
-### Immediate Actions
-1. **Deploy to Testnet**: Deploy contract to Sepolia for testing
-2. **Web Integration**: Connect web app with deployed contract
-3. **Signal Integration**: Test signal-to-NFT flow
-4. **Metadata API**: Set up metadata endpoint
+2. **Achievement Eligibility**: Requires trust score ≥ 750
 
-### Future Enhancements
-1. **Role Templates**: Predefined role structures
-2. **Achievement Levels**: Tiered achievement system
-3. **Governance**: DAO-based contract upgrades
-4. **Cross-Chain**: Multi-chain digital twin support
-5. **Privacy**: Zero-knowledge proof integration
+3. **Signal Types**:
+   - Security Audit
+   - Code Review
+   - Vulnerability Found
+   - Certification Earned
+   - Peer Validation
+   - Performance Metric
+   - Training Completed
 
-## ✅ Success Metrics
+## 🎮 Usage Examples
 
-### Technical Achievements
-- ✅ Single contract design (simplified architecture)
-- ✅ Comprehensive test coverage
-- ✅ Type-safe web integration
-- ✅ Signal-to-NFT automation
-- ✅ Soulbound functionality
-- ✅ DID integration
-- ✅ Gas-optimized functions
+### Mint Role Agent
+```solidity
+uint256 tokenId = sckNFT.mintRoleAgent(
+    userAddress,
+    "did:ethr:0x123...",
+    "Alice Security Expert", 
+    "Security Engineer",
+    "SecureCorp",
+    850  // Initial trust score
+);
+```
 
-### Business Value
-- ✅ Digital twin identity management
-- ✅ Achievement tracking system
-- ✅ Automated NFT minting
-- ✅ Scalable architecture
-- ✅ Security-focused design
+### Process Trust Signal
+```solidity
+sckNFT.processTrustSignal(
+    tokenId,
+    SignalType.SECURITY_AUDIT,
+    50,  // +50 trust score
+    "audit-system-v1",
+    '{"audit_type":"smart_contract","severity":"high"}'
+);
+```
 
-## 🎯 Ready for Production
+### Mint Achievement
+```solidity
+sckNFT.mintAchievement(
+    tokenId,
+    "Security Certification",
+    "Smart Contract Security Expert",
+    "Completed advanced security audit training",
+    '{"certification_level":"expert"}',
+    false, // Not soulbound
+    "https://api.sck.com/achievements/security-expert.png"
+);
+```
 
-The NFT contract system is now **production-ready** with:
-- **Comprehensive testing** and validation
-- **Security best practices** implemented
-- **Gas optimization** for cost efficiency
-- **Type-safe integration** with web application
-- **Automated achievement minting** from signal collection
+## 📊 Cross-Chain Support
 
-The system provides a solid foundation for the SCK platform's digital identity and achievement system, ready to scale as the platform grows.
+### Phase 1: Single Chain (Current)
+- ✅ Role agent identity management
+- ✅ Achievement tracking
+- ✅ Trust score updates
+- ✅ Soulbound tokens
+
+### Phase 2: Multi-Chain (Planned)
+- 🔄 Cross-chain role agent verification
+- 🔄 Universal achievement recognition
+- 🔄 Trust score synchronization
+- 🔄 Cross-chain governance
+
+## 🧪 Testing
+
+### Contract Tests
+```bash
+cd packages/contracts/backend
+npm run test
+```
+
+### Frontend Integration Tests
+```bash
+cd apps/web
+npm run test:integration
+```
+
+## 📈 Platform Statistics
+
+The contract provides comprehensive analytics:
+
+```solidity
+function getPlatformStats() external view returns (
+    uint256 totalAgents,
+    uint256 totalSignals, 
+    uint256 totalAchievements,
+    uint256 eligibleAgents,
+    uint256 unverifiedAgents,
+    uint256 basicAgents,
+    uint256 trustedAgents,
+    uint256 highlyTrustedAgents,
+    uint256 eliteAgents
+);
+```
+
+## 🔧 Integration Points
+
+### Frontend Integration
+- `apps/web/lib/sck-dynamic-nft-service.ts` - Service layer
+- `apps/web/components/nft-minting.tsx` - UI component
+- `apps/web/app/api/v1/nft/mint/route.ts` - API endpoint
+
+### Database Integration
+- Role agent data stored in PostgreSQL
+- Blockchain transactions tracked
+- Trust signals logged and processed
+- Achievement records maintained
+
+## 🎯 Next Steps
+
+1. **Enhanced Trust Scoring**: Machine learning-based trust calculation
+2. **External Integrations**: GitHub, LinkedIn verification
+3. **Achievement Templates**: Predefined achievement categories
+4. **Cross-Chain**: Multi-chain role agent support
+5. **DAO Governance**: Community-driven role template approval
 
 ---
 
-**Status**: ✅ **IMPLEMENTATION COMPLETE**  
-**Next**: Deploy to testnet and integrate with web application 
+**Contract Status**: ✅ **DEPLOYED AND FUNCTIONAL**  
+**Network**: Sepolia Testnet  
+**Integration**: Complete with SCK platform 

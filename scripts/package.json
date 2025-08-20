@@ -1,0 +1,39 @@
+{
+  "name": "sck-plattform-scripts",
+  "version": "1.0.0",
+  "description": "SCK Platform development and deployment scripts",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iov-mexit/sck-plattform.git"
+  },
+  "scripts": {
+    "import-issues": "GITHUB_REPO=iov-mexit/sck-plattform node github-issues-import.js",
+    "import-issues:dry-run": "GITHUB_REPO=iov-mexit/sck-plattform node github-issues-import.js --dry-run --verbose",
+    "create-milestones": "GITHUB_REPO=iov-mexit/sck-plattform node github-issues-import.js --create-milestones --dry-run",
+    "create-milestones:real": "GITHUB_REPO=iov-mexit/sck-plattform node github-issues-import.js --create-milestones",
+    "import-all": "GITHUB_REPO=iov-mexit/sck-plattform node github-issues-import.js --create-milestones",
+    "export-kanban": "node kanban-export.js",
+    "health-check": "node health-check.js"
+  },
+  "dependencies": {
+    "@octokit/rest": "^20.0.2",
+    "chalk": "^4.1.2",
+    "inquirer": "^9.2.12",
+    "yargs": "^17.7.2"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "keywords": [
+    "sck",
+    "github",
+    "issues",
+    "milestones",
+    "project-management",
+    "iov-mexit",
+    "sck-plattform"
+  ],
+  "author": "SCK Platform Team",
+  "license": "MIT"
+}

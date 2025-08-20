@@ -1,4 +1,4 @@
-import { prisma } from './database';
+import prisma from './database';
 import { z } from 'zod';
 
 // =============================================================================
@@ -40,18 +40,18 @@ export class SignalCollectionService {
       // Validate the signal data
       const validatedData = SignalSchema.parse(data);
 
-      // Check if digital twin exists
-      const digitalTwin = await prisma.digitalTwin.findUnique({
+      // Check if role agent exists
+      const roleAgent = await prisma.role_agents.findUnique({
         where: { id: validatedData.digitalTwinId },
-        include: { organization: true, roleTemplate: true }
+        include: { organizations: true, role_templates: true }
       });
 
-      if (!digitalTwin) {
-        throw new Error(`Digital twin not found: ${validatedData.digitalTwinId}`);
+      if (!roleAgent) {
+        throw new Error(`Role agent not found: ${validatedData.digitalTwinId}`);
       }
 
       // Create the signal
-      const signal = await prisma.signal.create({
+      const signal = await prisma.signals.create({
         data: {
           type: validatedData.type,
           title: validatedData.title,
@@ -59,13 +59,13 @@ export class SignalCollectionService {
           source: validatedData.source,
           url: validatedData.url,
           metadata: validatedData.metadata as import('@prisma/client').Prisma.InputJsonValue,
-          digitalTwinId: validatedData.digitalTwinId,
+          roleAgentId: validatedData.digitalTwinId,
         },
         include: {
-          digitalTwin: {
+          role_agents: {
             include: {
-              organization: true,
-              roleTemplate: true
+              organizations: true,
+              role_templates: true
             }
           }
         }
@@ -78,26 +78,26 @@ export class SignalCollectionService {
     }
   }
 
-  // Get signals for a digital twin
-  async getSignalsByDigitalTwin(digitalTwinId: string, options?: {
+  // Get signals for a role agent
+  async getSignalsByRoleAgent(roleAgentId: string, options?: {
     type?: 'certification' | 'activity';
     limit?: number;
     offset?: number;
   }): Promise<unknown[]> {
     try {
-      const where: Record<string, unknown> = { digitalTwinId };
+      const where: Record<string, unknown> = { roleAgentId };
 
       if (options?.type) {
         where.type = options.type;
       }
 
-      const signals = await prisma.signal.findMany({
+      const signals = await prisma.signals.findMany({
         where,
         include: {
-          digitalTwin: {
+          role_agents: {
             include: {
-              organization: true,
-              roleTemplate: true
+              organizations: true,
+              role_templates: true
             }
           }
         },
@@ -113,11 +113,11 @@ export class SignalCollectionService {
     }
   }
 
-  // Get signal count for a digital twin
-  async getSignalCount(digitalTwinId: string): Promise<number> {
+  // Get signal count for a role agent
+  async getSignalCount(roleAgentId: string): Promise<number> {
     try {
-      return await prisma.signal.count({
-        where: { digitalTwinId }
+      return await prisma.signals.count({
+        where: { roleAgentId }
       });
     } catch (error: unknown) {
       console.error('Error counting signals:', error);
@@ -125,18 +125,18 @@ export class SignalCollectionService {
     }
   }
 
-  // Get recent signals for a digital twin
-  async getRecentSignals(digitalTwinId: string, limit: number = 5): Promise<unknown[]> {
+  // Get recent signals for a role agent
+  async getRecentSignals(roleAgentId: string, limit: number = 5): Promise<unknown[]> {
     try {
-      return await prisma.signal.findMany({
-        where: { digitalTwinId },
+      return await prisma.signals.findMany({
+        where: { roleAgentId },
         orderBy: { createdAt: 'desc' },
         take: limit,
         include: {
-          digitalTwin: {
+          role_agents: {
             include: {
-              organization: true,
-              roleTemplate: true
+              organizations: true,
+              role_templates: true
             }
           }
         }

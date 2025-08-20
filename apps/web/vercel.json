@@ -1,0 +1,36 @@
+{
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "outputDirectory": ".next",
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 30
+    }
+  },
+  "env": {
+    "NEXT_PUBLIC_ENVIRONMENT": "production",
+    "NEXT_PUBLIC_API_VERSION": "v1",
+    "NEXT_PUBLIC_ANS_REGISTRY_URL": "https://knaight.site",
+    "NEXT_PUBLIC_AUTO_REGISTER_ANS": "true",
+    "NEXT_PUBLIC_ENABLE_ANS_INTEGRATION": "true",
+    "NEXT_PUBLIC_ENABLE_NFT_MINTING": "true",
+    "NEXT_PUBLIC_ENABLE_EXTERNAL_SIGNALS": "true",
+    "NEXT_PUBLIC_DEBUG_MODE": "false",
+    "NEXT_PUBLIC_LOG_LEVEL": "info",
+    "NEXT_PUBLIC_EU_COMPLIANCE": "false",
+    "NEXT_PUBLIC_COOKIE_CONSENT_ENABLED": "true"
+  },
+  "build": {
+    "env": {
+      "DATABASE_URL": "@database_url",
+      "NEXT_PUBLIC_MAGIC_API_KEY": "@magic_api_key",
+      "WALLET_CONNECT_PROJECT_ID": "@wallet_connect_project_id",
+      "INFURA_KEY": "@infura_key",
+      "SCK_NFT_ADDRESS": "@sck_nft_address",
+      "SCK_NFT_DYNAMIC_ADDRESS": "@sck_nft_dynamic_address",
+      "SENTRY_DSN": "@sentry_dsn",
+      "ANALYTICS_ID": "@analytics_id"
+    }
+  }
+} 

@@ -1,249 +1,227 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 interface TrustDashboardProps {
   organizationId: string;
 }
 
-interface DigitalTwin {
+interface RoleAgent {
   id: string;
   name: string;
-  assignedDid: string;
-  trustScore?: number;
-  isEligibleForMint: boolean;
-  status: 'active' | 'inactive';
-  roleTemplate?: {
+  assignedToDid: string;
+  trustScore: number;
+  roleTemplate: {
     title: string;
     category: string;
+  };
+  organization: {
+    name: string;
   };
   createdAt: string;
 }
 
-interface TrustData {
-  totalTwins: number;
+interface DashboardStats {
+  totalRoleAgents: number;
   averageTrustScore: number;
-  eligibleForNFT: number;
-  pendingValidation: number;
-  trustThreshold: number;
+  eligibleForMint: number;
+  recentRoleAgents: RoleAgent[];
 }
 
 export function TrustDashboard({ organizationId }: TrustDashboardProps) {
-  const [activeView, setActiveView] = useState('overview');
-  const [trustData, setTrustData] = useState<TrustData | null>(null);
-  const [recentTwins, setRecentTwins] = useState<DigitalTwin[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTrustData = async () => {
+    async function fetchDashboardData() {
       try {
         setLoading(true);
-        
-        // Fetch digital twins for this organization
-        const response = await fetch(`/api/v1/digital-twins?organizationId=${organizationId}`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          const twins: DigitalTwin[] = data.data || [];
-          
-          // Calculate trust metrics from real data
-          const totalTwins = twins.length;
-          const eligibleForNFT = twins.filter(twin => twin.isEligibleForMint).length;
-          const pendingValidation = twins.filter(twin => !twin.trustScore).length;
-          
-          const trustScores = twins
-            .map(twin => twin.trustScore)
-            .filter(score => score !== undefined && score !== null) as number[];
-          
-          const averageTrustScore = trustScores.length > 0 
-            ? Math.round(trustScores.reduce((sum, score) => sum + score, 0) / trustScores.length)
-            : 0;
-          
-          // Default trust threshold (could be fetched from organization settings)
-          const trustThreshold = 75;
-          
-          setTrustData({
-            totalTwins,
-            averageTrustScore,
-            eligibleForNFT,
-            pendingValidation,
-            trustThreshold
-          });
-          
-          // Get recent twins (last 5 created)
-          const recent = twins
-            .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-            .slice(0, 5);
-          
-          setRecentTwins(recent);
-        } else {
-          throw new Error('Failed to fetch trust data');
+        setError(null);
+
+        // Fetch role agents for this organization
+        const response = await fetch(`/api/v1/role-agents?organizationId=${organizationId}`);
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch role agents: ${response.status}`);
         }
+
+        const data = await response.json();
+        const roleAgents = data.roleAgents || [];
+
+        // Calculate statistics
+        const totalRoleAgents = roleAgents.length;
+        const averageTrustScore = totalRoleAgents > 0
+          ? roleAgents.reduce((sum: number, agent: RoleAgent) => sum + (agent.trustScore || 0), 0) / totalRoleAgents
+          : 0;
+        const eligibleForMint = roleAgents.filter((agent: RoleAgent) => (agent.trustScore || 0) >= 750).length;
+        const recentRoleAgents = roleAgents
+          .sort((a: RoleAgent, b: RoleAgent) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, 5);
+
+        setStats({
+          totalRoleAgents,
+          averageTrustScore: Math.round(averageTrustScore),
+          eligibleForMint,
+          recentRoleAgents
+        });
       } catch (err) {
-        setError('Failed to load trust dashboard data');
-        console.error('Trust dashboard error:', err);
+        console.error('Error fetching dashboard data:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load dashboard data');
       } finally {
         setLoading(false);
       }
-    };
+    }
 
-    fetchTrustData();
+    if (organizationId) {
+      fetchDashboardData();
+    }
   }, [organizationId]);
 
   if (loading) {
     return (
       <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Trust Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="animate-pulse">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i} className="h-20 bg-gray-100 rounded"></div>
-                ))}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <Card key={i}>
+              <CardHeader className="pb-3">
+                <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+              </CardHeader>
+              <CardContent>
+                <div className="h-8 bg-gray-200 rounded animate-pulse"></div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Trust Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center text-red-600">
-              <p>{error}</p>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center">
+            <div className="text-red-500 mb-2">⚠️ Error Loading Dashboard</div>
+            <div className="text-sm text-gray-600">{error}</div>
+            <button
+              onClick={() => window.location.reload()}
+              className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Retry
+            </button>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
-  if (!trustData) {
+  if (!stats) {
     return (
-      <div className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Trust Dashboard</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <div className="text-gray-400 text-sm">No trust data available</div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="text-center text-gray-500">
+            No dashboard data available
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Role Agents
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">
+              {stats.totalRoleAgents}
+            </div>
+            <div className="text-sm text-muted-foreground">Total Role Agents</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              Trust Score
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-gray-900">
+              {stats.averageTrustScore}
+            </div>
+            <div className="text-sm text-muted-foreground">Average Score</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-sm font-medium text-gray-600">
+              NFT Eligible
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-green-600">
+              {stats.eligibleForMint}
+            </div>
+            <div className="text-sm text-muted-foreground">Ready for Minting</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Recent Role Agents */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Badge variant="secondary">Organization ID: {organizationId}</Badge>
-            Trust Dashboard
-          </CardTitle>
+          <CardTitle>Recent Role Agents</CardTitle>
+          <CardDescription>
+            Latest role agent assignments in your organization
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Trust Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-blue-600">{trustData.totalTwins}</div>
-                <div className="text-sm text-muted-foreground">Total Digital Twins</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-green-600">{trustData.averageTrustScore}%</div>
-                <div className="text-sm text-muted-foreground">Average Trust Score</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-purple-600">{trustData.eligibleForNFT}</div>
-                <div className="text-sm text-muted-foreground">Eligible for NFT</div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="p-4">
-                <div className="text-2xl font-bold text-orange-600">{trustData.pendingValidation}</div>
-                <div className="text-sm text-muted-foreground">Pending Validation</div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Trust Threshold */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Trust Threshold Configuration</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <div className="text-sm text-muted-foreground mb-2">Current Threshold</div>
-                  <div className="text-2xl font-bold">{trustData.trustThreshold}%</div>
-                </div>
-                <Button variant="outline">Update Threshold</Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Digital Twins */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Digital Twins</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {recentTwins.length > 0 ? (
-                <div className="space-y-3">
-                  {recentTwins.map((twin) => (
-                    <div key={twin.id} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="flex-1">
-                        <div className="font-medium">{twin.name}</div>
-                        <div className="text-sm text-muted-foreground">
-                          {twin.roleTemplate?.title || 'Unknown Role'}
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant={twin.trustScore ? 'default' : 'secondary'}>
-                          {twin.trustScore || 'N/A'}%
-                        </Badge>
-                        <Badge variant={twin.isEligibleForMint ? 'default' : 'outline'}>
-                          {twin.isEligibleForMint ? 'Eligible' : 'Pending'}
-                        </Badge>
-                      </div>
+        <CardContent>
+          {stats.recentRoleAgents.length > 0 ? (
+            <div className="space-y-4">
+              {stats.recentRoleAgents.map((agent) => (
+                <div
+                  key={agent.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                >
+                  <div className="flex-1">
+                    <div className="font-medium text-gray-900">
+                      {agent.name}
                     </div>
-                  ))}
+                    <div className="text-sm text-gray-500">
+                      {agent.roleTemplate.title} • {agent.roleTemplate.category}
+                    </div>
+                    <div className="text-xs text-gray-400 mt-1">
+                      DID: {agent.assignedToDid.substring(0, 20)}...
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className={`text-sm font-medium ${(agent.trustScore || 0) >= 750
+                        ? 'text-green-600'
+                        : (agent.trustScore || 0) >= 500
+                          ? 'text-yellow-600'
+                          : 'text-red-600'
+                      }`}>
+                      Trust Score: {agent.trustScore || 0}
+                    </div>
+                    <div className="text-xs text-gray-400">
+                      {new Date(agent.createdAt).toLocaleDateString()}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="text-center py-8">
-                  <div className="text-gray-400 text-sm">No digital twins found</div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <div className="flex gap-2">
-            <Button>Export Trust Report</Button>
-            <Button variant="outline">View All Twins</Button>
-            <Button variant="outline">Configure Alerts</Button>
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-gray-400 text-sm">No role agents found</div>
+          )}
         </CardContent>
       </Card>
     </div>

@@ -5,7 +5,7 @@ import { SignalSchema, MetadataSchema } from '../signal-collection';
 // Mock Prisma for testing
 jest.mock('../database', () => ({
   prisma: {
-    digitalTwin: {
+    role_agents: {
       findUnique: jest.fn(),
     },
     signal: {
@@ -184,7 +184,7 @@ describe('Signal Collection System', () => {
     };
 
     beforeEach(() => {
-      (prisma.digitalTwin.findUnique as jest.Mock).mockResolvedValue(mockDigitalTwin);
+      (prisma.role_agents.findUnique as jest.Mock).mockResolvedValue(mockDigitalTwin);
       (prisma.signal.create as jest.Mock).mockResolvedValue(mockSignal);
       (prisma.signal.count as jest.Mock).mockResolvedValue(0);
       (prisma.auditLog.create as jest.Mock).mockResolvedValue({});
@@ -318,7 +318,7 @@ describe('Signal Collection System', () => {
         }
       ];
 
-      (prisma.digitalTwin.findUnique as jest.Mock)
+      (prisma.role_agents.findUnique as jest.Mock)
         .mockResolvedValueOnce(mockDigitalTwin) // First call succeeds
         .mockResolvedValueOnce(null); // Second call fails
 

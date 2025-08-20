@@ -6,7 +6,7 @@
  */
 
 import { getEnvironmentConfig } from './env-validation';
-import { getCurrentDomain } from './domains';
+import { getDomainConfig } from './domains';
 
 export interface PaymentConfig {
   strategy: 'stripe' | 'crypto' | 'none';
@@ -29,7 +29,8 @@ export interface PaymentValidation {
  */
 export function getPaymentConfig(): PaymentConfig {
   const config = getEnvironmentConfig();
-  const domain = getCurrentDomain();
+  const domainConfig = getDomainConfig();
+  const domain = domainConfig.baseUrl.replace(/^https?:\/\//, '').replace(/:\d+$/, '');
 
   return {
     strategy: config.paymentStrategy,

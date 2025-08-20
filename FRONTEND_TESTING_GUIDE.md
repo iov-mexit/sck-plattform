@@ -1,221 +1,249 @@
-# Frontend NFT Testing Guide
+# 🧪 Frontend Testing Guide
 
-## 🎯 **What's Ready for Testing**
+## Overview
 
-We've successfully implemented the frontend NFT system with the following components:
+This guide provides comprehensive testing instructions for the SCK (Secure Code KnAIght) platform frontend components, focusing on role agent management, NFT minting, and trust system validation.
 
-### ✅ **Implemented Components**
-- **Wallet Connection**: Connect MetaMask, WalletConnect, etc.
-- **NFT Minting Interface**: Mint Digital Twins and Achievements
-- **Blockchain Integration**: Wagmi + Viem setup
-- **TypeScript Support**: Full type safety
-- **UI Components**: Beautiful, responsive interface
+## Features to Test
 
-### ✅ **Dependencies Added**
-```json
-{
-  "ethers": "^6.8.1",
-  "wagmi": "^2.5.7", 
-  "viem": "^2.7.9",
-  "@tanstack/react-query": "^5.17.9"
-}
-```
+- **NFT Minting Interface**: Mint Role Agents and Achievements
+- **Role Templates**: Browse and select from 35+ security-focused roles
+- **Organization Dashboard**: View role agent statistics and trust metrics
+- **Authentication**: Magic Link login and wallet connectivity
+- **Trust Score System**: Real-time trust validation and scoring
 
-## 🚀 **How to Start Testing**
+## Prerequisites
 
-### Step 1: Install Dependencies
-```bash
-cd apps/web
-npm install
-```
+1. **Development Environment**
+   - Next.js development server running (`npm run dev`)
+   - PostgreSQL database with seeded data
+   - MetaMask wallet with Sepolia testnet ETH
 
-### Step 2: Set Up Environment
-```bash
-# Copy environment template
-cp env.template .env.local
+2. **Test Accounts**
+   - Valid email for Magic Link authentication
+   - MetaMask wallet connected to Sepolia testnet
+   - Test organization domain configured
 
-# Edit .env.local and add:
-NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=your_wallet_connect_project_id
-NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC=https://sepolia.infura.io/v3/YOUR_INFURA_KEY
-```
+3. **Environment Variables**
+   - Magic Link keys configured
+   - Blockchain contract addresses set
+   - Database connection established
 
-### Step 3: Start Development Server
-```bash
-npm run dev
-```
+## Testing Scenarios
 
-### Step 4: Test NFT Features
-1. **Navigate to NFT System Tab**
-   - Go to http://localhost:3000
-   - Click on "NFT System" tab
+### Authentication Flow
 
-2. **Connect Wallet**
-   - Click "Connect Wallet"
-   - Choose MetaMask or WalletConnect
-   - Approve connection
+1. **Magic Link Login**
+   - Navigate to `/` (homepage)
+   - Enter email address in login form
+   - Check email for Magic Link
+   - Click link to authenticate
+   - Verify redirect to dashboard
 
-3. **Test NFT Minting**
-   - Select "Digital Twin NFT" or "Achievement NFT"
-   - Fill in the form
-   - Click "Mint" button
-   - Watch the transaction
+2. **Organization Setup**
+   - Complete organization onboarding
+   - Set company name and domain
+   - Verify organization creation in database
 
-## 🧪 **Testing Scenarios**
+### Role Agent Management
 
-### Scenario 1: Digital Twin NFT Minting
-```
-1. Connect wallet
-2. Select "Digital Twin NFT"
-3. Fill in:
-   - DID: did:sck:123456789
-   - Role: Security Engineer
-   - Organization: SecureCorp
-4. Click "Mint Digital Twin"
-5. Verify success message
-```
+1. **Create Role Agent**
+   - Navigate to `/role-agents`
+   - Click "Create Role Agent"
+   - Select role template from library
+   - Enter DID and basic information
+   - Set initial trust score
+   - Submit and verify creation
+
+2. **Manage Existing Agents**
+   - View role agent list
+   - Edit agent details
+   - Update trust scores
+   - Toggle NFT eligibility
+   - Delete agents if needed
+
+### NFT Minting Testing
+
+#### Setup Requirements
+- MetaMask installed and configured
+- Sepolia testnet selected
+- Contract deployed and address configured
+- Sufficient test ETH for gas fees
+
+#### Test Data
+- Select "Role Agent NFT" or "Achievement NFT"
+- Choose eligible role agent (trust score ≥ 750)
+- Verify wallet connection
+- Confirm transaction details
+- Monitor blockchain confirmation
+
+### Scenario 1: Role Agent NFT Minting
+
+**Steps:**
+1. Navigate to `/nft-minting`
+2. Select "Role Agent NFT"
+3. Choose role agent from dropdown
+4. Connect MetaMask wallet
+4. Click "Mint Role Agent"
+5. Confirm transaction in MetaMask
+6. Wait for blockchain confirmation
+7. Verify NFT appears in wallet
+
+**Expected Results:**
+- Transaction completes successfully
+- NFT metadata displays correctly
+- Trust score reflected in token
+- Database updated with transaction
+- OpenSea shows new token
 
 ### Scenario 2: Achievement NFT Minting
-```
-1. Connect wallet
-2. Select "Achievement NFT"
-3. Fill in:
-   - Token ID: 0 (or existing token)
-   - Achievement Type: Certification
-   - Title: Security Expert Certification
-   - Metadata: {"score": 95, "provider": "SecureCodeWarrior"}
-   - Check "Soulbound"
-4. Click "Mint Achievement"
-5. Verify success message
-```
 
-### Scenario 3: Wallet Connection
-```
-1. Click "Connect Wallet"
-2. Test different connectors:
-   - MetaMask
-   - WalletConnect
-   - Other injected wallets
-3. Verify connection status
-4. Test disconnect functionality
-```
+**Steps:**
+1. Select existing role agent
+2. Choose achievement type
+3. Enter achievement details
+4. Set soulbound status
+5. Mint achievement NFT
+6. Verify achievement attribution
 
-## 🔧 **Current Implementation Status**
+### Trust Score Validation
 
-### ✅ **What Works Now**
-- **Mock NFT Minting**: Simulated minting with realistic delays
-- **Wallet Connection**: Full wagmi integration
-- **UI Components**: Complete minting interface
-- **Type Safety**: Full TypeScript support
-- **Error Handling**: Graceful error messages
+1. **Score Calculation**
+   - Add trust signals to role agent
+   - Verify automatic score updates
+   - Test eligibility threshold (≥750)
+   - Validate score ranges (0-1000)
 
-### 🔄 **What's Mocked (For Testing)**
-- **Contract Calls**: Currently using mock transactions
-- **Gas Estimation**: Simulated gas costs
-- **Transaction Confirmation**: Mock confirmation delays
-- **Token IDs**: Random generation for testing
+2. **Real-Time Updates**
+   - Monitor dashboard metrics
+   - Verify live score changes
+   - Test batch signal processing
+   - Validate trust level badges
 
-### 🚧 **What Needs Real Contract**
-- **Actual Minting**: Connect to deployed SCK NFT contract
-- **Real Transactions**: Actual blockchain transactions
-- **Gas Costs**: Real gas estimation
-- **Token Verification**: Verify minted tokens on blockchain
+### Error Handling
 
-## 📊 **Testing Checklist**
+1. **Network Issues**
+   - Test with poor connectivity
+   - Verify error messages
+   - Test retry mechanisms
+   - Validate graceful degradation
 
-### Wallet Connection
-- [ ] MetaMask connection works
-- [ ] WalletConnect connection works
-- [ ] Disconnect functionality works
-- [ ] Error handling for failed connections
-- [ ] Network switching works
+2. **Wallet Integration**
+   - Test without MetaMask
+   - Wrong network selection
+   - Insufficient gas fees
+   - Transaction rejection
 
-### NFT Minting
-- [ ] Digital Twin minting form validation
-- [ ] Achievement minting form validation
-- [ ] Soulbound checkbox functionality
-- [ ] Metadata JSON validation
-- [ ] Success/error message display
-- [ ] Loading states during minting
+3. **Data Validation**
+   - Invalid DID formats
+   - Out-of-range trust scores
+   - Missing required fields
+   - Duplicate role assignments
 
-### UI/UX
-- [ ] Responsive design on mobile
-- [ ] Dark mode compatibility
-- [ ] Accessibility features
-- [ ] Form validation messages
-- [ ] Loading indicators
+## Browser Compatibility
 
-## 🎯 **Next Steps for Production**
+Test across multiple browsers:
+- Chrome (recommended for MetaMask)
+- Firefox
+- Safari (limited MetaMask support)
+- Edge
 
-### 1. Deploy Contracts
+## Mobile Testing
+
+1. **Responsive Design**
+   - Test on various screen sizes
+   - Verify component layouts
+   - Check navigation usability
+
+2. **Wallet Integration**
+   - Test mobile wallet apps
+   - Verify WalletConnect functionality
+   - Check QR code scanning
+
+## Performance Testing
+
+1. **Page Load Times**
+   - Monitor initial load performance
+   - Test with large datasets
+   - Verify lazy loading
+   - Check bundle sizes
+
+2. **Database Queries**
+   - Monitor API response times
+   - Test with many role agents
+   - Verify pagination
+   - Check query optimization
+
+## Security Testing
+
+1. **Authentication**
+   - Test session management
+   - Verify logout functionality
+   - Check token expiration
+   - Test unauthorized access
+
+2. **Data Protection**
+   - Verify DID-only storage
+   - Test organization isolation
+   - Check API access controls
+   - Validate input sanitization
+
+## Checklist
+
+### Core Functionality
+- [ ] Magic Link authentication works
+- [ ] Organization onboarding complete
+- [ ] Role agent creation functional
+- [ ] Role template library accessible
+- [ ] Trust score system operational
+- [ ] NFT minting successful
+- [ ] Dashboard displays correctly
+
+### Integration Testing
+- [ ] MetaMask connectivity works
+- [ ] Blockchain transactions confirm
+- [ ] Database updates properly
+- [ ] Real-time updates functional
+- [ ] Cross-browser compatibility
+- [ ] Mobile responsiveness
+
+### Error Scenarios
+- [ ] Network failure handling
+- [ ] Invalid input validation
+- [ ] Transaction failure recovery
+- [ ] Role agent minting form validation
+- [ ] Trust score boundary testing
+- [ ] Insufficient gas handling
+
+### Performance
+- [ ] Page load under 3 seconds
+- [ ] API responses under 500ms
+- [ ] Large dataset handling
+- [ ] Memory usage reasonable
+
+## Reporting Issues
+
+When reporting issues, include:
+1. Browser and version
+2. MetaMask version
+3. Steps to reproduce
+4. Expected vs actual behavior
+5. Console error messages
+6. Network requests (if relevant)
+7. Screenshots or screen recordings
+
+## Test Data Reset
+
+To reset test data:
 ```bash
-cd packages/contracts/backend
-npm run deploy:sepolia
+# Reset role agent minting status
+curl -X POST "http://localhost:3000/api/v1/nft/reset"
+
+# Reset database to initial state
+npx prisma migrate reset
+npx prisma db seed
 ```
-
-### 2. Update Environment Variables
-```bash
-# Add contract addresses to .env.local
-NEXT_PUBLIC_SCK_NFT_ADDRESS=0x... # Deployed contract address
-NEXT_PUBLIC_SCK_NFT_DYNAMIC_ADDRESS=0x... # Deployed dynamic contract address
-```
-
-### 3. Connect Real Contracts
-- Replace mock minting with real contract calls
-- Add real gas estimation
-- Implement transaction confirmation
-- Add token verification
-
-### 4. Add Advanced Features
-- Achievement management interface
-- NFT metadata viewer
-- Transaction history
-- Gas optimization
-
-## 🐛 **Common Issues & Solutions**
-
-### Issue: Wallet Not Connecting
-**Solution**: 
-- Check if MetaMask is installed
-- Ensure you're on the correct network (Sepolia for testing)
-- Clear browser cache and try again
-
-### Issue: Transaction Failing
-**Solution**:
-- Ensure you have enough ETH for gas
-- Check network connection
-- Verify contract is deployed
-
-### Issue: Form Validation Errors
-**Solution**:
-- Check all required fields are filled
-- Ensure DID format is correct
-- Verify JSON metadata format
-
-## 📈 **Performance Testing**
-
-### Load Testing
-- Test with multiple wallet connections
-- Verify UI responsiveness during minting
-- Check memory usage with multiple transactions
-
-### Network Testing
-- Test on different networks (Sepolia, Mainnet)
-- Verify gas estimation accuracy
-- Test transaction confirmation times
-
-## 🎉 **Ready for Demo**
-
-The frontend is now **ready for demonstration** with:
-
-- ✅ **Complete UI**: Beautiful, responsive interface
-- ✅ **Wallet Integration**: Full blockchain connectivity
-- ✅ **Mock Functionality**: Realistic NFT minting simulation
-- ✅ **Error Handling**: Graceful error management
-- ✅ **Type Safety**: Full TypeScript support
-
-You can now show stakeholders a working NFT minting interface that demonstrates the complete SCK platform vision!
 
 ---
 
-**Status**: ✅ **FRONTEND READY FOR TESTING**  
-**Next**: Deploy contracts and connect real blockchain functionality 
+**Note**: This testing guide covers the current role agent-based system. For legacy digital twin references, please update to role agent terminology. 

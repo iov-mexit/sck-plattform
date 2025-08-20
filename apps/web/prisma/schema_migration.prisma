@@ -1,0 +1,334 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+//
+// ENUMS
+//
+enum BlockchainTxStatus {
+  pending
+  confirmed
+  failed
+}
+
+enum BlockchainTxType {
+  NFT_MINT
+  TRANSFER
+  OTHER
+}
+
+enum RoleAgentStatus {
+  active
+  inactive
+  suspended
+  retired
+}
+
+enum ArtifactType {
+  RoleAgent
+  MCP
+}
+
+enum ApprovalFacet {
+  security
+  compliance
+  policy
+  risk
+}
+
+enum ApprovalDecision {
+  approve
+  reject
+}
+
+enum PolicyStatus {
+  draft
+  active
+  archived
+}
+
+//
+// MODELS - Migration Version (with both old and new columns)
+//
+model audit_logs {
+  id            String   @id @default(cuid())
+  action        String
+  entity        String
+  entityId      String
+  userId        String?
+  metadata      Json?
+  createdAt     DateTime @default(now())
+  
+  // New columns for migration
+  organizationId String?
+  roleAgentId   String?
+
+  organizations organizations? @relation(fields: [organizationId], references: [id])
+  role_agents   role_agents?   @relation(fields: [roleAgentId], references: [id])
+
+  @@index([action], map: "idx_audit_action")
+  @@index([createdAt], map: "idx_audit_created")
+  @@index([entity], map: "idx_audit_entity")
+}
+
+model blockchain_transactions {
+  id              String       @id @default(cuid())
+  transactionHash String       @unique
+  network         String
+  blockNumber     Int?
+  gasUsed         String?
+  gasPrice        String?
+  status          String       @default("pending")  // Keep old column
+  statusNew       BlockchainTxStatus?               // New enum column
+  roleAgentId     String?
+  contractAddress String?
+  metadata        Json?
+  tokenId         String?
+  transactionType String?                           // Keep old column
+  transactionTypeNew BlockchainTxType?              // New enum column
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  role_agents     role_agents? @relation(fields: [roleAgentId], references: [id])
+
+  @@index([transactionHash], map: "idx_blockchain_tx_hash")
+  @@index([network], map: "idx_blockchain_tx_network")
+  @@index([status], map: "idx_blockchain_tx_status")
+  @@index([transactionType], map: "idx_blockchain_tx_type")
+  @@index([tokenId], map: "idx_blockchain_tx_token")
+}
+
+model certifications {
+  id            String      @id @default(cuid())
+  name          String
+  issuer        String
+  issuedAt      DateTime
+  expiresAt     DateTime?
+  credentialUrl String?
+  verified      Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  roleAgentId   String
+  verificationMethod String? // New column
+  role_agents   role_agents @relation(fields: [roleAgentId], references: [id])
+
+  @@index([roleAgentId], map: "idx_certifications_role_agent")
+  @@index([expiresAt], map: "idx_certifications_expires")
+  @@index([verified], map: "idx_certifications_verified")
+}
+
+model role_agents {
+  id                      String                    @id @default(cuid())
+  name                    String
+  description             String?
+  blockchainAddress       String?
+  soulboundTokenId        String?
+  blockchainNetwork       String?
+  status                  String                    @default("active")  // Keep old column
+  statusNew               RoleAgentStatus?          // New enum column
+  level                   Int                       @default(1)
+  organizationId          String
+  roleTemplateId          String
+  assignedToDid           String?
+  assignedToUserId        String?                   // New column
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  isEligibleForMint       Boolean                   @default(false)
+  lastTrustCheck          DateTime?
+  trustScore              Float?
+  ansIdentifier           String?
+  ansRegistrationStatus   String?                   @default("not_registered")
+  ansRegistrationError    String?
+  ansVerificationUrl      String?
+
+  blockchain_transactions blockchain_transactions[]
+  certifications          certifications[]
+  trust_histories         trust_histories[]
+  organizations           organizations             @relation(fields: [organizationId], references: [id])
+  role_templates          role_templates            @relation(fields: [roleTemplateId], references: [id])
+  signals                 signals[]
+  audit_logs              audit_logs[]
+
+  @@index([assignedToDid], map: "idx_role_agents_assigned_did")
+  @@index([assignedToUserId], map: "idx_role_agents_assigned_user")
+  @@index([blockchainAddress], map: "idx_role_agents_blockchain")
+  @@index([isEligibleForMint], map: "idx_role_agents_eligible")
+  @@index([organizationId], map: "idx_role_agents_org")
+  @@index([roleTemplateId], map: "idx_role_agents_role")
+  @@index([status], map: "idx_role_agents_status")
+  @@index([trustScore], map: "idx_role_agents_trust")
+  @@index([ansIdentifier], map: "idx_role_agents_ans")
+  @@index([ansRegistrationStatus], map: "idx_role_agents_ans_status")
+}
+
+model trust_histories {
+  id          String     @id @default(cuid())
+  roleAgentId String
+  trustScore  Float
+  computedAt  DateTime   @default(now())
+  metadata    Json?
+  role_agents role_agents @relation(fields: [roleAgentId], references: [id])
+
+  @@index([roleAgentId], map: "idx_trust_histories_role_agent")
+  @@index([computedAt], map: "idx_trust_histories_time")
+}
+
+model organization_members {
+  id             String        @id @default(cuid())
+  organizationId String
+  name           String
+  email          String
+  role           String
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizations  organizations @relation(fields: [organizationId], references: [id])
+}
+
+model organizations {
+  id                    String                  @id @default(cuid())
+  name                  String
+  description           String?
+  domain                String                  @unique
+  createdAt             DateTime                @default(now())
+  updatedAt             DateTime                @updatedAt
+  isActive              Boolean                 @default(true)
+  onboardingComplete    Boolean                 @default(false)
+  complianceTags        Json?                   // New column
+
+  role_agents           role_agents[]
+  organization_members  organization_members[]
+  role_templates        role_templates[]
+  role_trust_thresholds role_trust_thresholds[]
+  loa_policies          loa_policies[]
+  approvals             approvals[]
+  mcp_policies          mcp_policies[]
+  audit_logs            audit_logs[]
+
+  @@index([isActive], map: "idx_organizations_active")
+  @@index([domain], map: "idx_organizations_domain")
+}
+
+model role_templates {
+  id                    String          @id @default(cuid())
+  title                 String
+  focus                 String
+  category              String
+  selectable            Boolean         @default(true)
+  responsibilities      Json
+  securityContributions Json
+  organizationId        String?
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+  role_agents           role_agents[]
+  organizations         organizations?  @relation(fields: [organizationId], references: [id])
+}
+
+model role_trust_thresholds {
+  id             String        @id @default(cuid())
+  roleTitle      String
+  minTrustScore  Float
+  minLoALevel    Int?          // New column
+  isActive       Boolean       @default(true)
+  organizationId String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizations  organizations @relation(fields: [organizationId], references: [id])
+
+  @@unique([organizationId, roleTitle])
+  @@index([organizationId], map: "idx_role_threshold_org")
+}
+
+model signals {
+  id            String        @id @default(cuid())
+  type          String
+  title         String
+  description   String?
+  metadata      Json?
+  value         Float?
+  confidence    Float?        // New column
+  source        String
+  sourceType    String?       // New column
+  verified      Boolean       @default(false)
+  roleAgentId   String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  url           String?
+  role_agents   role_agents   @relation(fields: [roleAgentId], references: [id])
+
+  @@index([roleAgentId], map: "idx_signals_role_agent")
+  @@index([type], map: "idx_signals_type")
+  @@index([verified], map: "idx_signals_verified")
+}
+
+model loa_policies {
+  id              String        @id @default(cuid())
+  organizationId  String
+  artifactType    String        // Keep old column
+  artifactTypeNew ArtifactType? // New enum column
+  minReviewers    Int
+  requiredFacets  String[]      // Keep old column
+  requiredFacetsNew ApprovalFacet[] // New enum column
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organizations   organizations @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId], map: "idx_loa_policies_org")
+}
+
+model approvals {
+  id             String        @id @default(cuid())
+  organizationId String
+  artifactId     String
+  artifactType   String        // Keep old column
+  artifactTypeNew ArtifactType? // New enum column
+  reviewerId     String
+  facet          String        // Keep old column
+  facetNew       ApprovalFacet? // New enum column
+  decision       String        // Keep old column
+  decisionNew    ApprovalDecision? // New enum column
+  comment        String?
+  createdAt      DateTime      @default(now())
+  organizations  organizations @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId], map: "idx_approvals_org")
+}
+
+model mcp_policies {
+  id              String        @id @default(cuid())
+  organizationId  String
+  name            String
+  version         Int           @default(1)
+  status          String        // Keep old column
+  statusNew       PolicyStatus? // New enum column
+  regoModule      String
+  sha256          String
+  isDefault       Boolean       @default(false)
+  scope           Json
+  createdBy       String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  organizations   organizations @relation(fields: [organizationId], references: [id])
+  mcp_policy_tests mcp_policy_tests[]
+
+  @@index([organizationId], map: "idx_mcp_policies_org")
+  @@index([status], map: "idx_mcp_policies_status")
+}
+
+model mcp_policy_tests {
+  id         String        @id @default(cuid())
+  policyId   String
+  name       String
+  input      Json
+  expected   Json
+  createdAt  DateTime      @default(now())
+  mcp_policies mcp_policies @relation(fields: [policyId], references: [id])
+
+  @@index([policyId], map: "idx_mcp_policy_tests_policy")
+}

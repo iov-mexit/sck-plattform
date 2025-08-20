@@ -1,31 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
     console.log('Testing database connection...');
 
     // Test basic connection
-    const organizations = await prisma.organization.findMany({
+    const organizations = await prisma.organizations.findMany({
       take: 1,
     });
 
     console.log('Found organizations:', organizations.length);
 
-    // Test digital twins table
-    const digitalTwins = await prisma.digitalTwin.findMany({
+    // Test role agents table
+    const role_agents = await prisma.role_agents.findMany({
       take: 1,
     });
 
-    console.log('Found digital twins:', digitalTwins.length);
+    console.log('Found role agents:', role_agents.length);
 
     return NextResponse.json({
       success: true,
       message: 'Database connection working',
       organizationsCount: organizations.length,
-      digitalTwinsCount: digitalTwins.length,
+      roleAgentsCount: role_agents.length,
     });
 
   } catch (error) {
