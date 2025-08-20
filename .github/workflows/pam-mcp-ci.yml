@@ -34,19 +34,6 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Debug environment
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Current directory: $(pwd)"
-          echo "Directory contents:"
-          ls -la
-          echo "Package.json contents:"
-          cat package.json
-          echo "Environment variables:"
-          echo "CI: $CI"
-          echo "NODE_ENV: $NODE_ENV"
-
       - name: TypeScript strict mode check
         run: npm run type-check
         continue-on-error: true
@@ -94,81 +81,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Debug build environment
-        run: |
-          echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
-          echo "Current directory: $(pwd)"
-          echo "Directory contents:"
-          ls -la
-          echo "Apps directory:"
-          ls -la apps/
-          echo "Web app package.json:"
-          cat apps/web/package.json
-          echo "Environment variables:"
-          echo "CI: $CI"
-          echo "NODE_ENV: $NODE_ENV"
-
       - name: Generate Prisma client
         run: |
           cd apps/web
           echo "Generating Prisma client..."
-          echo "Current directory: $(pwd)"
-          echo "Prisma schema exists: $(ls -la prisma/schema.prisma)"
-          
-          # Try to generate Prisma client with fallback
-          if npx prisma generate --schema=./prisma/schema.prisma; then
-            echo "Prisma client generated successfully"
-          else
-            echo "Prisma generation failed, trying alternative approach..."
-            # Fallback: create minimal Prisma client structure
-            mkdir -p generated/prisma
-            echo "// Fallback Prisma client for CI" > generated/prisma/index.js
-            echo "console.log('Using fallback Prisma client for CI build');" >> generated/prisma/index.js
-            echo "Fallback Prisma client created for CI build"
-          fi
+          npx prisma generate --schema=./prisma/schema.prisma
 
       - name: Build application
         run: |
-          echo "Building application with turbo..."
-          if npm run build; then
-            echo "Build completed successfully"
-          else
-            echo "Build failed, trying alternative approach..."
-            cd apps/web
-            if npm run build; then
-              echo "Direct build in web app succeeded"
-            else
-              echo "All build attempts failed"
-              exit 1
-            fi
-          fi
+          echo "Building application..."
+          npm run build
 
       - name: Verify build output
         run: |
           echo "Checking build output..."
-          if [ -d "apps/web/.next" ]; then
-            ls -la apps/web/.next
-            echo "Build verification completed"
-          else
-            echo "Build output not found, checking web app directory..."
-            cd apps/web
-            if [ -d ".next" ]; then
-              ls -la .next
-              echo "Build verification completed in web app directory"
-            else
-              echo "Build output not found anywhere"
-              exit 1
-            fi
-          fi
+          ls -la apps/web/.next
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build
-          path: |
-            apps/web/.next
-            apps/web/dist
+          path: apps/web/.next
 
   # Deploy to Vercel
   deploy:
