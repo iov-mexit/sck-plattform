@@ -95,7 +95,7 @@ async function seedTrustThresholds() {
     console.log('✅ Created trust thresholds:', thresholds.length);
     console.log('');
     console.log('Trust Thresholds:');
-    thresholds.forEach(threshold => {
+    thresholds.forEach((threshold: any) => {
       console.log(`  - ${threshold.roleTitle}: ${threshold.minTrustScore}/100`);
     });
 

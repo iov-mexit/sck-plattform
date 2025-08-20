@@ -87,9 +87,9 @@ async function seedComprehensiveTrustThresholds() {
       'QA Manual': createdThresholds.filter(t => ['QA Analyst', 'QA Tester', 'UAT Tester', 'Release QA Engineer'].includes(t.roleTitle)),
     };
 
-    Object.entries(categories).forEach(([category, thresholds]) => {
-      console.log(`  ${category} (${thresholds.length} roles):`);
-      thresholds.forEach(threshold => {
+    Object.entries(categories).forEach(([category, thresholds]: [string, any[]]) => {
+      console.log(`  📊 ${category}:`);
+      thresholds.forEach((threshold: any) => {
         console.log(`    - ${threshold.roleTitle}: ${threshold.minTrustScore}/100`);
       });
     });

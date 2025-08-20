@@ -39,7 +39,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ artifac
         for (const f of policy.requiredFacets) requiredFacets.add(f);
       }
       const approvalsByFacet = new Map<string, number>();
-      approvals.forEach(a => {
+      approvals.forEach((a: any) => {
         if (a.decision === 'approve') {
           approvedFacets.add(a.facet);
           approvalsByFacet.set(a.facet, (approvalsByFacet.get(a.facet) || 0) + 1);

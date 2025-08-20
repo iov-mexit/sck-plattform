@@ -161,13 +161,12 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
 export function logValidationResults(result: ValidationResult): void {
   if (!result.isValid) {
     console.group('❌ Environment Validation Failed');
-    result.errors.forEach(e => console.error(`ERROR: ${e}`));
-    result.warnings.forEach(w => console.warn(`⚠️ Warning: ${w}`));
+    result.errors.forEach((e: string) => console.error(`ERROR: ${e}`));
+    result.warnings.forEach((w: string) => console.warn(`⚠️ Warning: ${w}`));
     console.groupEnd();
   } else {
-    console.group('✅ Environment Validation Passed');
-    result.warnings.forEach(w => console.warn(`⚠️ Warning: ${w}`));
-    console.groupEnd();
+    console.log('✅ Environment validation passed');
+    result.warnings.forEach((w: string) => console.warn(`⚠️ Warning: ${w}`));
   }
 }
 

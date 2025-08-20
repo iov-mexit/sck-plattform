@@ -27,8 +27,8 @@ export function initializeEnvironmentValidation(): void {
       const paymentValidation = validatePaymentConfig();
       if (!paymentValidation.isValid) {
         console.error('❌ Payment configuration validation failed:');
-        paymentValidation.errors.forEach(error => console.error(`  ❌ ${error}`));
-        paymentValidation.recommendations.forEach(rec => console.info(`  💡 ${rec}`));
+        paymentValidation.errors.forEach((error: string) => console.error(`  ❌ ${error}`));
+        paymentValidation.recommendations.forEach((rec: string) => console.info(`  💡 ${rec}`));
       }
 
       // Log domain info in development

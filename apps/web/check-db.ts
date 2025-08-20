@@ -25,7 +25,7 @@ async function checkOrganizations() {
     } else {
       console.log(`✅ Found ${organizations.length} organization(s):\n`);
       
-      organizations.forEach((org, index) => {
+      organizations.forEach((org: any, index: number) => {
         console.log(`${index + 1}. ${org.name}`);
         console.log(`   📧 Domain: "${org.domain}"`);
         console.log(`   🆔 ID: ${org.id}`);
@@ -46,9 +46,9 @@ async function checkOrganizations() {
       'dev@example.com'
     ];
 
-    testEmails.forEach(email => {
+    testEmails.forEach((email: string) => {
       const domain = email.split('@')[1] || '';
-      const matchingOrg = organizations.find(org => org.domain === domain);
+      const matchingOrg = organizations.find((org: any) => org.domain === domain);
       console.log(`   📧 ${email} → domain: "${domain}" → ${matchingOrg ? '✅ MATCH' : '❌ NO MATCH'}`);
     });
 
