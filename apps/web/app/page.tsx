@@ -2,8 +2,9 @@
 
 import { AuthProvider, useAuth } from '@/lib/auth/auth-context';
 import { MagicLinkLogin } from '@/components/auth/magic-link-login';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+// Temporarily removed react-toastify to fix build
+// import { ToastContainer } from 'react-toastify';
+// import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
 import { Shield, Zap, Users, Lock, CheckCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -159,7 +160,7 @@ export default function HomePage() {
   return (
     <>
       <HomeContent />
-      <ToastContainer />
+      {/* <ToastContainer /> */}
     </>
   );
 }
