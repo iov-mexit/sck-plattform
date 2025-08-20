@@ -170,11 +170,29 @@ jobs:
             apps/web/.next
             apps/web/dist
 
+  # Deploy to Vercel
+  deploy:
+    name: Deploy to Vercel
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Vercel
+        uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
+          vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
+          vercel-args: '--prod'
+
   # Quality Gate Summary
   quality-summary:
     name: Quality Gate Summary
     runs-on: ubuntu-latest
-    needs: [quality-gates, security-scan, build]
+    needs: [quality-gates, security-scan, build, deploy]
     if: always()
     steps:
       - name: Quality Gate Summary
@@ -199,6 +217,12 @@ jobs:
           else
             echo "❌ **Build**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
+
+          if [ "${{ needs.deploy.result }}" == "success" ]; then
+            echo "✅ **Deploy to Vercel**: PASSED" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Deploy to Vercel**: FAILED" >> $GITHUB_STEP_SUMMARY
+          fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🔒 Quality Gates Status" >> $GITHUB_STEP_SUMMARY
@@ -206,3 +230,4 @@ jobs:
           echo "- **Code Quality**: ${{ needs.quality-gates.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Security**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Build**: ${{ needs.build.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deploy**: ${{ needs.deploy.result }}" >> $GITHUB_STEP_SUMMARY
