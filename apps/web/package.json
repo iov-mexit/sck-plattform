@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "postinstall": "prisma generate --schema=./prisma/schema.prisma --no-engine",
+    "postinstall": "echo 'Skipping postinstall in CI' || prisma generate --schema=./prisma/schema.prisma --no-engine",
     "prisma:generate": "prisma generate --schema=./prisma/schema.prisma",
     "db:generate": "prisma generate --schema=./prisma/schema.prisma",
     "check:db": "node ./scripts/check-db.js"
