@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     console.log('Received body:', body);
 
     // Check if organization exists
-    const organization = await prisma.organizations.findUnique({
+    const organization = await prisma.organization.findUnique({
       where: { id: body.organizationId },
     });
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if role template exists
-    const roleTemplate = await prisma.role_templates.findUnique({
+    const roleTemplate = await prisma.roleTemplate.findUnique({
       where: { id: body.roleTemplateId },
     });
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Create role agent with DID only
-    const roleAgent = await prisma.role_agents.create({
+    const roleAgent = await prisma.roleAgent.create({
       data: {
         id: `agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         organizationId: body.organizationId,
@@ -59,14 +59,14 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date(),
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             id: true,
             title: true,
@@ -86,8 +86,8 @@ export async function POST(request: NextRequest) {
         assignedToDid: roleAgent.assignedToDid,
         trustScore: roleAgent.trustScore,
         isEligibleForMint: roleAgent.isEligibleForMint,
-        organization: roleAgent.organizations,
-        roleTemplate: roleAgent.role_templates,
+        organization: roleAgent.organization,
+        roleTemplate: roleAgent.roleTemplate,
         createdAt: roleAgent.createdAt,
       }
     });

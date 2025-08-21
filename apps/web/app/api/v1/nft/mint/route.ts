@@ -35,11 +35,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch the role agent
-    const role_agent = await prisma.role_agents.findUnique({
+    const role_agent = await prisma.roleAgent.findUnique({
       where: { id: body.roleAgentId },
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
       },
     });
 
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     // If this is a frontend-initiated real minting request, perform blockchain minting
     if (body.transactionHash && body.tokenId) {
       // This is a confirmation from frontend real minting - just update database
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id: body.roleAgentId },
         data: {
           soulboundTokenId: body.tokenId,
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
       // Create blockchain transaction record
       try {
-        await prisma.blockchain_transactions.create({
+        await prisma.blockchainTransaction.create({
           data: {
             id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             roleAgentId: body.roleAgentId,
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       const transactionHash = `0x${Date.now().toString(16)}${Math.random().toString(16).substring(2, 14)}`;
 
       // Update database to mark as minted (simulation)
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id: body.roleAgentId },
         data: {
           soulboundTokenId: tokenId,
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
 
       // Create blockchain transaction record (simulation)
       try {
-        await prisma.blockchain_transactions.create({
+        await prisma.blockchainTransaction.create({
           data: {
             id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             roleAgentId: body.roleAgentId,
@@ -168,11 +168,11 @@ export async function POST(request: NextRequest) {
               },
               {
                 trait_type: "Role",
-                value: role_agent.role_templates?.title || 'Unknown'
+                value: role_agent.roleTemplate?.title || 'Unknown'
               },
               {
                 trait_type: "Organization",
-                value: role_agent.organizations?.name || 'Unknown Organization'
+                value: role_agent.organization?.name || 'Unknown Organization'
               },
               {
                 trait_type: "Trust Score",
@@ -248,8 +248,8 @@ export async function POST(request: NextRequest) {
         to: body.recipientAddress,
         did: role_agent.assignedToDid,
         name: role_agent.name,
-        role: role_agent.role_templates?.title || 'Role Agent',
-        organization: role_agent.organizations?.name || 'Unknown Organization',
+        role: role_agent.roleTemplate?.title || 'Role Agent',
+        organization: role_agent.organization?.name || 'Unknown Organization',
         trustScore: Math.floor(role_agent.trustScore || 750)
       });
 
@@ -258,8 +258,8 @@ export async function POST(request: NextRequest) {
         body.recipientAddress,
         role_agent.assignedToDid,
         role_agent.name,
-        role_agent.role_templates?.title || 'Role Agent',
-        role_agent.organizations?.name || 'Unknown Organization',
+        role_agent.roleTemplate?.title || 'Role Agent',
+        role_agent.organization?.name || 'Unknown Organization',
         Math.floor(role_agent.trustScore || 750)
       );
 
@@ -289,7 +289,7 @@ export async function POST(request: NextRequest) {
       console.log('🎯 NFT minted! Token ID:', tokenId);
 
       // Update database
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id: body.roleAgentId },
         data: {
           soulboundTokenId: tokenId,
@@ -300,7 +300,7 @@ export async function POST(request: NextRequest) {
 
       // Create blockchain transaction record
       try {
-        await prisma.blockchain_transactions.create({
+        await prisma.blockchainTransaction.create({
           data: {
             id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             roleAgentId: body.roleAgentId,
@@ -348,11 +348,11 @@ export async function POST(request: NextRequest) {
               },
               {
                 trait_type: "Role",
-                value: role_agent.role_templates?.title || 'Unknown'
+                value: role_agent.roleTemplate?.title || 'Unknown'
               },
               {
                 trait_type: "Organization",
-                value: role_agent.organizations?.name || 'Unknown Organization'
+                value: role_agent.organization?.name || 'Unknown Organization'
               },
               {
                 trait_type: "Trust Score",

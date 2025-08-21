@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     console.log('🔄 Starting NFT data reset...');
 
     // Reset all role agents to unminted state
-    const updateResult = await prisma.role_agents.updateMany({
+    const updateResult = await prisma.roleAgent.updateMany({
       where: {
         OR: [
           { soulboundTokenId: { not: null } },
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Optional: Clear blockchain transaction records (commented out to preserve history)
-    // const deleteTransactions = await prisma.blockchain_transactions.deleteMany({
+    // const deleteTransactions = await prisma.blockchainTransaction.deleteMany({
     //   where: {
     //     digitalTwinId: { not: null }
     //   }

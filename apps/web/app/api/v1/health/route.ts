@@ -20,12 +20,13 @@ export async function GET() {
     const responseTime = Date.now() - startTime;
 
     // Get basic stats
-    const roleAgentsCount = await prisma.role_agents.count();
-    const organizationsCount = await prisma.organizations.count();
-    const roleTemplatesCount = await prisma.role_templates.count();
-
-    // ANS registration stats
-    const ansRegisteredCount = await prisma.role_agents.count({
+    const roleAgentsCount = await prisma.roleAgent.count();
+    const organizationCount = await prisma.organization.count();
+    const roleTemplatesCount = await prisma.roleTemplate.count();
+    const signalsCount = await prisma.signal.count();
+    const certificationsCount = await prisma.certification.count();
+    const blockchainTransactionsCount = await prisma.blockchainTransaction.count();
+    const ansRegisteredCount = await prisma.roleAgent.count({
       where: { ansRegistrationStatus: 'registered' }
     });
 
@@ -42,7 +43,7 @@ export async function GET() {
       },
       stats: {
         roleAgents: roleAgentsCount,
-        organizations: organizationsCount,
+        organization: organizationCount,
         roleTemplates: roleTemplatesCount,
         ansRegistered: ansRegisteredCount
       },

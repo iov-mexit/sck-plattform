@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       whereClause.category = category;
     }
 
-    const roleTemplates = await prisma.role_templates.findMany({
+    const roleTemplates = await prisma.roleTemplate.findMany({
       where: whereClause,
       orderBy: {
         title: 'asc',
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const roleTemplate = await prisma.role_templates.create({
+    const roleTemplate = await prisma.roleTemplate.create({
       data: {
         id: `role-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         title: body.title,
@@ -109,7 +109,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Check if template is being used by any digital twins
-    const roleAgentsUsingTemplate = await prisma.role_agents.findFirst({
+    const roleAgentsUsingTemplate = await prisma.roleAgent.findFirst({
       where: {
         roleTemplateId: templateId,
       },
@@ -125,7 +125,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await prisma.role_templates.delete({
+    await prisma.roleTemplate.delete({
       where: {
         id: templateId,
       },

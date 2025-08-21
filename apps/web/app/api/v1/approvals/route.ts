@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
       where.organizationId = organizationId;
     }
 
-    const approvals = await prisma.approvals.findMany({
+    const approvals = await prisma.approval.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
-        organizations: {
+        organization: {
           select: {
             name: true,
             domain: true
@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
 
-    const newApproval = await prisma.approvals.create({
+    const newApproval = await prisma.approval.create({
       data: {
         organizationId,
         artifactId,
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         comment,
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             name: true,
             domain: true

@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const validatedData = TrustScoreSignalSchema.parse(body);
 
     // Find the role agent by DID
-    const roleAgent = await prisma.role_agents.findFirst({
+    const roleAgent = await prisma.roleAgent.findFirst({
       where: {
         assignedToDid: validatedData.did,
         ...(validatedData.organizationId && { organizationId: validatedData.organizationId }),
@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
     const isEligibleForMint = validatedData.trustScore >= 75;
 
     // Update the role agent with the new trust score
-    const updatedAgent = await prisma.role_agents.update({
+    const updatedAgent = await prisma.roleAgent.update({
       where: { id: roleAgent.id },
       data: {
         trustScore: validatedData.trustScore,
@@ -43,14 +43,14 @@ export async function POST(request: NextRequest) {
         lastTrustCheck: new Date(),
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             id: true,
             title: true,
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Record the signal
-    await prisma.signals.create({
+    await prisma.signal.create({
       data: {
         id: `signal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         type: 'trust_score',
@@ -84,8 +84,8 @@ export async function POST(request: NextRequest) {
         roleAgentId: roleAgent.id,
         trustScore: updatedAgent.trustScore,
         isEligibleForMint: updatedAgent.isEligibleForMint,
-        organization: updatedAgent.organizations,
-        roleTemplate: updatedAgent.role_templates,
+        organization: updatedAgent.organization,
+        roleTemplate: updatedAgent.roleTemplate,
       },
     });
 
@@ -120,7 +120,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find digital twin and its trust score
-    const roleAgent = await prisma.role_agents.findFirst({
+    const roleAgent = await prisma.roleAgent.findFirst({
       where: {
         assignedToDid: did,
         ...(organizationId && { organizationId }),
@@ -130,12 +130,12 @@ export async function GET(request: NextRequest) {
         trustScore: true,
         isEligibleForMint: true,
         lastTrustCheck: true,
-        organizations: {
+        organization: {
           select: {
             name: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             title: true,
           },
@@ -157,8 +157,8 @@ export async function GET(request: NextRequest) {
         trustScore: roleAgent.trustScore,
         isEligibleForMint: roleAgent.isEligibleForMint,
         lastTrustCheck: roleAgent.lastTrustCheck,
-        organization: roleAgent.organizations,
-        roleTemplate: roleAgent.role_templates,
+        organization: roleAgent.organization,
+        roleTemplate: roleAgent.roleTemplate,
       },
     });
 

@@ -9,7 +9,7 @@ export async function createOrganization(data: {
   description?: string;
 }) {
   try {
-    const organization = await prisma.organizations.create({
+    const organization = await prisma.organization.create({
       data: {
         id: `org-${Date.now()}`,
         name: data.name,
@@ -29,7 +29,7 @@ export async function createOrganization(data: {
 
 export async function getOrganizations() {
   try {
-    const organizations = await prisma.organizations.findMany({
+    const organizations = await prisma.organization.findMany({
       where: { isActive: true },
       orderBy: { createdAt: 'desc' },
     });
@@ -42,7 +42,7 @@ export async function getOrganizations() {
 
 export async function getOrganizationByDomain(domain: string) {
   try {
-    const organization = await prisma.organizations.findUnique({
+    const organization = await prisma.organization.findUnique({
       where: { domain },
     });
     return { success: true, data: organization };
@@ -57,11 +57,11 @@ export async function getRoleAgents(organizationId?: string) {
   try {
     const where = organizationId ? { organizationId } : {};
 
-    const roleAgents = await prisma.role_agents.findMany({
+    const roleAgents = await prisma.roleAgent.findMany({
       where,
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
       },
       orderBy: { createdAt: 'desc' },
     });
@@ -75,11 +75,11 @@ export async function getRoleAgents(organizationId?: string) {
 
 export async function getRoleAgentById(id: string) {
   try {
-    const roleAgent = await prisma.role_agents.findUnique({
+    const roleAgent = await prisma.roleAgent.findUnique({
       where: { id },
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
         signals: true,
         certifications: true,
       },
@@ -93,11 +93,11 @@ export async function getRoleAgentById(id: string) {
 
 export async function getRoleAgentByDid(assignedToDid: string) {
   try {
-    const roleAgent = await prisma.role_agents.findFirst({
+    const roleAgent = await prisma.roleAgent.findFirst({
       where: { assignedToDid },
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
       },
     });
     return { success: true, data: roleAgent };
@@ -118,7 +118,7 @@ export async function createRoleAgent(data: {
 }) {
   try {
     // Check if DID already exists
-    const existingAgent = await prisma.role_agents.findFirst({
+    const existingAgent = await prisma.roleAgent.findFirst({
       where: { assignedToDid: data.assignedToDid },
     });
 
@@ -131,7 +131,7 @@ export async function createRoleAgent(data: {
       };
     }
 
-    const roleAgent = await prisma.role_agents.create({
+    const roleAgent = await prisma.roleAgent.create({
       data: {
         id: `agent-${Date.now()}`,
         name: data.name,
@@ -146,8 +146,8 @@ export async function createRoleAgent(data: {
         updatedAt: new Date(),
       },
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
       },
     });
 
@@ -169,7 +169,7 @@ export async function addSignal(data: {
   url?: string;
 }) {
   try {
-    const signal = await prisma.signals.create({
+    const signal = await prisma.signal.create({
       data: {
         id: `signal-${Date.now()}`,
         type: data.type,
@@ -193,7 +193,7 @@ export async function addSignal(data: {
 // Get signals for a role agent
 export async function getSignalsForRoleAgent(roleAgentId: string) {
   try {
-    const signals = await prisma.signals.findMany({
+    const signals = await prisma.signal.findMany({
       where: { roleAgentId },
       orderBy: { createdAt: 'desc' },
     });
@@ -207,7 +207,7 @@ export async function getSignalsForRoleAgent(roleAgentId: string) {
 // Get signal count for a role agent
 export async function getSignalCount(roleAgentId: string) {
   try {
-    const count = await prisma.signals.count({
+    const count = await prisma.signal.count({
       where: { roleAgentId },
     });
     return { success: true, data: count };
@@ -220,7 +220,7 @@ export async function getSignalCount(roleAgentId: string) {
 // Get recent signals for a role agent
 export async function getRecentSignals(roleAgentId: string, limit: number = 10) {
   try {
-    const signals = await prisma.signals.findMany({
+    const signals = await prisma.signal.findMany({
       where: { roleAgentId },
       orderBy: { createdAt: 'desc' },
       take: limit,
@@ -237,7 +237,7 @@ export async function getRoleTemplates(organizationId?: string) {
   try {
     const where = organizationId ? { organizationId } : {};
 
-    const templates = await prisma.role_templates.findMany({
+    const templates = await prisma.roleTemplate.findMany({
       where: { ...where, selectable: true },
       orderBy: { category: 'asc' },
     });
@@ -251,7 +251,7 @@ export async function getRoleTemplates(organizationId?: string) {
 
 export async function getRoleTemplateById(id: string) {
   try {
-    const template = await prisma.role_templates.findUnique({
+    const template = await prisma.roleTemplate.findUnique({
       where: { id },
     });
     return { success: true, data: template };

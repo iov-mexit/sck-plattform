@@ -7,11 +7,11 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    const roleAgent = await prisma.role_agents.findUnique({
+    const roleAgent = await prisma.roleAgent.findUnique({
       where: { id },
       include: {
-        role_templates: true,
-        organizations: true
+        roleTemplate: true,
+        organization: true
       }
     });
 
@@ -49,7 +49,7 @@ export async function PATCH(
     const body = await request.json();
 
     // Validate that the role agent exists
-    const existingAgent = await prisma.role_agents.findUnique({
+    const existingAgent = await prisma.roleAgent.findUnique({
       where: { id }
     });
 
@@ -85,19 +85,19 @@ export async function PATCH(
     }
 
     // Update the role agent
-    const updatedAgent = await prisma.role_agents.update({
+    const updatedAgent = await prisma.roleAgent.update({
       where: { id },
       data: updateData,
       include: {
-        role_templates: true,
-        organizations: true
+        roleTemplate: true,
+        organization: true
       }
     });
 
     // If NFT information was provided, also create a blockchain transaction record
     if (body.nftTransactionHash && body.soulboundTokenId) {
       try {
-        await prisma.blockchain_transactions.create({
+        await prisma.blockchainTransaction.create({
           data: {
             id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             roleAgentId: id,
@@ -150,7 +150,7 @@ export async function DELETE(
   const { id } = await params;
   try {
     // Check if role agent exists
-    const existingAgent = await prisma.role_agents.findUnique({
+    const existingAgent = await prisma.roleAgent.findUnique({
       where: { id }
     });
 
@@ -162,12 +162,12 @@ export async function DELETE(
     }
 
     // Delete related blockchain transactions first
-    await prisma.blockchain_transactions.deleteMany({
+    await prisma.blockchainTransaction.deleteMany({
       where: { roleAgentId: id }
     });
 
     // Delete the role agent
-    await prisma.role_agents.delete({
+    await prisma.roleAgent.delete({
       where: { id }
     });
 

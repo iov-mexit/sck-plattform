@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
     if (organizationId) where.organizationId = organizationId;
     if (artifactType) where.artifactType = artifactType;
 
-    const policies = await prisma.loa_policies.findMany({
+    const policies = await prisma.loaPolicy.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     // If no organizationId provided, use the first available organization
     if (!organizationId) {
-      const defaultOrg = await prisma.organizations.findFirst({
+      const defaultOrg = await prisma.organization.findFirst({
         where: { isActive: true },
         orderBy: { createdAt: 'asc' }
       });
@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify the organization exists
-    const organization = await prisma.organizations.findUnique({
+    const organization = await prisma.organization.findUnique({
       where: { id: organizationId }
     });
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    const policy = await prisma.loa_policies.create({
+    const policy = await prisma.loaPolicy.create({
       data: {
         organizationId,
         artifactType,
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
         requiredFacets,
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,

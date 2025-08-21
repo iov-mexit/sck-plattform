@@ -15,17 +15,17 @@ export async function POST(request: Request) {
     const validatedData = TrustValidationSchema.parse(body);
 
     // Privacy: Verify role agent exists
-    const roleAgent = await prisma.role_agents.findUnique({
+    const roleAgent = await prisma.roleAgent.findUnique({
       where: { id: validatedData.digitalTwinId },
       include: {
-        organizations: {
+        organization: {
           select: {
             id: true,
             name: true,
             domain: true,
           },
         },
-        role_templates: {
+        roleTemplate: {
           select: {
             id: true,
             title: true,
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     // Get trust threshold for the role
-    const trustThreshold = await prisma.role_trust_thresholds.findFirst({
+    const trustThreshold = await prisma.roleTrustThreshold.findFirst({
       where: {
         organizationId: roleAgent.organizationId,
         roleTitle: validatedData.roleTitle,
@@ -56,7 +56,7 @@ export async function POST(request: Request) {
 
     // Update role agent trust score if valid
     if (isValid) {
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id: validatedData.digitalTwinId },
         data: {
           trustScore: validatedData.trustScore,
@@ -70,11 +70,11 @@ export async function POST(request: Request) {
     const recommendations = generateRecommendations(
       validatedData.trustScore,
       requiredScore,
-      roleAgent.role_templates.category
+      roleAgent.roleTemplate.category
     );
 
     // Audit log (privacy-compliant)
-    await prisma.audit_logs.create({
+    await prisma.auditLog.create({
       data: {
         id: `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         action: 'validate_trust',
@@ -99,8 +99,8 @@ export async function POST(request: Request) {
       roleAgent: {
         id: roleAgent.id,
         name: roleAgent.name,
-        organization: roleAgent.organizations,
-        roleTemplate: roleAgent.role_templates,
+        organization: roleAgent.organization,
+        roleTemplate: roleAgent.roleTemplate,
         trustScore: roleAgent.trustScore,
         isEligibleForMint: roleAgent.isEligibleForMint,
       },
@@ -191,7 +191,7 @@ export async function GET(request: Request) {
     }
 
     // Privacy: Verify organization exists
-    const organization = await prisma.organizations.findUnique({
+    const organization = await prisma.organization.findUnique({
       where: { id: organizationId },
     });
 
@@ -209,20 +209,20 @@ export async function GET(request: Request) {
       averageTrustScore,
       trustThresholds,
     ] = await Promise.all([
-      prisma.role_agents.count({
+      prisma.roleAgent.count({
         where: { organizationId },
       }),
-      prisma.role_agents.count({
+      prisma.roleAgent.count({
         where: {
           organizationId,
           isEligibleForMint: true,
         },
       }),
-      prisma.role_agents.aggregate({
+      prisma.roleAgent.aggregate({
         where: { organizationId },
         _avg: { trustScore: true },
       }),
-      prisma.role_trust_thresholds.findMany({
+      prisma.roleTrustThreshold.findMany({
         where: {
           organizationId,
           isActive: true,

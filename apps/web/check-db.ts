@@ -2,9 +2,9 @@ import prisma from './lib/database';
 
 async function checkOrganizations() {
   try {
-    console.log('🔍 Checking organizations in database...\n');
+    console.log('🔍 Checking organization in database...\n');
     
-    const organizations = await prisma.organizations.findMany({
+    const organization = await prisma.organization.findMany({
       select: {
         id: true,
         name: true,
@@ -14,24 +14,25 @@ async function checkOrganizations() {
         createdAt: true,
         _count: {
           select: {
-            role_agents: true
+            roleAgents: true,
+            roleTemplates: true
           }
         }
       }
     });
 
-    if (organizations.length === 0) {
-      console.log('❌ No organizations found in database');
+    if (organization.length === 0) {
+      console.log('❌ No organization found in database');
     } else {
-      console.log(`✅ Found ${organizations.length} organization(s):\n`);
+      console.log(`✅ Found ${organization.length} organization(s):\n`);
       
-      organizations.forEach((org: any, index: number) => {
+      organization.forEach((org: any, index: number) => {
         console.log(`${index + 1}. ${org.name}`);
         console.log(`   📧 Domain: "${org.domain}"`);
         console.log(`   🆔 ID: ${org.id}`);
         console.log(`   ✅ Active: ${org.isActive}`);
         console.log(`   🎯 Onboarded: ${org.onboardingComplete}`);
-        console.log(`   👥 Role Agents: ${org._count.role_agents}`);
+        console.log(`   👥 Role Agents: ${org._count.roleAgent}`);
         console.log(`   📅 Created: ${org.createdAt.toISOString()}`);
         console.log('');
       });
@@ -48,7 +49,7 @@ async function checkOrganizations() {
 
     testEmails.forEach((email: string) => {
       const domain = email.split('@')[1] || '';
-      const matchingOrg = organizations.find((org: any) => org.domain === domain);
+      const matchingOrg = organization.find((org: any) => org.domain === domain);
       console.log(`   📧 ${email} → domain: "${domain}" → ${matchingOrg ? '✅ MATCH' : '❌ NO MATCH'}`);
     });
 

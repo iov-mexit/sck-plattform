@@ -20,7 +20,7 @@ async function seedTrustThresholds() {
     const thresholds = await Promise.all([
       prisma.roleTrustThreshold.upsert({
         where: {
-          idx_role_threshold_org_role: {
+          organizationId_roleTitle: {
             organizationId: organization.id,
             roleTitle: 'Security Engineer',
           },
@@ -38,7 +38,7 @@ async function seedTrustThresholds() {
       }),
       prisma.roleTrustThreshold.upsert({
         where: {
-          idx_role_threshold_org_role: {
+          organizationId_roleTitle: {
             organizationId: organization.id,
             roleTitle: 'DevOps Engineer',
           },
@@ -56,7 +56,7 @@ async function seedTrustThresholds() {
       }),
       prisma.roleTrustThreshold.upsert({
         where: {
-          idx_role_threshold_org_role: {
+          organizationId_roleTitle: {
             organizationId: organization.id,
             roleTitle: 'Developer',
           },
@@ -74,7 +74,7 @@ async function seedTrustThresholds() {
       }),
       prisma.roleTrustThreshold.upsert({
         where: {
-          idx_role_threshold_org_role: {
+          organizationId_roleTitle: {
             organizationId: organization.id,
             roleTitle: 'Analyst',
           },

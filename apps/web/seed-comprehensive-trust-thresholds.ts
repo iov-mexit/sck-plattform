@@ -55,7 +55,7 @@ async function seedComprehensiveTrustThresholds() {
       trustThresholds.map(async (threshold) => {
         return await prisma.roleTrustThreshold.upsert({
           where: {
-            idx_role_threshold_org_role: {
+            organizationId_roleTitle: {
               organizationId: organization.id,
               roleTitle: threshold.roleTitle,
             },

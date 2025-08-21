@@ -41,9 +41,9 @@ export class SignalCollectionService {
       const validatedData = SignalSchema.parse(data);
 
       // Check if role agent exists
-      const roleAgent = await prisma.role_agents.findUnique({
+      const roleAgent = await prisma.roleAgent.findUnique({
         where: { id: validatedData.digitalTwinId },
-        include: { organizations: true, role_templates: true }
+        include: { organization: true, roleTemplate: true }
       });
 
       if (!roleAgent) {
@@ -51,7 +51,7 @@ export class SignalCollectionService {
       }
 
       // Create the signal
-      const signal = await prisma.signals.create({
+      const signal = await prisma.signal.create({
         data: {
           type: validatedData.type,
           title: validatedData.title,
@@ -62,10 +62,10 @@ export class SignalCollectionService {
           roleAgentId: validatedData.digitalTwinId,
         },
         include: {
-          role_agents: {
+          roleAgent: {
             include: {
-              organizations: true,
-              role_templates: true
+              organization: true,
+              roleTemplate: true
             }
           }
         }
@@ -91,13 +91,13 @@ export class SignalCollectionService {
         where.type = options.type;
       }
 
-      const signals = await prisma.signals.findMany({
+      const signals = await prisma.signal.findMany({
         where,
         include: {
-          role_agents: {
+          roleAgent: {
             include: {
-              organizations: true,
-              role_templates: true
+              organization: true,
+              roleTemplate: true
             }
           }
         },
@@ -116,7 +116,7 @@ export class SignalCollectionService {
   // Get signal count for a role agent
   async getSignalCount(roleAgentId: string): Promise<number> {
     try {
-      return await prisma.signals.count({
+      return await prisma.signal.count({
         where: { roleAgentId }
       });
     } catch (error: unknown) {
@@ -128,15 +128,15 @@ export class SignalCollectionService {
   // Get recent signals for a role agent
   async getRecentSignals(roleAgentId: string, limit: number = 5): Promise<unknown[]> {
     try {
-      return await prisma.signals.findMany({
+      return await prisma.signal.findMany({
         where: { roleAgentId },
         orderBy: { createdAt: 'desc' },
         take: limit,
         include: {
-          role_agents: {
+          roleAgent: {
             include: {
-              organizations: true,
-              role_templates: true
+              organization: true,
+              roleTemplate: true
             }
           }
         }

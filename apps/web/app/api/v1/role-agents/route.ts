@@ -26,17 +26,17 @@ export async function GET(request: NextRequest) {
     const whereClause = organizationId ? { organizationId } : {};
 
     const [roleAgents, total] = await Promise.all([
-      prisma.role_agents.findMany({
+      prisma.roleAgent.findMany({
         where: whereClause,
         include: {
-          organizations: true,
-          role_templates: true,
+          organization: true,
+          roleTemplate: true,
         },
         skip: offset,
         take: limit,
         orderBy: { createdAt: 'desc' },
       }),
-      prisma.role_agents.count({ where: whereClause }),
+      prisma.roleAgent.count({ where: whereClause }),
     ]);
 
     // Map database results to include computed fields for frontend compatibility
@@ -44,8 +44,8 @@ export async function GET(request: NextRequest) {
       ...agent,
       nftMinted: !!agent.soulboundTokenId,
       assignedDid: agent.assignedToDid, // Legacy compatibility
-      organization: agent.organizations, // Map snake_case to camelCase for frontend
-      roleTemplate: agent.role_templates, // Map snake_case to camelCase for frontend
+      organization: agent.organization, // Map to new PascalCase names
+      roleTemplate: agent.roleTemplate, // Map to new PascalCase names
     }));
 
     return NextResponse.json({
@@ -71,12 +71,12 @@ export async function POST(request: NextRequest) {
     const validatedData = CreateRoleAgentSchema.parse(body);
 
     // Check for duplicate DID
-    const existingRoleAgent = await prisma.role_agents.findFirst({
+    const existingRoleAgent = await prisma.roleAgent.findFirst({
       where: {
         assignedToDid: validatedData.assignedToDid,
       },
       include: {
-        organizations: true,
+        organization: true,
       },
     });
 
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const uniqueId = `agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
     // Create role agent with DID only - manually provide the id
-    const roleAgent = await prisma.role_agents.create({
+    const roleAgent = await prisma.roleAgent.create({
       data: {
         id: uniqueId,
         organizationId: validatedData.organizationId,

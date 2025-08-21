@@ -20,24 +20,8 @@ export async function GET(request: NextRequest) {
 
     // If we have a specific organizationId or domain, return single organization
     if (organizationId || domain) {
-      const organization = await prisma.organizations.findUnique({
+      const organization = await prisma.organization.findUnique({
         where: organizationId ? { id: organizationId } : { domain: domain || undefined },
-        select: {
-          id: true,
-          name: true,
-          description: true,
-          domain: true,
-          isActive: true,
-          onboardingComplete: true,
-          createdAt: true,
-          updatedAt: true,
-          _count: {
-            select: {
-              role_agents: true,
-              role_templates: true
-            }
-          }
-        }
       });
 
       if (!organization) {
@@ -53,8 +37,8 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    // Otherwise, return list of organizations
-    const organizations = await prisma.organizations.findMany({
+    // Otherwise, return list of organization
+    const organization = await prisma.organization.findMany({
       where: whereClause,
       take: limit,
       skip: offset,
@@ -72,20 +56,20 @@ export async function GET(request: NextRequest) {
         updatedAt: true,
         _count: {
           select: {
-            role_agents: true,
-            role_templates: true
+            roleAgents: true,
+            roleTemplates: true
           }
         }
       }
     });
 
-    const totalCount = await prisma.organizations.count({
+    const totalCount = await prisma.organization.count({
       where: whereClause
     });
 
     return NextResponse.json({
       success: true,
-      data: organizations,
+      data: organization,
       pagination: {
         total: totalCount,
         limit,
@@ -95,11 +79,11 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Error fetching organizations:', error);
+    console.error('Error fetching organization:', error);
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to fetch organizations',
+        error: 'Failed to fetch organization',
         details: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
@@ -119,7 +103,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const organization = await prisma.organizations.create({
+    const organization = await prisma.organization.create({
       data: {
         name,
         description: description || '',

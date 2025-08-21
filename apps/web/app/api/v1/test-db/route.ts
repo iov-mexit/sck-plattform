@@ -6,24 +6,24 @@ export async function GET(request: NextRequest) {
     console.log('Testing database connection...');
 
     // Test basic connection
-    const organizations = await prisma.organizations.findMany({
+    const organization = await prisma.organization.findMany({
       take: 1,
     });
 
-    console.log('Found organizations:', organizations.length);
+    console.log('Found organization:', organization.length);
 
     // Test role agents table
-    const role_agents = await prisma.role_agents.findMany({
+    const roleAgent = await prisma.roleAgent.findMany({
       take: 1,
     });
 
-    console.log('Found role agents:', role_agents.length);
+    console.log('Found role agents:', roleAgent.length);
 
     return NextResponse.json({
       success: true,
       message: 'Database connection working',
-      organizationsCount: organizations.length,
-      roleAgentsCount: role_agents.length,
+      organizationCount: organization.length,
+      roleAgentsCount: roleAgent.length,
     });
 
   } catch (error) {

@@ -15,7 +15,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ artifac
     // Cast artifactType to the proper enum type
     const artifactTypeEnum = artifactType as 'RoleAgent' | 'MCP';
 
-    const approvals = await prisma.approvals.findMany({
+    const approvals = await prisma.approval.findMany({
       where: {
         artifactType: artifactTypeEnum,
         artifactId,
@@ -31,7 +31,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ artifac
 
     // Optional: fetch LoA policy to determine required facets/min reviewers if org provided
     if (organizationId) {
-      const policy = await prisma.loa_policies.findFirst({
+      const policy = await prisma.loaPolicy.findFirst({
         where: { organizationId, artifactType: artifactTypeEnum },
         orderBy: { createdAt: 'desc' },
       });

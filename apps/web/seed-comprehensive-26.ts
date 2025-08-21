@@ -8,7 +8,7 @@ async function seedComprehensive26() {
   try {
     // Clear existing role templates only
     console.log('🗑️  Clearing existing role templates...');
-    await prisma.role_templates.deleteMany();
+    await prisma.roleTemplate.deleteMany();
 
     // Create comprehensive role templates (GLOBAL - not tied to any organization)
     console.log('👥 Creating comprehensive 26 role templates...');
@@ -998,7 +998,7 @@ async function seedComprehensive26() {
     // Create all role templates
     const createdRoles = [];
     for (const template of roleTemplates) {
-      const created = await prisma.role_templates.upsert({
+      const created = await prisma.roleTemplate.upsert({
         where: { id: template.id },
         update: {
           title: template.title,

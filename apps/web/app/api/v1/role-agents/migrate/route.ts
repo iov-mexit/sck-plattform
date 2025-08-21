@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch all role templates
-    const roleTemplates = await prisma.role_templates.findMany({
+    const roleTemplates = await prisma.roleTemplate.findMany({
       where: {
         selectable: true,
       },
@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get existing role agents to avoid duplicates
-    const existingAgents = await prisma.role_agents.findMany({
+    const existingAgents = await prisma.roleAgent.findMany({
       where: {
         organizationId: organizationId,
       },
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
       const isEligibleForMint = trustScore >= 750;
 
       try {
-        const roleAgent = await prisma.role_agents.create({
+        const roleAgent = await prisma.roleAgent.create({
           data: {
             id: `agent-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             name: agentName,
@@ -88,8 +88,8 @@ export async function POST(request: NextRequest) {
             updatedAt: new Date(),
           },
           include: {
-            role_templates: true,
-            organizations: true,
+            roleTemplate: true,
+            organization: true,
           },
         });
 

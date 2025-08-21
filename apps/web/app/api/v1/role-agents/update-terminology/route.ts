@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
     console.log('Starting terminology update for existing role agents...');
 
     // Find all role agents with "Digital Twin" in their name or description
-    const roleAgentsToUpdate = await prisma.role_agents.findMany({
+    const roleAgentsToUpdate = await prisma.roleAgent.findMany({
       where: {
         OR: [
           {
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       const updatedName = agent.name?.replace(/Digital Twin/gi, 'Role Agent') || agent.name;
       const updatedDescription = agent.description?.replace(/Digital twin/gi, 'Role agent') || agent.description;
 
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id: agent.id },
         data: {
           name: updatedName,

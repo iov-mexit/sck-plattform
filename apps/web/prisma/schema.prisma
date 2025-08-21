@@ -56,7 +56,7 @@ enum PolicyStatus {
 //
 // MODELS
 //
-model audit_logs {
+model AuditLog {
   id            String   @id @default(cuid())
   action        String
   entity        String
@@ -67,15 +67,15 @@ model audit_logs {
   metadata      Json?
   createdAt     DateTime @default(now())
 
-  organizations organizations? @relation(fields: [organizationId], references: [id])
-  role_agents   role_agents?   @relation(fields: [roleAgentId], references: [id])
+  organization Organization? @relation(fields: [organizationId], references: [id])
+  roleAgent    RoleAgent?   @relation(fields: [roleAgentId], references: [id])
 
   @@index([action], map: "idx_audit_action")
   @@index([createdAt], map: "idx_audit_created")
   @@index([entity], map: "idx_audit_entity")
 }
 
-model blockchain_transactions {
+model BlockchainTransaction {
   id              String            @id @default(cuid())
   transactionHash String            @unique
   network         String
@@ -90,7 +90,7 @@ model blockchain_transactions {
   metadata        Json?
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
-  role_agents     role_agents?      @relation(fields: [roleAgentId], references: [id])
+  roleAgent       RoleAgent?        @relation(fields: [roleAgentId], references: [id])
 
   @@index([transactionHash], map: "idx_blockchain_tx_hash")
   @@index([network], map: "idx_blockchain_tx_network")
@@ -99,7 +99,7 @@ model blockchain_transactions {
   @@index([tokenId], map: "idx_blockchain_tx_token")
 }
 
-model certifications {
+model Certification {
   id            String      @id @default(cuid())
   name          String
   issuer        String
@@ -111,14 +111,14 @@ model certifications {
   roleAgentId   String
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  role_agents   role_agents @relation(fields: [roleAgentId], references: [id])
+  roleAgent     RoleAgent   @relation(fields: [roleAgentId], references: [id])
 
   @@index([roleAgentId], map: "idx_certifications_role_agent")
   @@index([expiresAt], map: "idx_certifications_expires")
   @@index([verified], map: "idx_certifications_verified")
 }
 
-model role_agents {
+model RoleAgent {
   id                      String                    @id @default(cuid())
   name                    String
   description             String?
@@ -141,13 +141,13 @@ model role_agents {
   ansRegistrationError    String?
   ansVerificationUrl      String?
 
-  blockchain_transactions blockchain_transactions[]
-  certifications          certifications[]
-  trust_histories         trust_histories[]
-  organizations           organizations             @relation(fields: [organizationId], references: [id])
-  role_templates          role_templates            @relation(fields: [roleTemplateId], references: [id])
-  signals                 signals[]
-  audit_logs              audit_logs[]
+  blockchainTransactions BlockchainTransaction[]
+  certifications         Certification[]
+  trustHistories         TrustHistory[]
+  organization           Organization              @relation(fields: [organizationId], references: [id])
+  roleTemplate           RoleTemplate              @relation(fields: [roleTemplateId], references: [id])
+  signals                Signal[]
+  auditLogs              AuditLog[]
 
   @@index([assignedToDid], map: "idx_role_agents_assigned_did")
   @@index([assignedToUserId], map: "idx_role_agents_assigned_user")
@@ -161,19 +161,19 @@ model role_agents {
   @@index([ansRegistrationStatus], map: "idx_role_agents_ans_status")
 }
 
-model trust_histories {
+model TrustHistory {
   id          String     @id @default(cuid())
   roleAgentId String
   trustScore  Float
   computedAt  DateTime   @default(now())
   metadata    Json?
-  role_agents role_agents @relation(fields: [roleAgentId], references: [id])
+  roleAgent   RoleAgent  @relation(fields: [roleAgentId], references: [id])
 
   @@index([roleAgentId], map: "idx_trust_histories_role_agent")
   @@index([computedAt], map: "idx_trust_histories_time")
 }
 
-model organization_members {
+model OrganizationMember {
   id             String        @id @default(cuid())
   organizationId String
   name           String
@@ -182,10 +182,10 @@ model organization_members {
   isActive       Boolean       @default(true)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  organizations  organizations @relation(fields: [organizationId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id])
 }
 
-model organizations {
+model Organization {
   id                    String                  @id @default(cuid())
   name                  String
   description           String?
@@ -196,20 +196,20 @@ model organizations {
   onboardingComplete    Boolean                 @default(false)
   complianceTags        Json?
 
-  role_agents           role_agents[]
-  organization_members  organization_members[]
-  role_templates        role_templates[]
-  role_trust_thresholds role_trust_thresholds[]
-  loa_policies          loa_policies[]
-  approvals             approvals[]
-  mcp_policies          mcp_policies[]
-  audit_logs            audit_logs[]
+  roleAgents            RoleAgent[]
+  organizationMembers   OrganizationMember[]
+  roleTemplates         RoleTemplate[]
+  roleTrustThresholds   RoleTrustThreshold[]
+  loaPolicies           LoaPolicy[]
+  approvals             Approval[]
+  mcpPolicies           McpPolicy[]
+  auditLogs             AuditLog[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
 }
 
-model role_templates {
+model RoleTemplate {
   id                    String          @id @default(cuid())
   title                 String
   focus                 String
@@ -220,11 +220,11 @@ model role_templates {
   organizationId        String?
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
-  role_agents           role_agents[]
-  organizations         organizations?  @relation(fields: [organizationId], references: [id])
+  roleAgents            RoleAgent[]
+  organization          Organization?   @relation(fields: [organizationId], references: [id])
 }
 
-model role_trust_thresholds {
+model RoleTrustThreshold {
   id             String        @id @default(cuid())
   roleTitle      String
   minTrustScore  Float
@@ -233,13 +233,13 @@ model role_trust_thresholds {
   organizationId String
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  organizations  organizations @relation(fields: [organizationId], references: [id])
+  organization   Organization  @relation(fields: [organizationId], references: [id])
 
   @@unique([organizationId, roleTitle])
   @@index([organizationId], map: "idx_role_threshold_org")
 }
 
-model signals {
+model Signal {
   id            String        @id @default(cuid())
   type          String
   title         String
@@ -254,14 +254,14 @@ model signals {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   url           String?
-  role_agents   role_agents   @relation(fields: [roleAgentId], references: [id])
+  roleAgent     RoleAgent     @relation(fields: [roleAgentId], references: [id])
 
   @@index([roleAgentId], map: "idx_signals_role_agent")
   @@index([type], map: "idx_signals_type")
   @@index([verified], map: "idx_signals_verified")
 }
 
-model loa_policies {
+model LoaPolicy {
   id              String      @id @default(cuid())
   organizationId  String
   artifactType    ArtifactType
@@ -269,12 +269,12 @@ model loa_policies {
   requiredFacets  ApprovalFacet[]
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
-  organizations   organizations @relation(fields: [organizationId], references: [id])
+  organization    Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId], map: "idx_loa_policies_org")
 }
 
-model approvals {
+model Approval {
   id             String    @id @default(cuid())
   organizationId String
   artifactId     String
@@ -284,13 +284,13 @@ model approvals {
   decision       ApprovalDecision
   comment        String?
   createdAt      DateTime  @default(now())
-  organizations  organizations @relation(fields: [organizationId], references: [id])
+  organization   Organization @relation(fields: [organizationId], references: [id])
 
   @@index([organizationId], map: "idx_approvals_org")
   @@unique([artifactId, artifactType, reviewerId, facet])
 }
 
-model mcp_policies {
+model McpPolicy {
   id              String        @id @default(cuid())
   organizationId  String
   name            String
@@ -303,22 +303,22 @@ model mcp_policies {
   createdBy       String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  organizations   organizations @relation(fields: [organizationId], references: [id])
-  mcp_policy_tests mcp_policy_tests[]
+  organization    Organization  @relation(fields: [organizationId], references: [id])
+  mcpPolicyTests  McpPolicyTest[]
 
   @@index([organizationId], map: "idx_mcp_policies_org")
   @@index([status], map: "idx_mcp_policies_status")
   @@unique([organizationId, name, version])
 }
 
-model mcp_policy_tests {
+model McpPolicyTest {
   id         String        @id @default(cuid())
   policyId   String
   name       String
   input      Json
   expected   Json
   createdAt  DateTime      @default(now())
-  mcp_policies mcp_policies @relation(fields: [policyId], references: [id])
+  mcpPolicy  McpPolicy     @relation(fields: [policyId], references: [id])
 
   @@index([policyId], map: "idx_mcp_policy_tests_policy")
 }

@@ -15,12 +15,13 @@ export async function GET(request: NextRequest) {
       where.status = status;
     }
 
-    const mcpPolicies = await prisma.mcp_policies.findMany({
+    const mcpPolicies = await prisma.mcpPolicy.findMany({
       where,
       orderBy: { createdAt: 'desc' },
       include: {
-        organizations: {
+        organization: {
           select: {
+            id: true,
             name: true,
             domain: true
           }
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
     }
 
-    const newPolicy = await prisma.mcp_policies.create({
+    const newPolicy = await prisma.mcpPolicy.create({
       data: {
         organizationId,
         name,
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
         createdBy,
       },
       include: {
-        organizations: {
+        organization: {
           select: {
             name: true,
             domain: true

@@ -10,11 +10,11 @@ export async function POST(
   try {
 
     // Fetch the role agent
-    const roleAgent = await prisma.role_agents.findUnique({
+    const roleAgent = await prisma.roleAgent.findUnique({
       where: { id },
       include: {
-        role_templates: true,
-        organizations: true,
+        roleTemplate: true,
+        organization: true,
       },
     });
 
@@ -28,24 +28,24 @@ export async function POST(
     // Generate ANS identifier and qualification level
     const level = assignLevel(roleAgent.trustScore || 0);
     const qualificationLevel = getQualificationLevel(roleAgent.trustScore || 0, level);
-    const roleName = generateRoleAgentName(roleAgent.role_templates.title, level);
-    const ansIdentifier = `${level}-${roleName}.${roleAgent.organizations.domain}.knaight`;
+    const roleName = generateRoleAgentName(roleAgent.roleTemplate.title, level);
+    const ansIdentifier = `${level}-${roleName}.${roleAgent.organization.domain}.knaight`;
 
     // Build ANS registration payload
     const ansPayload = {
       ansId: ansIdentifier,
-      did: roleAgent.assignedToDid || `did:web:${roleAgent.organizations.domain}:${roleAgent.id}`,
-      role: roleAgent.role_templates.title,
+      did: roleAgent.assignedToDid || `did:web:${roleAgent.organization.domain}:${roleAgent.id}`,
+      role: roleAgent.roleTemplate.title,
       level,
       qualificationLevel,
-      organization: roleAgent.organizations.name,
+      organization: roleAgent.organization.name,
       trustLevel: getTrustLevel(roleAgent.trustScore || 0),
       verificationEndpoint: `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/role-agents/${roleAgent.id}/verify`,
       publicMetadata: {
-        role: roleAgent.role_templates.title,
+        role: roleAgent.roleTemplate.title,
         level,
         qualificationLevel,
-        organization: roleAgent.organizations.name,
+        organization: roleAgent.organization.name,
         trustScore: roleAgent.trustScore || 0,
         lastUpdated: new Date().toISOString()
       }
@@ -56,7 +56,7 @@ export async function POST(
 
     if (ansResult.success) {
       // Update role agent with ANS registration info
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id },
         data: {
           ansIdentifier,
@@ -76,7 +76,7 @@ export async function POST(
       });
     } else {
       // Update role agent with failed status
-      await prisma.role_agents.update({
+      await prisma.roleAgent.update({
         where: { id },
         data: {
           ansIdentifier,
