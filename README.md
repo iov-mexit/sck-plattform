@@ -1,3 +1,17 @@
+# SCK Platform - Privileged Access Management (PAM) & Trust-Gated Management Control Planes (MCPs)
+
+> **Trust-based credentialing platform with external signal funneling architecture**
+
+## 🎯 **Platform Vision**
+
+Knaight is a **security control-plane for AI and distributed compute**, where only ANS-registered Role Agents with sufficient externally-sourced trust can invoke privileged MCP/control endpoints, with auditable and revocable decisions.
+
+## 🚀 **Latest Update: Vercel Deployment Fixed!**
+
+✅ **Vercel token issue resolved** - Local deployment working perfectly  
+✅ **GitHub Actions ready** - All secrets properly configured  
+✅ **Build process optimized** - Prisma client generation working  
+
 # 🛡️ Secure Code KnAIght (SCK) Platform
 
 > **Trust-based credentialing platform for security-focused software development teams, with a vision for global decentralized trust networks.**
