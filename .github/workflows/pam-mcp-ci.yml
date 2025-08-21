@@ -153,23 +153,19 @@ jobs:
           # Install Vercel CLI
           npm install -g vercel@latest
           
-          # Create .vercel directory with project config
-          mkdir -p .vercel
-          echo '{"projectId":"prj_cliUhJIbVCN4r5tpipREwXInaY6C","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > .vercel/project.json
+          # Set environment variables
+          export VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}"
+          export VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}"
+          export VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}"
           
-          # Link project explicitly
-          echo "Linking to Vercel project..."
-          VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}" \
-          VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
-          VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
-          vercel link --yes --token "${{ secrets.VERCEL_TOKEN }}"
+          # Debug: Show what we're using (without exposing the actual token)
+          echo "Using Vercel Project ID: $VERCEL_PROJECT_ID"
+          echo "Using Vercel Org ID: $VERCEL_ORG_ID"
+          echo "Token length: ${#VERCEL_TOKEN} characters"
           
-          # Deploy to production
-          echo "Deploying to production..."
-          VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}" \
-          VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
-          VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
-          vercel --prod --yes
+          # Deploy directly with token (no linking needed)
+          echo "Deploying to Vercel..."
+          vercel --prod --yes --token "$VERCEL_TOKEN"
 
   # Quality Gate Summary
   quality-summary:
