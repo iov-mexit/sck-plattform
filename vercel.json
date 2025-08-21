@@ -21,6 +21,5 @@
     "NEXT_PUBLIC_LOG_LEVEL": "info",
     "NEXT_PUBLIC_EU_COMPLIANCE": "false",
     "NEXT_PUBLIC_COOKIE_CONSENT_ENABLED": "true"
-  },
-
+  }
 }
