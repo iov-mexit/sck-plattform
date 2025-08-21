@@ -164,7 +164,7 @@ jobs:
           VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
           vercel link --yes --token "${{ secrets.VERCEL_TOKEN }}"
           
-          # Deploy using environment variables
+          # Deploy to production
           echo "Deploying to production..."
           VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}" \
           VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
