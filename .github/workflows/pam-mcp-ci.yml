@@ -111,7 +111,7 @@ jobs:
           echo "Generating Prisma client..."
           npx prisma generate --schema=./prisma/schema.prisma
           echo "Prisma client generated successfully"
-          ls -la node_modules/.prisma/client/
+          ls -la ../../node_modules/.prisma/client/
 
       - name: Build application
         run: |
