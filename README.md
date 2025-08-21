@@ -11,7 +11,8 @@ Knaight is a **security control-plane for AI and distributed compute**, where on
 ✅ **Vercel token issue resolved** - Local deployment working perfectly  
 ✅ **GitHub Actions ready** - All secrets properly configured  
 ✅ **Build process optimized** - Prisma client generation working  
-🕐 **Last deployment test**: $(date) - Fresh commit to trigger workflow
+🕐 **Last deployment test**: $(date) - Fresh commit to trigger workflow  
+🔧 **vercel.json fixed**: Removed invalid projectId and orgId properties
 
 # 🛡️ Secure Code KnAIght (SCK) Platform
 
