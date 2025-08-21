@@ -155,9 +155,17 @@ jobs:
           
           # Create .vercel directory with project config
           mkdir -p .vercel
-          echo '{"projectId":"${{ secrets.VERCEL_PROJECT_ID }}","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > .vercel/project.json
+          echo '{"projectId":"prj_cliUhJIbVCN4r5tpipREwXInaY6C","orgId":"${{ secrets.VERCEL_ORG_ID }}"}' > .vercel/project.json
+          
+          # Link project explicitly
+          echo "Linking to Vercel project..."
+          VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}" \
+          VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
+          VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
+          vercel link --yes --token "${{ secrets.VERCEL_TOKEN }}"
           
           # Deploy using environment variables
+          echo "Deploying to production..."
           VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}" \
           VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}" \
           VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}" \
