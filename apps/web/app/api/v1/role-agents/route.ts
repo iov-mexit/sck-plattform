@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/database';
 import { z } from 'zod';
-
-const prisma = new PrismaClient();
 
 const CreateRoleAgentSchema = z.object({
   organizationId: z.string(),

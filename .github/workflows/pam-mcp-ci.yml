@@ -101,10 +101,13 @@ jobs:
           cd apps/web
           echo "Generating Prisma client..."
           npx prisma generate --schema=./prisma/schema.prisma
+          echo "Prisma client generated successfully"
+          ls -la node_modules/.prisma/client/
 
       - name: Build application
         run: |
           echo "Building application..."
+          cd apps/web
           npm run build
 
       - name: Verify build output
