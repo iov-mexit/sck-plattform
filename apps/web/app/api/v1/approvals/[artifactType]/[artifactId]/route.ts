@@ -27,7 +27,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ artifac
     // Derive status based on decisions and facets
     const requiredFacets = new Set<string>();
     const approvedFacets = new Set<string>();
-    const rejected = approvals.some(a => a.decision === 'reject');
+    const rejected = approvals.some((a: any) => a.decision === 'reject');
 
     // Optional: fetch LoA policy to determine required facets/min reviewers if org provided
     if (organizationId) {

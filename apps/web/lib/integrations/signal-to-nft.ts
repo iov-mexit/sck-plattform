@@ -229,9 +229,9 @@ export class SignalToNFTIntegration {
 
       return {
         totalAchievements: achievements.length,
-        certifications: achievements.filter(a => a.achievementType === 'certification').length,
-        activities: achievements.filter(a => a.achievementType === 'activity').length,
-        soulboundAchievements: achievements.filter(a => a.isSoulbound).length
+        certifications: achievements.filter((a: any) => a.achievementType === 'certification').length,
+        activities: achievements.filter((a: any) => a.achievementType === 'activity').length,
+        soulboundAchievements: achievements.filter((a: any) => a.isSoulbound).length
       };
 
     } catch (error) {
