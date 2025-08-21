@@ -162,4 +162,4 @@ The `.env.example` file contains a list of all the environment variables used by
 
 ### Validation & Sanity Checks
 
-*   `NEXT_PUBLIC_VALIDATE_ENVIRONMENT`: Whether or not to validate the environment.
+*   `NEXT_PUBLIC_VALIDATE_ENVIRONMENT`: Whether or not to validate the environment.// Token updated - testing deployment
