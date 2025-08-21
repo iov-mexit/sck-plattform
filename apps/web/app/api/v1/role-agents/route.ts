@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // Map database results to include computed fields for frontend compatibility
-    const mappedRoleAgents = roleAgents.map(agent => ({
+    const mappedRoleAgents = roleAgents.map((agent: any) => ({
       ...agent,
       nftMinted: !!agent.soulboundTokenId,
       assignedDid: agent.assignedToDid, // Legacy compatibility

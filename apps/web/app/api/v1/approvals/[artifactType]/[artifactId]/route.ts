@@ -47,7 +47,7 @@ export async function GET(request: NextRequest, ctx: { params: Promise<{ artifac
       });
 
       const minReviewers = policy?.minReviewers || 1;
-      const facetsSatisfied = [...(requiredFacets.size ? requiredFacets : approvedFacets)].every(f => (approvals.filter(a => a.facet === f && a.decision === 'approve').length) >= minReviewers);
+      const facetsSatisfied = [...(requiredFacets.size ? requiredFacets : approvedFacets)].every(f => (approvals.filter((a: any) => a.facet === f && a.decision === 'approve').length) >= minReviewers);
       const isApproved = !rejected && facetsSatisfied && approvals.length > 0;
 
       return NextResponse.json({ success: true, data: { approvals, status: isApproved ? 'approved' : 'pending', requiredFacets: [...requiredFacets], approvedFacets: [...approvedFacets], minReviewers } });

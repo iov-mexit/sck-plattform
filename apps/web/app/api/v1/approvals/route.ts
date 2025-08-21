@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     if (status === 'pending') {
       // For pending status, we need to check if the approval meets the LoA requirements
       // This is a simplified check - in production you'd want more sophisticated logic
-      filteredApprovals = approvals.filter(approval => {
+      filteredApprovals = approvals.filter((approval: any) => {
         // For now, consider all approvals as pending if they don't have a clear status
         // In a real implementation, you'd check against LoA policies
         return true; // Simplified for MVP

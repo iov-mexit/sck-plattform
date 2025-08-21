@@ -46,8 +46,8 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    const existingTemplateIds = new Set(existingAgents.map(agent => agent.roleTemplateId));
-    const templatesToMigrate = roleTemplates.filter(template => !existingTemplateIds.has(template.id));
+    const existingTemplateIds = new Set(existingAgents.map((agent: any) => agent.roleTemplateId));
+    const templatesToMigrate = roleTemplates.filter((template: any) => !existingTemplateIds.has(template.id));
 
     if (templatesToMigrate.length === 0) {
       return NextResponse.json({
