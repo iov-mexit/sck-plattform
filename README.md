@@ -17,7 +17,8 @@ Knaight is a **security control-plane for AI and distributed compute**, where on
 🔧 **Environment variables**: Configured in Vercel dashboard for Magic Link authentication  
 🚀 **Fresh deployment**: Triggered to load updated Magic Link environment variables  
 🔗 **RPC URL**: Configured for Ethereum Sepolia network  
-🌐 **Domain allowlist**: New Vercel deployment URL needs to be added to Magic Link allowlist
+🌐 **Domain allowlist**: New Vercel deployment URL needs to be added to Magic Link allowlist  
+✅ **Domains updated**: Magic Link allowlist configured for new Vercel deployment
 
 # 🛡️ Secure Code KnAIght (SCK) Platform
 
