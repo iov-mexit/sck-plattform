@@ -20,6 +20,10 @@
     "NEXT_PUBLIC_DEBUG_MODE": "false",
     "NEXT_PUBLIC_LOG_LEVEL": "info",
     "NEXT_PUBLIC_EU_COMPLIANCE": "false",
-    "NEXT_PUBLIC_COOKIE_CONSENT_ENABLED": "true"
+    "NEXT_PUBLIC_COOKIE_CONSENT_ENABLED": "true",
+    "DATABASE_URL": "postgres://postgres.vqftrdxexmsdvhbbyjff:CPGQ3DOml9iD3QID@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://vqftrdxexmsdvhbbyjff.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZnRyZHhleG1zZHZoYmJ5amZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4NTgwNzUsImV4cCI6MjA3MTQzNDA3NX0.-AMvB0s5UQrAM9d6GKwxPoKJymcCSlymLUGhirTeEWs",
+    "NEXT_PUBLIC_MAGIC_API_KEY": "pk_live_43D590E8CEC1E6C3"
   }
 }
