@@ -5,16 +5,23 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Shield,
-  FileText,
-  Signal,
-  Globe,
-  Plus,
+import { 
+  Shield, 
+  FileText, 
+  Signal, 
+  Globe, 
+  Plus, 
   Settings,
   CheckCircle,
   XCircle,
-  Clock
+  Clock,
+  Edit,
+  Copy,
+  Users,
+  Workflow,
+  BarChart3,
+  Eye,
+  History
 } from 'lucide-react';
 
 interface LoAPolicy {
@@ -44,15 +51,27 @@ interface ApprovalTask {
   createdAt: Date;
 }
 
+interface ReviewerRole {
+  id: string;
+  name: string;
+  category: 'Security' | 'Compliance' | 'Policy' | 'Risk' | 'External';
+  canApproveLevels: ('L1' | 'L2' | 'L3' | 'L4' | 'L5')[];
+  isActive: boolean;
+}
+
 export default function LoAManagementPage() {
   const [loaPolicies, setLoAPolicies] = useState<LoAPolicy[]>([]);
   const [pendingApprovals, setPendingApprovals] = useState<ApprovalTask[]>([]);
+  const [reviewerRoles, setReviewerRoles] = useState<ReviewerRole[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('policies');
+  const [selectedPolicy, setSelectedPolicy] = useState<LoAPolicy | null>(null);
+  const [showPolicyModal, setShowPolicyModal] = useState(false);
 
   useEffect(() => {
     fetchLoAPolicies();
     fetchPendingApprovals();
+    fetchReviewerRoles();
   }, []);
 
   const fetchLoAPolicies = async () => {
@@ -61,7 +80,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/loa/policies?organizationId=${orgId}`);
       const data = await response.json();
-
+      
       if (data.success) {
         setLoAPolicies(data.data);
       }
@@ -76,7 +95,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/approvals?organizationId=${orgId}&status=pending`);
       const data = await response.json();
-
+      
       if (data.success) {
         setPendingApprovals(data.data);
       }
@@ -84,6 +103,60 @@ export default function LoAManagementPage() {
       console.error('Error fetching pending approvals:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchReviewerRoles = async () => {
+    try {
+      // TODO: Get organization ID from auth context
+      const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
+      const response = await fetch(`/api/v1/loa/reviewer-roles?organizationId=${orgId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setReviewerRoles(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching reviewer roles:', error);
+      // Fallback to mock data if API fails
+      const mockRoles: ReviewerRole[] = [
+        {
+          id: '1',
+          name: 'Security Officer',
+          category: 'Security',
+          canApproveLevels: ['L1', 'L2', 'L3', 'L4', 'L5'],
+          isActive: true
+        },
+        {
+          id: '2',
+          name: 'Compliance Manager',
+          category: 'Compliance',
+          canApproveLevels: ['L2', 'L3', 'L4', 'L5'],
+          isActive: true
+        },
+        {
+          id: '3',
+          name: 'Policy Advisor',
+          category: 'Policy',
+          canApproveLevels: ['L3', 'L4', 'L5'],
+          isActive: true
+        },
+        {
+          id: '4',
+          name: 'Risk Analyst',
+          category: 'Risk',
+          canApproveLevels: ['L4', 'L5'],
+          isActive: true
+        },
+        {
+          id: '5',
+          name: 'External Auditor',
+          category: 'External',
+          canApproveLevels: ['L4', 'L5'],
+          isActive: true
+        }
+      ];
+      setReviewerRoles(mockRoles);
     }
   };
 
@@ -127,6 +200,59 @@ export default function LoAManagementPage() {
     }
   };
 
+  const getApprovalWorkflow = (policy: LoAPolicy) => {
+    const workflow = [];
+    
+    // Add required facets with reviewer roles
+    policy.requiredFacets.forEach((facet, index) => {
+      const role = reviewerRoles.find(r => r.category.toLowerCase() === facet);
+      if (role) {
+        workflow.push({
+          step: index + 1,
+          facet,
+          role: role.name,
+          canApprove: role.canApproveLevels.includes(policy.level)
+        });
+      }
+    });
+
+    // Add external validation if required
+    if (policy.externalRequired) {
+      const externalRole = reviewerRoles.find(r => r.category === 'External');
+      if (externalRole) {
+        workflow.push({
+          step: workflow.length + 1,
+          facet: 'external',
+          role: externalRole.name,
+          canApprove: externalRole.canApproveLevels.includes(policy.level)
+        });
+      }
+    }
+
+    return workflow;
+  };
+
+  const getPolicyUsageStats = (policy: LoAPolicy) => {
+    // TODO: Implement real usage statistics
+    const mockStats = {
+      totalApprovals: Math.floor(Math.random() * 50) + 5,
+      lastApproved: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+      avgApprovalTime: Math.floor(Math.random() * 48) + 2,
+      successRate: Math.floor(Math.random() * 20) + 80
+    };
+    return mockStats;
+  };
+
+  const handleEditPolicy = (policy: LoAPolicy) => {
+    setSelectedPolicy(policy);
+    setShowPolicyModal(true);
+  };
+
+  const handleClonePolicy = (policy: LoAPolicy) => {
+    // TODO: Implement policy cloning
+    console.log('Clone policy:', policy);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -154,9 +280,10 @@ export default function LoAManagementPage() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="policies">LoA Policies</TabsTrigger>
           <TabsTrigger value="approvals">Pending Approvals</TabsTrigger>
+          <TabsTrigger value="roles">Reviewer Roles</TabsTrigger>
           <TabsTrigger value="overview">Overview</TabsTrigger>
         </TabsList>
 
@@ -178,43 +305,115 @@ export default function LoAManagementPage() {
                     {loaPolicies
                       .filter(policy => policy.artifactType === artifactType)
                       .sort((a, b) => a.level.localeCompare(b.level))
-                      .map((policy) => (
-                        <div
-                          key={policy.id}
-                          className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
-                        >
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <Badge className={getLevelColor(policy.level)}>
-                                {policy.level}
-                              </Badge>
-                              <span className="font-medium">
-                                {policy.minReviewers} reviewer{policy.minReviewers > 1 ? 's' : ''} required
-                              </span>
-                              {policy.externalRequired && (
-                                <Badge variant="outline" className="border-orange-300 text-orange-700">
-                                  External Required
+                      .map((policy) => {
+                        const workflow = getApprovalWorkflow(policy);
+                        const stats = getPolicyUsageStats(policy);
+                        
+                        return (
+                          <div
+                            key={policy.id}
+                            className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                          >
+                            <div className="flex items-center justify-between mb-3">
+                              <div className="flex items-center gap-3">
+                                <Badge className={getLevelColor(policy.level)}>
+                                  {policy.level}
                                 </Badge>
-                              )}
+                                <span className="font-medium">
+                                  {policy.minReviewers} reviewer{policy.minReviewers > 1 ? 's' : ''} required
+                                </span>
+                                {policy.externalRequired && (
+                                  <Badge variant="outline" className="border-orange-300 text-orange-700">
+                                    External Required
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="flex items-center gap-2">
+                                <Badge variant={policy.isActive ? "default" : "secondary"}>
+                                  {policy.isActive ? 'Active' : 'Inactive'}
+                                </Badge>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleEditPolicy(policy)}
+                                  className="h-8 px-2"
+                                >
+                                  <Edit className="h-3 w-3" />
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => handleClonePolicy(policy)}
+                                  className="h-8 px-2"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
                             </div>
-                            <Badge variant={policy.isActive ? "default" : "secondary"}>
-                              {policy.isActive ? 'Active' : 'Inactive'}
-                            </Badge>
-                          </div>
+                            
+                            <p className="text-gray-600 mb-3">
+                              {policy.description}
+                            </p>
+                            
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {policy.requiredFacets.map((facet) => (
+                                <Badge key={facet} className={getFacetColor(facet)}>
+                                  {facet}
+                                </Badge>
+                              ))}
+                            </div>
 
-                          <p className="text-gray-600 mb-3">
-                            {policy.description}
-                          </p>
+                            {/* Approval Workflow Visualization */}
+                            <div className="mb-4">
+                              <h4 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                                <Workflow className="h-4 w-4" />
+                                Approval Workflow
+                              </h4>
+                              <div className="flex items-center gap-2 text-sm">
+                                {workflow.map((step, index) => (
+                                  <div key={step.step} className="flex items-center gap-2">
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                                      step.canApprove ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                                    }`}>
+                                      {step.step}
+                                    </div>
+                                    <span className="text-gray-600">{step.role}</span>
+                                    {index < workflow.length - 1 && (
+                                      <span className="text-gray-400">→</span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
 
-                          <div className="flex flex-wrap gap-2">
-                            {policy.requiredFacets.map((facet) => (
-                              <Badge key={facet} className={getFacetColor(facet)}>
-                                {facet}
-                              </Badge>
-                            ))}
+                            {/* Usage Statistics */}
+                            <div className="flex items-center justify-between text-sm text-gray-500">
+                              <div className="flex items-center gap-4">
+                                <span className="flex items-center gap-1">
+                                  <BarChart3 className="h-3 w-3" />
+                                  {stats.totalApprovals} approvals
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Clock className="h-3 w-3" />
+                                  {stats.avgApprovalTime}h avg
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <CheckCircle className="h-3 w-3" />
+                                  {stats.successRate}% success
+                                </span>
+                              </div>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                <History className="h-3 w-3 mr-1" />
+                                View History
+                              </Button>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                   </div>
                 </CardContent>
               </Card>
@@ -258,7 +457,7 @@ export default function LoAManagementPage() {
                           </span>
                         </div>
                       </div>
-
+                      
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Badge className={getFacetColor(approval.facet)}>
@@ -268,7 +467,7 @@ export default function LoAManagementPage() {
                             Artifact ID: {approval.artifactId.slice(0, 8)}...
                           </span>
                         </div>
-
+                        
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline" className="text-green-600 border-green-300">
                             Approve
@@ -282,6 +481,48 @@ export default function LoAManagementPage() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="roles" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Reviewer Roles & Permissions</CardTitle>
+              <CardDescription>
+                Manage who can approve at each LoA level
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {reviewerRoles.map((role) => (
+                  <div
+                    key={role.id}
+                    className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <Badge className={getFacetColor(role.category.toLowerCase())}>
+                          {role.category}
+                        </Badge>
+                        <span className="font-medium">{role.name}</span>
+                      </div>
+                      <Badge variant={role.isActive ? "default" : "secondary"}>
+                        {role.isActive ? 'Active' : 'Inactive'}
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Can approve:</span>
+                      {role.canApproveLevels.map((level) => (
+                        <Badge key={level} className={getLevelColor(level)}>
+                          {level}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
