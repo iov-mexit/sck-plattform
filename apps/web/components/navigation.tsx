@@ -17,6 +17,7 @@ import { ConnectWallet } from '@/components/ConnectWallet';
 const simplifiedNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
   { name: 'Services', href: '/services', icon: Grid3X3 },
+  { name: 'LoA Management', href: '/loa-management', icon: Shield },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 

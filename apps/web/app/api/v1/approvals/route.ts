@@ -1,5 +1,5 @@
-import prisma from '@/lib/database';
 import { NextRequest, NextResponse } from 'next/server';
+import LoAService from '@/lib/services/loa-service';
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,76 +7,75 @@ export async function GET(request: NextRequest) {
     const organizationId = searchParams.get('organizationId');
     const status = searchParams.get('status');
 
-    const where: any = {};
-    if (organizationId) {
-      where.organizationId = organizationId;
+    if (!organizationId) {
+      return NextResponse.json(
+        { success: false, error: 'Organization ID is required' },
+        { status: 400 }
+      );
     }
 
-    const approvals = await prisma.approval.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      include: {
-        organization: {
-          select: {
-            name: true,
-            domain: true
-          }
-        }
-      }
-    });
-
-    // If status filter is requested, filter the results
-    let filteredApprovals = approvals;
+    let approvals;
     if (status === 'pending') {
-      // For pending status, we need to check if the approval meets the LoA requirements
-      // This is a simplified check - in production you'd want more sophisticated logic
-      filteredApprovals = approvals.filter((approval: any) => {
-        // For now, consider all approvals as pending if they don't have a clear status
-        // In a real implementation, you'd check against LoA policies
-        return true; // Simplified for MVP
-      });
+      approvals = await LoAService.getPendingApprovals(organizationId);
+    } else {
+      // For now, just return pending approvals
+      // TODO: Add filtering by status
+      approvals = await LoAService.getPendingApprovals(organizationId);
     }
 
-    return NextResponse.json({ success: true, data: filteredApprovals });
+    return NextResponse.json({
+      success: true,
+      data: approvals
+    });
   } catch (error) {
     console.error('Error fetching approvals:', error);
-    return NextResponse.json({ success: false, error: 'Failed to fetch approvals' }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to fetch approvals',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { organizationId, artifactId, artifactType, reviewerId, facet, decision, comment } = body;
+    const { approvalId, reviewerId, decision, comment } = body;
 
-    if (!organizationId || !artifactId || !artifactType || !reviewerId || !facet || !decision) {
-      return NextResponse.json({ success: false, error: 'Missing required fields' }, { status: 400 });
+    // Validation
+    if (!approvalId || !reviewerId || !decision) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields: approvalId, reviewerId, decision' },
+        { status: 400 }
+      );
     }
 
-    const newApproval = await prisma.approval.create({
-      data: {
-        organizationId,
-        artifactId,
-        artifactType,
-        reviewerId,
-        facet,
-        decision,
-        comment,
-      },
-      include: {
-        organization: {
-          select: {
-            name: true,
-            domain: true
-          }
-        }
-      }
-    });
+    if (!['approve', 'reject'].includes(decision)) {
+      return NextResponse.json(
+        { success: false, error: 'Decision must be either "approve" or "reject"' },
+        { status: 400 }
+      );
+    }
 
-    return NextResponse.json({ success: true, data: newApproval }, { status: 201 });
+    const result = await LoAService.submitReview(approvalId, reviewerId, decision, comment);
+
+    return NextResponse.json({
+      success: true,
+      data: result
+    });
   } catch (error) {
-    console.error('Error submitting approval:', error);
-    return NextResponse.json({ success: false, error: 'Failed to submit approval' }, { status: 500 });
+    console.error('Error submitting review:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to submit review',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 }
 
