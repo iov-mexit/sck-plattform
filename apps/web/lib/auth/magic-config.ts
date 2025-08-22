@@ -23,6 +23,10 @@ export const MAGIC_CONFIG = {
   email: {
     from: 'noreply@securecodeknight.com',
     subject: 'Login to Secure Code KnAIght',
+    // Production domain for Magic Link redirects
+    redirectUrl: process.env.NODE_ENV === 'production' 
+      ? 'https://sck-plattform.vercel.app' 
+      : 'http://localhost:3000',
   },
 
   // Session configuration

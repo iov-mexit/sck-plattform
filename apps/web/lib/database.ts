@@ -1,6 +1,34 @@
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+// Global variable to prevent multiple Prisma instances in development
+declare global {
+  var __prisma: PrismaClient | undefined;
+}
+
+const prisma = globalThis.__prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  errorFormat: 'pretty',
+});
+
+// In development, save the instance to prevent hot reload issues
+if (process.env.NODE_ENV === 'development') {
+  globalThis.__prisma = prisma;
+}
+
+// Test database connection
+export async function testDatabaseConnection() {
+  try {
+    await prisma.$connect();
+    console.log('Database connection successful');
+    return { success: true };
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Unknown database error' 
+    };
+  }
+}
 
 // Organization operations
 export async function createOrganization(data: {

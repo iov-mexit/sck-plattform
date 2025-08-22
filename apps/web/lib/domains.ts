@@ -68,10 +68,10 @@ export function getDomainConfig(hostname?: string): DomainConfig {
     };
   }
 
-  // Vercel Production Deployment
-  if (host.includes('vercel.app') || host.includes('sck-plattform')) {
+  // Vercel Production Deployment - SCK Platform
+  if (host.includes('vercel.app') && (host.includes('sck-plattform') || host.includes('web-'))) {
     return {
-      baseUrl: process.env.NEXT_PUBLIC_BASE_URL || `https://${host}`,
+      baseUrl: 'https://sck-plattform.vercel.app', // Use consistent production domain
       ansRegistry: process.env.NEXT_PUBLIC_ANS_REGISTRY_URL || 'https://knaight.site',
       autoRegisterANS: true,
       isEU: false,

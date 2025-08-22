@@ -3,6 +3,22 @@ import prisma from '@/lib/database';
 
 export async function GET(request: NextRequest) {
   try {
+    // Test database connection first
+    try {
+      await prisma.$connect();
+    } catch (dbError) {
+      console.error('Database connection failed:', dbError);
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Database connection failed',
+          details: dbError instanceof Error ? dbError.message : 'Unknown database error',
+          timestamp: new Date().toISOString()
+        },
+        { status: 503 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const organizationId = searchParams.get('organizationId');
     const domain = searchParams.get('domain');
@@ -80,14 +96,24 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Error fetching organization:', error);
-    return NextResponse.json(
-      {
-        success: false,
-        error: 'Failed to fetch organization',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
+    
+    // Provide more detailed error information
+    const errorDetails = {
+      success: false,
+      error: 'Failed to fetch organization',
+      details: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString(),
+      stack: process.env.NODE_ENV === 'development' && error instanceof Error ? error.stack : undefined
+    };
+    
+    return NextResponse.json(errorDetails, { status: 500 });
+  } finally {
+    // Always disconnect to prevent connection pool issues
+    try {
+      await prisma.$disconnect();
+    } catch (disconnectError) {
+      console.error('Error disconnecting from database:', disconnectError);
+    }
   }
 }
 
