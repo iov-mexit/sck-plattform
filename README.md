@@ -15,7 +15,8 @@ Knaight is a **security control-plane for AI and distributed compute**, where on
 🔧 **vercel.json fixed**: Removed invalid projectId and orgId properties  
 🔄 **Build configuration**: Optimized for monorepo structure with Turbo  
 🔧 **Environment variables**: Configured in Vercel dashboard for Magic Link authentication  
-🚀 **Fresh deployment**: Triggered to load updated environment variables
+🚀 **Fresh deployment**: Triggered to load updated Magic Link environment variables  
+🔗 **RPC URL**: Configured for Ethereum Sepolia network
 
 # 🛡️ Secure Code KnAIght (SCK) Platform
 
