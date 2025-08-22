@@ -195,7 +195,7 @@ export class LoAService {
       const approvedFacets = approvals
         .filter(a => a.decision === 'approve')
         .map(a => a.facet);
-      
+
       const rejectedFacets = approvals
         .filter(a => a.decision === 'reject')
         .map(a => a.facet);
@@ -205,10 +205,10 @@ export class LoAService {
         .map(a => a.facet);
 
       // Check if requirements are met
-      const allRequiredFacetsApproved = policy.requiredFacets.every(f => 
+      const allRequiredFacetsApproved = policy.requiredFacets.every(f =>
         approvedFacets.includes(f)
       );
-      
+
       const hasRejections = rejectedFacets.length > 0;
       const meetsThreshold = allRequiredFacetsApproved && !hasRejections;
 
@@ -278,7 +278,9 @@ export class LoAService {
         facet: approval.facet,
         reviewerId: approval.reviewerId || undefined,
         decision: approval.decision,
-        comment: approval.comment || undefined
+        comment: approval.comment || null,
+        reviewedAt: approval.reviewedAt || null,
+        createdAt: approval.createdAt
       }));
     } catch (error) {
       console.error('Error fetching pending approvals:', error);
