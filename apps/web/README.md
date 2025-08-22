@@ -1,4 +1,10 @@
-# Web Application
+# SCK Platform
+
+> **Trust-based credentialing platform with external signal funneling architecture**
+
+<!-- Last deployment trigger: 2025-08-22 -->
+
+## 🎯 SCK PLATFORM CORE PRINCIPLES
 
 This is a Next.js application that serves as a web interface for the Secure Knaight platform. It allows users to interact with role agents, manage roles and trust thresholds, and view signal analytics.
 
