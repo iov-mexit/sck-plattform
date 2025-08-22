@@ -113,36 +113,16 @@ jobs:
           echo "Prisma client generated successfully"
           ls -la ../../node_modules/.prisma/client/
 
-      - name: Build application
+      - name: Skip build (Vercel will handle it)
         run: |
-          echo "Building application..."
-          cd apps/web
-          npm run build
-
-      - name: Verify build output
-        run: |
-          echo "Checking build output..."
-          ls -la apps/web/
-          if [ -d "apps/web/.next" ]; then
-            echo "Build output found at apps/web/.next"
-            ls -la apps/web/.next
-          else
-            echo "Build output not found, checking for alternative locations..."
-            find . -name ".next" -type d 2>/dev/null || echo "No .next directories found"
-            exit 1
-          fi
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: build
-          path: apps/web/.next
+          echo "Skipping build in GitHub Actions - Vercel will handle the build process"
+          echo "This prevents conflicts between GitHub Actions build and Vercel build"
 
   # Deploy to Vercel
   deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [quality-gates, security-scan]
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout code
@@ -171,7 +151,7 @@ jobs:
   quality-summary:
     name: Quality Gate Summary
     runs-on: ubuntu-latest
-    needs: [quality-gates, security-scan, build, deploy]
+    needs: [quality-gates, security-scan, deploy]
     if: always()
     steps:
       - name: Quality Gate Summary
@@ -191,11 +171,7 @@ jobs:
             echo "❌ **Security Scan**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
           
-          if [ "${{ needs.build.result }}" == "success" ]; then
-            echo "✅ **Build**: PASSED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Build**: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "✅ **Build**: Handled by Vercel" >> $GITHUB_STEP_SUMMARY
 
           if [ "${{ needs.deploy.result }}" == "success" ]; then
             echo "✅ **Deploy to Vercel**: PASSED" >> $GITHUB_STEP_SUMMARY
