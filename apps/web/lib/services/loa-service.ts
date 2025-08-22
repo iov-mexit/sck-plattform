@@ -11,8 +11,10 @@ export interface LoAPolicy {
   minReviewers: number;
   requiredFacets: ApprovalFacet[];
   externalRequired: boolean;
-  description?: string;
+  description?: string | null;
   isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface ApprovalTask {
@@ -23,7 +25,9 @@ export interface ApprovalTask {
   facet: ApprovalFacet;
   reviewerId?: string;
   decision: ApprovalDecision;
-  comment?: string;
+  comment?: string | null;
+  reviewedAt?: Date | null;
+  createdAt: Date;
 }
 
 export interface ApprovalResult {

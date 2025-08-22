@@ -3,10 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { 
-  Shield, 
-  Home, 
-  Grid3X3, 
+import {
+  Shield,
+  Home,
+  Grid3X3,
   Settings,
   Bell,
   Menu,
@@ -40,16 +40,15 @@ export function NavBar() {
               {simplifiedNavigation.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
-                
+
                 return (
                   <Link
                     key={item.name}
                     href={item.href}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${isActive
                         ? 'bg-blue-100 text-blue-700'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                    }`}
+                      }`}
                   >
                     <Icon className="h-4 w-4" />
                     <span className="hidden lg:inline">{item.name}</span>

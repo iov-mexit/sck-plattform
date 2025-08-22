@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Shield, 
-  FileText, 
-  Signal, 
-  Globe, 
-  Plus, 
+import {
+  Shield,
+  FileText,
+  Signal,
+  Globe,
+  Plus,
   Settings,
   CheckCircle,
   XCircle,
@@ -25,8 +25,10 @@ interface LoAPolicy {
   minReviewers: number;
   requiredFacets: string[];
   externalRequired: boolean;
-  description?: string;
+  description?: string | null;
   isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 interface ApprovalTask {
@@ -37,7 +39,9 @@ interface ApprovalTask {
   facet: string;
   reviewerId?: string;
   decision: 'approve' | 'reject' | 'pending';
-  comment?: string;
+  comment?: string | null;
+  reviewedAt?: Date | null;
+  createdAt: Date;
 }
 
 export default function LoAManagementPage() {
@@ -57,7 +61,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/loa/policies?organizationId=${orgId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setLoAPolicies(data.data);
       }
@@ -72,7 +76,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/approvals?organizationId=${orgId}&status=pending`);
       const data = await response.json();
-      
+
       if (data.success) {
         setPendingApprovals(data.data);
       }
@@ -197,11 +201,11 @@ export default function LoAManagementPage() {
                               {policy.isActive ? 'Active' : 'Inactive'}
                             </Badge>
                           </div>
-                          
+
                           <p className="text-gray-600 mb-3">
                             {policy.description}
                           </p>
-                          
+
                           <div className="flex flex-wrap gap-2">
                             {policy.requiredFacets.map((facet) => (
                               <Badge key={facet} className={getFacetColor(facet)}>
@@ -254,7 +258,7 @@ export default function LoAManagementPage() {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Badge className={getFacetColor(approval.facet)}>
@@ -264,7 +268,7 @@ export default function LoAManagementPage() {
                             Artifact ID: {approval.artifactId.slice(0, 8)}...
                           </span>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline" className="text-green-600 border-green-300">
                             Approve

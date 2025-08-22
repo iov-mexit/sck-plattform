@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/database';
 import LoAService from '@/lib/services/loa-service';
 
 export async function GET(request: NextRequest) {
