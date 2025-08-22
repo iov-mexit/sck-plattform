@@ -13,7 +13,8 @@ Knaight is a **security control-plane for AI and distributed compute**, where on
 ✅ **Build process optimized** - Prisma client generation working  
 🕐 **Last deployment test**: $(date) - Fresh commit to trigger workflow  
 🔧 **vercel.json fixed**: Removed invalid projectId and orgId properties  
-🔄 **Build configuration**: Optimized for monorepo structure with Turbo
+🔄 **Build configuration**: Optimized for monorepo structure with Turbo  
+🔧 **Environment variables**: Configured in Vercel dashboard for Magic Link authentication
 
 # 🛡️ Secure Code KnAIght (SCK) Platform
 
