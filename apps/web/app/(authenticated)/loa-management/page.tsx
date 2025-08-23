@@ -5,12 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Shield, 
-  FileText, 
-  Signal, 
-  Globe, 
-  Plus, 
+import {
+  Shield,
+  FileText,
+  Signal,
+  Globe,
+  Plus,
   Settings,
   CheckCircle,
   XCircle,
@@ -80,7 +80,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/loa/policies?organizationId=${orgId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setLoAPolicies(data.data);
       }
@@ -95,7 +95,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/approvals?organizationId=${orgId}&status=pending`);
       const data = await response.json();
-      
+
       if (data.success) {
         setPendingApprovals(data.data);
       }
@@ -112,7 +112,7 @@ export default function LoAManagementPage() {
       const orgId = 'cmemudyrn0000rqsyyr787rpy'; // From seeding
       const response = await fetch(`/api/v1/loa/reviewer-roles?organizationId=${orgId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setReviewerRoles(data.data);
       }
@@ -202,7 +202,7 @@ export default function LoAManagementPage() {
 
   const getApprovalWorkflow = (policy: LoAPolicy) => {
     const workflow = [];
-    
+
     // Add required facets with reviewer roles
     policy.requiredFacets.forEach((facet, index) => {
       const role = reviewerRoles.find(r => r.category.toLowerCase() === facet);
@@ -308,7 +308,7 @@ export default function LoAManagementPage() {
                       .map((policy) => {
                         const workflow = getApprovalWorkflow(policy);
                         const stats = getPolicyUsageStats(policy);
-                        
+
                         return (
                           <div
                             key={policy.id}
@@ -350,11 +350,11 @@ export default function LoAManagementPage() {
                                 </Button>
                               </div>
                             </div>
-                            
+
                             <p className="text-gray-600 mb-3">
                               {policy.description}
                             </p>
-                            
+
                             <div className="flex flex-wrap gap-2 mb-4">
                               {policy.requiredFacets.map((facet) => (
                                 <Badge key={facet} className={getFacetColor(facet)}>
@@ -372,9 +372,8 @@ export default function LoAManagementPage() {
                               <div className="flex items-center gap-2 text-sm">
                                 {workflow.map((step, index) => (
                                   <div key={step.step} className="flex items-center gap-2">
-                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                                      step.canApprove ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                                    }`}>
+                                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${step.canApprove ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
+                                      }`}>
                                       {step.step}
                                     </div>
                                     <span className="text-gray-600">{step.role}</span>
@@ -457,7 +456,7 @@ export default function LoAManagementPage() {
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Badge className={getFacetColor(approval.facet)}>
@@ -467,7 +466,7 @@ export default function LoAManagementPage() {
                             Artifact ID: {approval.artifactId.slice(0, 8)}...
                           </span>
                         </div>
-                        
+
                         <div className="flex gap-2">
                           <Button size="sm" variant="outline" className="text-green-600 border-green-300">
                             Approve
@@ -511,7 +510,7 @@ export default function LoAManagementPage() {
                         {role.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <span className="text-sm text-gray-600">Can approve:</span>
                       {role.canApproveLevels.map((level) => (

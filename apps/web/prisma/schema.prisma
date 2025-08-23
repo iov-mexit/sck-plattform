@@ -357,5 +357,87 @@ model McpPolicyTest {
   createdAt  DateTime      @default(now())
   mcpPolicy  McpPolicy     @relation(fields: [policyId], references: [id])
 
-  @@index([policyId], map: "idx_mcp_policy_tests_policy")
+  @@index([policyId], map: "idx_mcp_policy_tests")
+}
+
+/// --- Milestone 1: AI & RAG tables ---
+
+model knowledge_documents {
+  id             String   @id @default(cuid())
+  organizationId String?  // optional: null => global doc
+  sourceType     String   // "manual" | "url" | "upload"
+  sourceRef      String?  // URL, filename, or note
+  title          String
+  jurisdiction   String?  // "EU" | "US" | ...
+  framework      String?  // "ISO27001" | "SOC2" | "EU AI Act" | ...
+  version        String?  // "2022", "1.1", etc.
+  language       String?  // "en", ...
+  chunkIndex     Int      // we store as chunks
+  content        String
+  embedding      Bytes?   // swap to Vector via pgvector if preferred (see note)
+  hash           String   // sha256(content)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([organizationId])
+  @@index([framework])
+  @@index([jurisdiction])
+  @@index([hash], map: "idx_knowledge_hash")
+}
+
+model ai_recommendations {
+  id              String   @id @default(cuid())
+  organizationId  String?
+  agentType       String   // "PolicyIntelligence" | "ComplianceIntelligence" | ...
+  inputRef        String   // e.g. artifact composite key or payload hash
+  outputJson      Json     // full recommendation object (policy draft, reasons, scores)
+  confidence      Float?
+  rationale       String?  // human-readable explanation
+  citations       String[] // knowledge_document ids or URLs
+  createdAt       DateTime @default(now())
+}
+
+model trust_ledger {
+  id           String   @id @default(cuid())
+  prevHash     String?
+  eventType    String   // "AI_RECOMMENDATION" | "POLICY_DRAFTED" | "APPROVAL_REQUESTED" | ...
+  payloadHash  String   // sha256 of canonical payload
+  payload      Json     // canonical payload (small; avoid secrets)
+  merkleRoot   String?  // optional batch anchoring
+  anchoredTx   String?  // optional on-chain anchor tx
+  createdAt    DateTime @default(now())
+
+  @@index([eventType])
+  @@index([createdAt])
+}
+
+model policy_bundles {
+  id             String   @id @default(cuid())
+  organizationId String?
+  name           String
+  version        Int      @default(1)
+  status         String   // "draft" | "active" | "archived"
+  regoModule     String   // Rego
+  sha256         String
+  signatures     Json?    // [{by, algo, sig}]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([status])
+  @@index([organizationId])
+}
+
+model artifact_risk_profiles {
+  id             String   @id @default(cuid())
+  artifactType   String   // "MCP" | "RoleAgent" | "ANS"
+  artifactId     String
+  organizationId String?
+  riskScore      Float
+  rationale      String?
+  lastReviewedAt DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([artifactType, artifactId])
+  @@index([organizationId])
 }
