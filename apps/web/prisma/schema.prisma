@@ -103,6 +103,8 @@ model BlockchainTransaction {
   createdAt       DateTime          @default(now())
   updatedAt       DateTime          @updatedAt
   roleAgent       RoleAgent?        @relation(fields: [roleAgentId], references: [id])
+  approvalRequest ApprovalRequest?  @relation(fields: [approvalRequestId], references: [id])
+  approvalRequestId String?
 
   @@index([transactionHash], map: "idx_blockchain_tx_hash")
   @@index([network], map: "idx_blockchain_tx_network")
@@ -221,6 +223,7 @@ model Organization {
   approvals             Approval[]
   mcpPolicies           McpPolicy[]
   auditLogs             AuditLog[]
+  approvalRequests      ApprovalRequest[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
@@ -440,4 +443,70 @@ model artifact_risk_profiles {
 
   @@unique([artifactType, artifactId])
   @@index([organizationId])
+}
+
+/// --- Governance Console: Unified LoA Approvals ---
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+model ApprovalRequest {
+  id             String         @id @default(cuid())
+  organizationId String?
+  artifactId     String         // ID of the artifact being approved
+  artifactType   String         // "MCP_POLICY" | "ROLE_AGENT" | "ANS_ENTRY" | "AI_RECOMMENDATION"
+  loaLevel       Int            // LoA level required (1-5)
+  status         ApprovalStatus @default(PENDING)
+  requestorId    String?        // Who requested the approval
+  requestorType  String?        // "USER" | "SYSTEM" | "AI_AGENT"
+  requestReason  String?        // Why approval is needed
+  priority       String?        // "LOW" | "MEDIUM" | "HIGH" | "CRITICAL"
+  dueDate        DateTime?      // When approval is needed by
+  reviewers      Json           // List of assigned reviewers with roles
+  reviewHistory  Json?          // History of review decisions and comments
+  metadata       Json?          // Additional artifact-specific data
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  organization   Organization?  @relation(fields: [organizationId], references: [id])
+  
+  // Blockchain audit trail
+  blockchainTransactions BlockchainTransaction[]
+  
+  // Review decisions
+  decisions      ApprovalDecision[]
+
+  @@index([organizationId])
+  @@index([artifactType])
+  @@index([status])
+  @@index([loaLevel])
+  @@index([dueDate])
+  @@index([createdAt])
+}
+
+model ApprovalDecision {
+  id                String         @id @default(cuid())
+  approvalRequestId String
+  reviewerId        String
+  reviewerType      String         // "USER" | "EXTERNAL_VALIDATOR" | "AI_SYSTEM"
+  decision          ApprovalStatus // "APPROVED" | "REJECTED"
+  comment           String?
+  evidence          Json?          // Supporting evidence or rationale
+  reviewDate        DateTime       @default(now())
+  
+  // Relations
+  approvalRequest   ApprovalRequest @relation(fields: [approvalRequestId], references: [id])
+  
+  @@index([approvalRequestId])
+  @@index([reviewerId])
+  @@index([reviewDate])
+  
+  @@index([approvalRequestId])
+  @@index([reviewerId])
+  @@index([reviewDate])
 }

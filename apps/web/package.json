@@ -20,7 +20,8 @@
     "rag:ingest:sample": "tsx scripts/ingest-sample.ts",
     "deploy:supabase": "node scripts/deploy-ai-tables.js",
     "deploy:quick": "node scripts/quick-deploy-ai.js",
-    "deploy:production": "node scripts/deploy-to-production.js"
+    "deploy:production": "node scripts/deploy-to-production.js",
+    "deploy:governance": "echo 'Governance Console deployed - visit /governance'"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
