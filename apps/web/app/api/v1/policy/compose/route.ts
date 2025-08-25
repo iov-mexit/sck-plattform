@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { advancedPolicyEngine } from "../../../../../../lib/policy/advanced-policy-engine";
+import { advancedPolicyEngine } from "../../../../lib/policy/advanced-policy-engine";
 
 export async function POST(req: NextRequest) {
   try {
