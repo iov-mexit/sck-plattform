@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+// Using built-in fetch for Node 18+
+// import fetch from 'node-fetch';
 
 async function main() {
   const r = await fetch('http://localhost:3000/api/knowledge/ingest', {

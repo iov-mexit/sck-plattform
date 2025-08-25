@@ -44,18 +44,23 @@ export async function POST(request: NextRequest) {
         }
       });
 
-      // 2. Create the approval decision record
-      const approvalDecision = await tx.approvalDecision.create({
-        data: {
-          approvalRequestId: id,
-          reviewerId,
-          reviewerType,
-          decision,
-          comment,
-          evidence,
-          reviewDate: new Date()
-        }
-      });
+      // 2. Create the approval decision record (only if organizationId exists)
+      let approvalDecision = null;
+      if (updatedRequest.organizationId) {
+        approvalDecision = await tx.approval.create({
+          data: {
+            organizationId: updatedRequest.organizationId,
+            artifactId: updatedRequest.artifactId,
+            artifactType: updatedRequest.artifactType as any,
+            loaLevel: updatedRequest.loaLevel as any,
+            reviewerId,
+            facet: 'policy', // Default facet for general approvals
+            decision: decision as any,
+            comment,
+            reviewedAt: new Date()
+          }
+        });
+      }
 
       // 3. Create blockchain audit log
       const auditPayload = {
@@ -87,17 +92,20 @@ export async function POST(request: NextRequest) {
       });
 
       // 4. Update the trust ledger
-      await tx.trust_ledger.create({
+      await tx.trustLedgerEvent.create({
         data: {
-          eventType: 'APPROVAL_DECISION',
-          payloadHash,
+          artifactType: updatedRequest.artifactType as any,
+          artifactId: updatedRequest.artifactId,
+          action: 'APPROVAL_DECISION',
           payload: {
             approvalRequestId: id,
             decision,
             reviewerId,
             blockchainTxId: blockchainTx.id,
             timestamp: new Date().toISOString()
-          }
+          },
+          contentHash: payloadHash,
+          prevHash: null // Will be threaded later
         }
       });
 
@@ -105,7 +113,8 @@ export async function POST(request: NextRequest) {
         approvalRequest: updatedRequest,
         decision: approvalDecision,
         blockchainTx,
-        payloadHash
+        payloadHash,
+        approvalCreated: !!approvalDecision
       };
     });
 

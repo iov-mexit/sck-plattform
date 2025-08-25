@@ -39,12 +39,12 @@ export async function GET(request: NextRequest) {
         organization: {
           select: { name: true, domain: true }
         },
-        decisions: {
-          orderBy: { reviewDate: 'desc' },
+        votes: {
+          orderBy: { createdAt: 'desc' },
           take: 5
         },
         _count: {
-          select: { decisions: true, blockchainTransactions: true }
+          select: { votes: true, blockchainTransactions: true }
         }
       },
       orderBy: [

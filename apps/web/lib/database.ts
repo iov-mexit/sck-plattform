@@ -10,6 +10,9 @@ const prisma = globalThis.__prisma || new PrismaClient({
   errorFormat: 'pretty',
 });
 
+// Export prisma instance for use in other files
+export { prisma };
+
 // In development, save the instance to prevent hot reload issues
 if (process.env.NODE_ENV === 'development') {
   globalThis.__prisma = prisma;

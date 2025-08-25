@@ -21,7 +21,8 @@
     "deploy:supabase": "node scripts/deploy-ai-tables.js",
     "deploy:quick": "node scripts/quick-deploy-ai.js",
     "deploy:production": "node scripts/deploy-to-production.js",
-    "deploy:governance": "echo 'Governance Console deployed - visit /governance'"
+    "deploy:governance": "echo 'Governance Console deployed - visit /governance'",
+    "deploy:phase1-2-bridge": "node scripts/deploy-phase1-2-bridge.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

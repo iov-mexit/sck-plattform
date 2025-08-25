@@ -1,4 +1,4 @@
-import { prisma } from '../database';
+import prisma from '../database';
 
 export interface ApprovalRequestData {
   artifactId: string;
@@ -119,8 +119,8 @@ export class ApprovalService {
         artifactType
       },
       include: {
-        decisions: {
-          orderBy: { reviewDate: 'desc' }
+        votes: {
+          orderBy: { createdAt: 'desc' }
         },
         blockchainTransactions: {
           orderBy: { createdAt: 'desc' }
