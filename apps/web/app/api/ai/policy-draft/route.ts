@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { retrieveKnowledge } from '@/lib/rag/retrieval';
+import { retrieveHybrid } from '@/lib/rag/retrieval';
 import { llmChat } from '@/lib/ai/llm';
-import { prisma } from '@/lib/database';
+import prisma from '@/lib/database';
 import crypto from 'crypto';
 
 export const runtime = 'nodejs';
@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
 
     // 1) Retrieve context
     const query = `${artifact.type} ${goal} ${riskHint}`;
-    const ctx = await retrieveKnowledge(query, 5);
+    const ctx = await retrieveHybrid({ query, organizationId, maxChunks: 5 });
 
     // 2) Prompt LLM
-    const contextText = ctx.map((c, i) => `[#${i+1}] ${c.title}\n${c.snippet}`).join('\n\n');
+    const contextText = ctx.snippets.map((c, i) => `[#${i+1}] ${c.content.slice(0, 200)}...`).join('\n\n');
     const user = `Artifact: ${JSON.stringify(artifact)}
 OrganizationId: ${organizationId}
 Goal: ${goal}
@@ -80,16 +80,18 @@ Return JSON exactly with:
       artifact,
       organizationId,
       output: parsed,
-      knowledgeRefs: ctx.map(d => d.id)
+      knowledgeRefs: ctx.snippets.map(d => d.id)
     };
     const payloadHash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
 
-    await prisma.trust_ledger.create({
+    await prisma.trustLedgerEvent.create({
       data: {
-        prevHash: null, // can thread later
-        eventType: 'AI_RECOMMENDATION',
-        payloadHash,
-        payload
+        artifactType: 'AI_RECOMMENDATION',
+        artifactId: `${artifact.type}:${artifact.id}`,
+        action: 'RECOMMENDATION_GENERATED',
+        payload,
+        contentHash: payloadHash,
+        prevHash: null // can thread later
       }
     });
 
@@ -97,7 +99,7 @@ Return JSON exactly with:
       ok: true,
       recommendationId: rec.id,
       output: parsed,
-      knowledge: ctx
+      knowledge: ctx.snippets
     });
   } catch (e: any) {
     console.error('policy-draft error', e);

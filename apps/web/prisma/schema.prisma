@@ -486,9 +486,8 @@ model ApprovalRequest {
   approvalsSatisfied Boolean        @default(false)
   rejectionCount     Int            @default(0)
   
-  // Explainability attachment
-  explainId          String?
-  explain            Explainability? @relation(fields: [explainId], references: [id])
+  // Phase 2: Explainability attachment
+  explainability     ExplainabilitySnapshot?
   
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
@@ -531,23 +530,7 @@ model ApprovalVote {
 
 // Note: ApprovalDecision model already exists above for backward compatibility
 
-// Explainability data model
-model Explainability {
-  id              String   @id @default(cuid())
-  summary         String   // human-readable rationale
-  riskScore       Float?
-  riskFactors     Json?    // [{label, score, detail}]
-  citations       Json?    // [{docId, title, chunkId, score}]
-  aiReasoning     Json?    // structured LLM trace (no PII)
-  modelRef        String?  // provider/model/version
-  redactionSummary String? // what was redacted before AI processing
-  createdAt       DateTime @default(now())
-  
-  // Relations
-  approvalRequests ApprovalRequest[]
-  
-  @@index([createdAt])
-}
+// Note: Old Explainability model replaced by ExplainabilitySnapshot in Phase 2
 
 // Enhanced Trust Ledger with threading
 model TrustLedgerEvent {
@@ -579,40 +562,59 @@ model TrustLedgerBatch {
   @@index([createdAt])
 }
 
-// Enhanced Knowledge System for Vector Migration
+// --- Phase 2: Enhanced Knowledge System + Explainability ---
+
 model KnowledgeDocument {
-  id         String   @id @default(cuid())
-  orgId      String?
-  title      String
-  source     String   // 'REGULATORY'|'POLICY'|'DOC'|'URL'
-  url        String?
-  hash       String   @unique
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String           @id @default(cuid())
+  organizationId String?
+  title         String
+  sourceType    String           // "REGULATORY" | "INTERNAL" | "EXTERNAL" | "CURATED"
+  sourceUrl     String?
+  tags          String[]         // ["ISO27001","EU-AI-ACT","SOC2"]
+  checksum      String?          // content hash
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  chunks        KnowledgeChunk[]
   
-  // Relations
-  chunks     KnowledgeChunk[]
-  
-  @@index([orgId])
-  @@index([source])
-  @@index([hash])
+  @@index([organizationId])
+  @@index([sourceType])
+  @@index([checksum])
 }
 
 model KnowledgeChunk {
   id            String   @id @default(cuid())
   documentId    String
-  ordinal       Int
-  text          String
-  tokens        Int
-  embeddingV    Unsupported("vector") // @db.Vector(768) when Prisma supports it
-  embeddingJson Json?    // fallback for migration safety
-  embeddingModel String? // model identifier
-  embeddingVersion String? // model version
+  ordinal       Int              // chunk order within doc
+  content       String
+  tokens        Int?
+  // Phase 2 vector placeholder; real vector migration is Phase 3
+  // Keep text-first; we'll add @db.Vector(768) in Phase 3
+  embeddingJson Json?            // store temporarily if you want to precompute
   createdAt     DateTime @default(now())
   
   // Relations
   document      KnowledgeDocument @relation(fields: [documentId], references: [id])
   
-  @@index([documentId, ordinal])
-  @@index([embeddingModel])
+  @@index([documentId], map: "idx_chunk_doc")
+}
+
+// Phase 2: Explainability Snapshots (immutable at approval time)
+model ExplainabilitySnapshot {
+  id             String    @id @default(cuid())
+  // the immutable "view" shown to reviewers at time of decision
+  approvalRequestId String  @unique
+  rationale       String    // human-readable rationale
+  riskScore       Int       // 0..100
+  riskVector      Json      // e.g., {privacy:20, security:70, legal:40}
+  loaLevel        Int       // 1..5 - LoA at time of snapshot
+  // citations: (docId, chunkIds[])
+  citations       Json      // [{documentId:"...", chunkIds:["...","..."], label:"EU AI Act Art.9"}]
+  // policy map shown (IDs only; no large blobs)
+  policyMap       Json      // [{policyId:"...", title:"...", version:2}]
+  aiInvolved      Boolean   @default(false)
+  aiMeta          Json?     // model, temp, prompt hash
+  createdAt       DateTime  @default(now())
+  
+  // Relations
+  approvalRequest ApprovalRequest @relation(fields: [approvalRequestId], references: [id])
 }
