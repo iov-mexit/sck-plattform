@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/database";
+import { prisma } from "../database";
 import { ethers } from "ethers";
 
 export interface TrustToken {
@@ -49,7 +49,7 @@ export interface TrustMarketplace {
 }
 
 export class TrustEconomySystem {
-  
+
   /**
    * Initialize trust token for organization
    */
@@ -60,7 +60,7 @@ export class TrustEconomySystem {
     initialSupply: string;
     network: string;
   }): Promise<TrustToken> {
-    
+
     // Generate contract address (in real implementation, this would deploy a smart contract)
     const contractAddress = ethers.utils.getAddress(
       ethers.utils.hexlify(ethers.utils.randomBytes(20))
@@ -105,7 +105,7 @@ export class TrustEconomySystem {
     amount: string;
     reason: string;
   }): Promise<TrustReward> {
-    
+
     const reward: TrustReward = {
       id: `reward_${Date.now()}`,
       userId: params.userId,
@@ -138,10 +138,10 @@ export class TrustEconomySystem {
    * Claim trust token rewards
    */
   async claimRewards(userId: string): Promise<TrustReward[]> {
-    
+
     // Fetch pending rewards
     const pendingRewards = await prisma.trustReward.findMany({
-      where: { 
+      where: {
         userId,
         status: 'PENDING'
       }
@@ -156,7 +156,7 @@ export class TrustEconomySystem {
     }
 
     // Update user's token balance
-    const totalAmount = pendingRewards.reduce((sum, reward) => 
+    const totalAmount = pendingRewards.reduce((sum, reward) =>
       sum + parseFloat(reward.amount), 0);
 
     // In real implementation, this would mint tokens on the blockchain
@@ -175,7 +175,7 @@ export class TrustEconomySystem {
     currency: Micropayment['currency'];
     purpose: string;
   }): Promise<Micropayment> {
-    
+
     const micropayment: Micropayment = {
       id: `payment_${Date.now()}`,
       fromUserId: params.fromUserId,
@@ -234,7 +234,7 @@ export class TrustEconomySystem {
     verificationStatus: TrustMarketplace['verificationStatus'];
     expiresInDays: number;
   }): Promise<TrustMarketplace> {
-    
+
     const marketplace: TrustMarketplace = {
       id: `listing_${Date.now()}`,
       credentialId: params.credentialId,
@@ -271,7 +271,7 @@ export class TrustEconomySystem {
    * Purchase credential from marketplace
    */
   async purchaseCredential(listingId: string, buyerId: string): Promise<boolean> {
-    
+
     // Fetch listing
     const listing = await prisma.trustMarketplace.findUnique({
       where: { id: listingId }
@@ -305,17 +305,17 @@ export class TrustEconomySystem {
    * Get user's trust token balance
    */
   async getUserBalance(userId: string): Promise<string> {
-    
+
     // Fetch user's claimed rewards
     const claimedRewards = await prisma.trustReward.findMany({
-      where: { 
+      where: {
         userId,
         status: 'CLAIMED'
       }
     });
 
     // Calculate total balance
-    const balance = claimedRewards.reduce((sum, reward) => 
+    const balance = claimedRewards.reduce((sum, reward) =>
       sum + parseFloat(reward.amount), 0);
 
     return balance.toString();
@@ -329,7 +329,7 @@ export class TrustEconomySystem {
     currency?: TrustMarketplace['currency'];
     verificationStatus?: TrustMarketplace['verificationStatus'];
   }): Promise<TrustMarketplace[]> {
-    
+
     const where: any = {
       expiresAt: { gt: new Date() } // Only active listings
     };
@@ -360,7 +360,7 @@ export class TrustEconomySystem {
   private async transferTrustTokens(fromUserId: string, toUserId: string, amount: string): Promise<void> {
     // In real implementation, this would interact with smart contracts
     console.log(`Transferring ${amount} trust tokens from ${fromUserId} to ${toUserId}`);
-    
+
     // Update database records
     // This is a simplified version - real implementation would use blockchain
   }
@@ -377,7 +377,7 @@ export class TrustEconomySystem {
   }): Promise<string> {
     // In real implementation, this would create blockchain transactions
     console.log(`Processing ${params.currency} payment of ${params.amount}`);
-    
+
     // Return mock transaction hash
     return ethers.utils.hexlify(ethers.utils.randomBytes(32));
   }
@@ -386,8 +386,8 @@ export class TrustEconomySystem {
    * Transfer credential ownership
    */
   private async transferCredentialOwnership(
-    credentialId: string, 
-    fromUserId: string, 
+    credentialId: string,
+    fromUserId: string,
     toUserId: string
   ): Promise<void> {
     // Update credential ownership in database

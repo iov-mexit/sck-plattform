@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/database";
+import { prisma } from "../database";
 import { PolicyBundle, PolicyComponent, PolicyDependency } from "@prisma/client";
 
 export interface PolicyComposition {
@@ -32,7 +32,7 @@ export interface PolicyAnalytics {
 }
 
 export class AdvancedPolicyEngine {
-  
+
   /**
    * Compose complex policies from multiple components
    */
@@ -43,7 +43,7 @@ export class AdvancedPolicyEngine {
     organizationId: string;
     complexity: PolicyComposition['complexity'];
   }): Promise<PolicyComposition> {
-    
+
     // Fetch policy components
     const components = await prisma.policyComponent.findMany({
       where: { id: { in: params.componentIds } }
@@ -51,10 +51,10 @@ export class AdvancedPolicyEngine {
 
     // Analyze dependencies
     const dependencies = await this.analyzeDependencies(components);
-    
+
     // Calculate complexity metrics
     const complexityMetrics = await this.calculateComplexityMetrics(components, dependencies);
-    
+
     // Create policy composition
     const composition: PolicyComposition = {
       id: `comp_${Date.now()}`,
@@ -75,22 +75,22 @@ export class AdvancedPolicyEngine {
    * Optimize existing policies using AI-powered analysis
    */
   async optimizePolicy(policyId: string): Promise<PolicyOptimization> {
-    
+
     // Fetch current policy
     const currentPolicy = await this.getPolicyComposition(policyId);
-    
+
     // Analyze performance metrics
     const analytics = await this.getPolicyAnalytics(policyId);
-    
+
     // Generate optimization suggestions
     const optimizations = await this.generateOptimizations(currentPolicy, analytics);
-    
+
     // Apply optimizations
     const optimizedPolicy = await this.applyOptimizations(currentPolicy, optimizations);
-    
+
     // Calculate improvements
     const improvements = this.calculateImprovements(currentPolicy, optimizedPolicy);
-    
+
     return {
       originalPolicy: currentPolicy,
       optimizedPolicy,
@@ -105,7 +105,7 @@ export class AdvancedPolicyEngine {
    * Get comprehensive policy analytics
    */
   async getPolicyAnalytics(policyId: string): Promise<PolicyAnalytics> {
-    
+
     // Fetch enforcement data
     const enforcementData = await prisma.enforcementCall.findMany({
       where: { policyBundleId: policyId },
@@ -114,13 +114,13 @@ export class AdvancedPolicyEngine {
 
     // Calculate metrics
     const totalEnforcements = enforcementData.length;
-    const avgResponseTime = enforcementData.reduce((sum, call) => 
+    const avgResponseTime = enforcementData.reduce((sum, call) =>
       sum + (call.responseTime || 0), 0) / totalEnforcements;
-    
-    const complianceRate = (enforcementData.filter(call => 
+
+    const complianceRate = (enforcementData.filter(call =>
       call.result?.allow).length / totalEnforcements) * 100;
-    
-    const riskIncidents = enforcementData.filter(call => 
+
+    const riskIncidents = enforcementData.filter(call =>
       call.riskLevel === 'HIGH' || call.riskLevel === 'CRITICAL').length;
 
     return {
@@ -138,7 +138,7 @@ export class AdvancedPolicyEngine {
    */
   private async analyzeDependencies(components: PolicyComponent[]): Promise<PolicyDependency[]> {
     const dependencies: PolicyDependency[] = [];
-    
+
     for (const component of components) {
       // Check for component dependencies
       if (component.dependencies) {
@@ -154,7 +154,7 @@ export class AdvancedPolicyEngine {
         }
       }
     }
-    
+
     return dependencies;
   }
 
@@ -162,12 +162,12 @@ export class AdvancedPolicyEngine {
    * Calculate complexity metrics
    */
   private async calculateComplexityMetrics(
-    components: PolicyComponent[], 
+    components: PolicyComponent[],
     dependencies: PolicyDependency[]
   ) {
     const componentCount = components.length;
     const dependencyCount = dependencies.length;
-    const avgComponentComplexity = components.reduce((sum, comp) => 
+    const avgComponentComplexity = components.reduce((sum, comp) =>
       sum + (comp.complexity || 1), 0) / componentCount;
 
     // Calculate enforcement time based on complexity
@@ -194,7 +194,7 @@ export class AdvancedPolicyEngine {
    * Generate optimization suggestions
    */
   private async generateOptimizations(
-    policy: PolicyComposition, 
+    policy: PolicyComposition,
     analytics: PolicyAnalytics
   ) {
     const optimizations = [];
@@ -233,12 +233,12 @@ export class AdvancedPolicyEngine {
    * Apply optimizations to policy
    */
   private async applyOptimizations(
-    policy: PolicyComposition, 
+    policy: PolicyComposition,
     optimizations: any[]
   ): Promise<PolicyComposition> {
     // Create optimized version
     const optimizedPolicy = { ...policy };
-    
+
     // Apply performance optimizations
     if (optimizations.some(o => o.type === 'PERFORMANCE')) {
       optimizedPolicy.estimatedEnforcementTime = Math.floor(policy.estimatedEnforcementTime * 0.8);
@@ -263,7 +263,7 @@ export class AdvancedPolicyEngine {
    * Calculate improvement metrics
    */
   private calculateImprovements(
-    original: PolicyComposition, 
+    original: PolicyComposition,
     optimized: PolicyComposition
   ) {
     const performanceGain = ((original.estimatedEnforcementTime - optimized.estimatedEnforcementTime) / original.estimatedEnforcementTime) * 100;
@@ -281,7 +281,7 @@ export class AdvancedPolicyEngine {
    * Calculate risk reduction score
    */
   private calculateRiskReduction(
-    originalRisk: PolicyComposition['riskLevel'], 
+    originalRisk: PolicyComposition['riskLevel'],
     optimizedRisk: PolicyComposition['riskLevel']
   ) {
     const riskValues = { 'LOW': 1, 'MEDIUM': 2, 'HIGH': 3, 'CRITICAL': 4 };
