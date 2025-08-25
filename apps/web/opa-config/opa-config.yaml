@@ -1,0 +1,24 @@
+services:
+  sck-platform:
+    url: https://sck-plattform.vercel.app
+    headers:
+      Authorization: Bearer ${OPA_ACCESS_TOKEN}
+
+bundles:
+  sck-policies:
+    service: sck-platform
+    resource: /api/v1/enforcement/bundles/active
+    polling:
+      min_delay_seconds: 10
+      max_delay_seconds: 60
+
+decision_logs:
+  service: sck-platform
+  resource: /api/v1/enforcement/logs
+  reporting:
+    min_delay_seconds: 5
+    max_delay_seconds: 30
+
+status:
+  service: sck-platform
+  resource: /api/v1/enforcement/status
