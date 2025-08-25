@@ -166,6 +166,9 @@ model Organization {
   roleAgents          RoleAgent[]
   roleTemplates       RoleTemplate[]
   roleTrustThresholds RoleTrustThreshold[]
+  policyComponents    PolicyComponent[]
+  policyCompositions  PolicyComposition[]
+  trustTokens         TrustToken[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
@@ -645,4 +648,161 @@ enum ApprovalStatus {
   APPROVED
   REJECTED
   EXPIRED
+}
+
+// --- Phase 4: Advanced Policy Management ---
+model PolicyComponent {
+  id                String    @id @default(cuid())
+  name              String
+  description       String
+  componentType     String
+  complexity        String
+  riskLevel         String
+  complianceScore   Int
+  organizationId    String
+  createdBy         String
+  isActive          Boolean   @default(true)
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([componentType])
+  @@index([complexity])
+  @@index([riskLevel])
+}
+
+model PolicyDependency {
+  id                String    @id @default(cuid())
+  sourceComponentId String
+  targetComponentId String
+  dependencyType    String
+  strength          String
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([sourceComponentId])
+  @@index([targetComponentId])
+  @@index([dependencyType])
+}
+
+model PolicyComposition {
+  id                String    @id @default(cuid())
+  name              String
+  description       String
+  componentIds      String[]
+  complexity        String
+  riskLevel         String
+  complianceScore   Int
+  organizationId    String
+  createdBy         String
+  isActive          Boolean   @default(true)
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([complexity])
+  @@index([riskLevel])
+}
+
+model PolicyPerformance {
+  id                String    @id @default(cuid())
+  policyId          String
+  enforcementCount  Int
+  averageResponseTime Int
+  complianceRate   Float
+  riskIncidents    Int
+  costPerEnforcement Float
+  userSatisfaction Float
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([policyId])
+  @@index([createdAt])
+}
+
+// --- Phase 5: Trust Economy Integration ---
+model TrustToken {
+  id                String    @id @default(cuid())
+  organizationId    String
+  symbol            String
+  name              String
+  totalSupply       String
+  circulatingSupply String
+  network           String
+  contractAddress   String?
+  decimals          Int       @default(18)
+  isActive          Boolean   @default(true)
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  organization      Organization @relation(fields: [organizationId], references: [id])
+
+  @@index([organizationId])
+  @@index([symbol])
+  @@index([network])
+}
+
+model TrustReward {
+  id                String    @id @default(cuid())
+  userId            String
+  organizationId    String
+  rewardType        String
+  amount            String
+  reason            String
+  metadata          Json?
+  isClaimed         Boolean   @default(false)
+  claimedAt         DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([rewardType])
+  @@index([isClaimed])
+}
+
+model Micropayment {
+  id                String    @id @default(cuid())
+  fromUserId        String
+  toUserId          String
+  amount            String
+  currency          String
+  purpose           String
+  transactionHash   String?
+  status            String    @default("pending")
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([fromUserId])
+  @@index([toUserId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model TrustMarketplace {
+  id                String    @id @default(cuid())
+  credentialId      String
+  sellerId          String
+  price             String
+  currency          String
+  description       String
+  trustScore        Int
+  verificationStatus String
+  expiresInDays     Int
+  isActive          Boolean   @default(true)
+  metadata          Json?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  @@index([credentialId])
+  @@index([sellerId])
+  @@index([currency])
+  @@index([isActive])
 }
