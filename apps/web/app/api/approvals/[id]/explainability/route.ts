@@ -12,3 +12,4 @@ export async function GET(_: NextRequest, { params }: { params: { id: string } }
     return NextResponse.json({ error: e.message }, { status: 500 });
   }
 }
+

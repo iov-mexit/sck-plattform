@@ -85,3 +85,4 @@ export function ExplainabilityPanel({ approvalRequestId }: { approvalRequestId: 
     </div>
   );
 }
+

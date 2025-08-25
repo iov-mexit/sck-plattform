@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
     const ctx = await retrieveHybrid({ query, organizationId, maxChunks: 5 });
 
     // 2) Prompt LLM
-    const contextText = ctx.snippets.map((c, i) => `[#${i+1}] ${c.content.slice(0, 200)}...`).join('\n\n');
+    const contextText = ctx.snippets.map((c, i) => `[#${i + 1}] ${c.content.slice(0, 200)}...`).join('\n\n');
     const user = `Artifact: ${JSON.stringify(artifact)}
 OrganizationId: ${organizationId}
 Goal: ${goal}

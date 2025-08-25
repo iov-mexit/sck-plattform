@@ -29,3 +29,4 @@ CREATE INDEX IF NOT EXISTS idx_explainability_approval
 
 CREATE INDEX IF NOT EXISTS idx_explainability_created
   ON "ExplainabilitySnapshot" ("createdAt");
+
