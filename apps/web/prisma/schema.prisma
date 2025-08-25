@@ -170,6 +170,8 @@ model RoleAgent {
   signals                Signal[]
   auditLogs              AuditLog[]
   approvals              Approval[]                // new: approval tasks for this agent
+  signedBundles          PolicyBundle[]
+  issuedTokens           GatewayToken[]
 
   @@index([assignedToDid], map: "idx_role_agents_assigned_did")
   @@index([assignedToUserId], map: "idx_role_agents_assigned_user")
@@ -229,6 +231,9 @@ model Organization {
   mcpPolicies           McpPolicy[]
   auditLogs             AuditLog[]
   approvalRequests      ApprovalRequest[]
+  policyBundles         PolicyBundle[]
+  gatewayTokens         GatewayToken[]
+  enforcementCalls      EnforcementCall[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
@@ -535,7 +540,7 @@ model ApprovalVote {
 // Enhanced Trust Ledger with threading
 model TrustLedgerEvent {
   id           String       @id @default(cuid())
-  artifactType String       // "MCP_POLICY" | "ROLE_AGENT" | "ANS_ENTRY" | "AI_RECOMMENDATION"
+  artifactType String       // "MCP_POLICY" | "ROLE_AGENT" | "ANS_ENTRY" | "AI_RECOMMENDATION" | "POLICY_BUNDLE" | "GATEWAY_TOKEN"
   artifactId   String
   action       String       // "APPROVAL_VOTE" | "APPROVAL_FINAL" | "POLICY_PUBLISH" | ...
   payload      Json
@@ -617,4 +622,85 @@ model ExplainabilitySnapshot {
   
   // Relations
   approvalRequest ApprovalRequest @relation(fields: [approvalRequestId], references: [id])
+}
+
+// --- Milestone 3: MCP Enforcement System ---
+
+// Policy Bundle Management
+model PolicyBundle {
+  id            String   @id @default(cuid())
+  organizationId String
+  version       String   // semantic versioning (e.g., "1.2.3")
+  status        String   // "DRAFT" | "PUBLISHED" | "ACTIVE" | "REVOKED"
+  bundleHash    String   @unique // sha256 of bundle content
+  signature     String?  // base64 encoded signature
+  signerId      String?  // who signed this bundle
+  storageUrl    String   // S3/Supabase storage location
+  bundleSize    Int      // size in bytes
+  buildLogs     String?  // compilation logs
+  metadata      Json     // {artifacts: [], policies: [], controls: []}
+  createdAt     DateTime @default(now())
+  publishedAt   DateTime?
+  activatedAt   DateTime?
+  revokedAt     DateTime?
+  
+  // Relations
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  signer       RoleAgent? @relation(fields: [signerId], references: [id])
+  
+  @@index([organizationId])
+  @@index([status])
+  @@index([version])
+  @@index([bundleHash])
+}
+
+// Gateway Token Management
+model GatewayToken {
+  id            String   @id @default(cuid())
+  organizationId String
+  tokenId       String   @unique // JWT jti claim
+  artifactId    String   // what this token authorizes
+  artifactType  String   // "MCP_POLICY" | "ROLE_AGENT" | etc.
+  loaLevel      Int      // LoA level (1-5)
+  scope         String[] // ["mcp:invoke", "policy:read"]
+  bundleVersion String?  // which policy bundle this token is valid under
+  expiresAt     DateTime
+  revokedAt     DateTime?
+  issuedBy      String   // who issued this token
+  issuedFor     String?  // specific user/system this was issued for
+  
+  // Relations
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  issuer       RoleAgent @relation(fields: [issuedBy], references: [id])
+  enforcementCalls EnforcementCall[]
+  
+  @@index([organizationId])
+  @@index([tokenId])
+  @@index([artifactId])
+  @@index([expiresAt])
+  @@index([revokedAt])
+}
+
+// Enforcement Call Logging
+model EnforcementCall {
+  id            String   @id @default(cuid())
+  organizationId String
+  tokenId       String?  // if authenticated
+  upstreamId    String   // ANS identifier of upstream service
+  method        String   // HTTP method
+  path          String   // request path
+  result        String   // "ALLOW" | "DENY" | "ERROR"
+  decisionReason String? // why this decision was made
+  metadata      Json     // {headers, body_hash, timestamp, hmac_valid}
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  organization  Organization @relation(fields: [organizationId], references: [id])
+  token        GatewayToken? @relation(fields: [tokenId], references: [id])
+  
+  @@index([organizationId])
+  @@index([tokenId])
+  @@index([upstreamId])
+  @@index([result])
+  @@index([createdAt])
 }

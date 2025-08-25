@@ -23,7 +23,8 @@
     "deploy:production": "node scripts/deploy-to-production.js",
     "deploy:governance": "echo 'Governance Console deployed - visit /governance'",
     "deploy:phase1-2-bridge": "node scripts/deploy-phase1-2-bridge.js",
-    "deploy:phase2": "node scripts/deploy-phase2-to-supabase.js"
+    "deploy:phase2": "node scripts/deploy-phase2-to-supabase.js",
+    "deploy:milestone3": "node scripts/deploy-milestone3-to-supabase.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
@@ -44,6 +45,7 @@
     "clsx": "^2.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.1",
+    "jsonwebtoken": "^9.0.2",
     "ethers": "^6.15.0",
     "express": "^5.1.0",
     "lucide-react": "^0.294.0",
@@ -72,6 +74,7 @@
     "@types/jest": "^30.0.0",
     "@types/react": "^18.2.45",
     "@types/react-dom": "^18.2.18",
+    "@types/jsonwebtoken": "^9.0.5",
     "eslint": "^8.54.0",
     "eslint-config-next": "^14.0.4",
     "jest": "^29.7.0",
