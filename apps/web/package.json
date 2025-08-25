@@ -24,7 +24,8 @@
     "deploy:governance": "echo 'Governance Console deployed - visit /governance'",
     "deploy:phase1-2-bridge": "node scripts/deploy-phase1-2-bridge.js",
     "deploy:phase2": "node scripts/deploy-phase2-to-supabase.js",
-    "deploy:milestone3": "node scripts/deploy-milestone3-to-supabase.js"
+    "deploy:milestone3": "node scripts/deploy-milestone3-to-supabase.js",
+    "deploy:milestone3:direct": "node scripts/deploy-milestone3-direct.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
