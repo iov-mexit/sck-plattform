@@ -255,9 +255,11 @@ model Approval {
   comment        String?
   reviewedAt     DateTime?
   createdAt      DateTime         @default(now())
-  roleAgent      McpPolicy        @relation(fields: [artifactId], references: [id], map: "Approval_roleAgent_fkey")
+  mcpPolicy      McpPolicy?       @relation(fields: [mcpPolicyId], references: [id])
+  mcpPolicyId    String?
   organization   Organization     @relation(fields: [organizationId], references: [id])
-  roleAgent      RoleAgent        @relation(fields: [artifactId], references: [id], map: "Approval_roleAgent_fkey")
+  roleAgent      RoleAgent?       @relation(fields: [roleAgentId], references: [id])
+  roleAgentId    String?
 
   @@unique([artifactId, artifactType, reviewerId, facet])
   @@index([organizationId], map: "idx_approvals_org")
