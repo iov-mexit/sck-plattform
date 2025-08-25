@@ -1,52 +1,24 @@
-import { prisma } from "../database";
+import { prisma } from "@/lib/database";
 import { ethers } from "ethers";
+import { TrustToken, TrustReward, Micropayment, TrustMarketplace } from "@prisma/client";
 
-export interface TrustToken {
+export interface TrustTokenInterface {
   id: string;
   symbol: string;
   name: string;
   totalSupply: string;
   circulatingSupply: string;
   decimals: number;
-  contractAddress: string;
+  contractAddress?: string;
   network: string;
-}
-
-export interface TrustReward {
-  id: string;
-  userId: string;
   organizationId: string;
-  rewardType: 'TRUST_BUILDING' | 'POLICY_ENFORCEMENT' | 'COMPLIANCE' | 'INNOVATION';
-  amount: string;
-  reason: string;
-  timestamp: Date;
-  status: 'PENDING' | 'CLAIMED' | 'EXPIRED';
-}
-
-export interface Micropayment {
-  id: string;
-  fromUserId: string;
-  toUserId: string;
-  amount: string;
-  currency: 'TRUST_TOKEN' | 'ETH' | 'USDC';
-  purpose: string;
-  timestamp: Date;
-  status: 'PENDING' | 'COMPLETED' | 'FAILED';
-  transactionHash?: string;
-}
-
-export interface TrustMarketplace {
-  id: string;
-  credentialId: string;
-  sellerId: string;
-  price: string;
-  currency: 'TRUST_TOKEN' | 'ETH' | 'USDC';
-  description: string;
-  trustScore: number;
-  verificationStatus: 'UNVERIFIED' | 'VERIFIED' | 'PREMIUM';
+  isActive: boolean;
+  metadata?: any;
   createdAt: Date;
-  expiresAt: Date;
+  updatedAt: Date;
 }
+
+// Using Prisma types instead of custom interfaces
 
 export class TrustEconomySystem {
 
@@ -74,7 +46,12 @@ export class TrustEconomySystem {
       circulatingSupply: '0',
       decimals: 18,
       contractAddress,
-      network: params.network
+      network: params.network,
+      organizationId: params.organizationId,
+      isActive: true,
+      metadata: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     // Store in database
@@ -88,7 +65,11 @@ export class TrustEconomySystem {
         decimals: trustToken.decimals,
         contractAddress: trustToken.contractAddress,
         network: trustToken.network,
-        organizationId: params.organizationId
+        organizationId: trustToken.organizationId,
+        isActive: trustToken.isActive,
+        metadata: trustToken.metadata as any,
+        createdAt: trustToken.createdAt,
+        updatedAt: trustToken.updatedAt
       }
     });
 
@@ -106,16 +87,19 @@ export class TrustEconomySystem {
     reason: string;
   }): Promise<TrustReward> {
 
-    const reward: TrustReward = {
-      id: `reward_${Date.now()}`,
-      userId: params.userId,
-      organizationId: params.organizationId,
-      rewardType: params.rewardType,
-      amount: params.amount,
-      reason: params.reason,
-      timestamp: new Date(),
-      status: 'PENDING'
-    };
+          const reward: TrustReward = {
+        id: `reward_${Date.now()}`,
+        userId: params.userId,
+        organizationId: params.organizationId,
+        rewardType: params.rewardType,
+        amount: params.amount,
+        reason: params.reason,
+        metadata: null,
+        isClaimed: false,
+        claimedAt: null,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
 
     // Store reward in database
     await prisma.trustReward.create({
@@ -126,8 +110,11 @@ export class TrustEconomySystem {
         rewardType: reward.rewardType,
         amount: reward.amount,
         reason: reward.reason,
-        timestamp: reward.timestamp,
-        status: reward.status
+        metadata: reward.metadata as any,
+        isClaimed: reward.isClaimed,
+        claimedAt: reward.claimedAt,
+        createdAt: reward.createdAt,
+        updatedAt: reward.updatedAt
       }
     });
 
@@ -143,7 +130,7 @@ export class TrustEconomySystem {
     const pendingRewards = await prisma.trustReward.findMany({
       where: {
         userId,
-        status: 'PENDING'
+        isClaimed: false
       }
     });
 
@@ -151,7 +138,7 @@ export class TrustEconomySystem {
     for (const reward of pendingRewards) {
       await prisma.trustReward.update({
         where: { id: reward.id },
-        data: { status: 'CLAIMED' }
+        data: { isClaimed: true, claimedAt: new Date() }
       });
     }
 
@@ -162,7 +149,20 @@ export class TrustEconomySystem {
     // In real implementation, this would mint tokens on the blockchain
     console.log(`Minting ${totalAmount} trust tokens for user ${userId}`);
 
-    return pendingRewards;
+    // Convert to TrustReward interface
+    return pendingRewards.map(reward => ({
+      id: reward.id,
+      userId: reward.userId,
+      organizationId: reward.organizationId,
+      rewardType: reward.rewardType,
+      amount: reward.amount,
+      reason: reward.reason,
+      metadata: reward.metadata,
+      isClaimed: reward.isClaimed,
+      claimedAt: reward.claimedAt,
+      createdAt: reward.createdAt,
+      updatedAt: reward.updatedAt
+    }));
   }
 
   /**
@@ -183,8 +183,11 @@ export class TrustEconomySystem {
       amount: params.amount,
       currency: params.currency,
       purpose: params.purpose,
-      timestamp: new Date(),
-      status: 'PENDING'
+      transactionHash: null,
+      status: 'PENDING',
+      metadata: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     // Store payment in database
@@ -196,8 +199,9 @@ export class TrustEconomySystem {
         amount: micropayment.amount,
         currency: micropayment.currency,
         purpose: micropayment.purpose,
-        timestamp: micropayment.timestamp,
-        status: micropayment.status
+        status: micropayment.status,
+        createdAt: micropayment.createdAt,
+        updatedAt: micropayment.updatedAt
       }
     });
 
@@ -207,7 +211,13 @@ export class TrustEconomySystem {
       await this.transferTrustTokens(params.fromUserId, params.toUserId, params.amount);
     } else {
       // Process blockchain payment (ETH/USDC)
-      const txHash = await this.processBlockchainPayment(params);
+      const txHash = await this.processBlockchainPayment({
+        fromUserId: params.fromUserId,
+        toUserId: params.toUserId,
+        amount: params.amount,
+        currency: params.currency as 'ETH' | 'USDC',
+        purpose: params.purpose
+      });
       micropayment.transactionHash = txHash;
     }
 
@@ -244,8 +254,11 @@ export class TrustEconomySystem {
       description: params.description,
       trustScore: params.trustScore,
       verificationStatus: params.verificationStatus,
+      expiresInDays: params.expiresInDays,
+      isActive: true,
+      metadata: null,
       createdAt: new Date(),
-      expiresAt: new Date(Date.now() + params.expiresInDays * 24 * 60 * 60 * 1000)
+      updatedAt: new Date()
     };
 
     // Store listing in database
@@ -259,8 +272,10 @@ export class TrustEconomySystem {
         description: marketplace.description,
         trustScore: marketplace.trustScore,
         verificationStatus: marketplace.verificationStatus,
+        expiresInDays: marketplace.expiresInDays,
+        isActive: marketplace.isActive,
         createdAt: marketplace.createdAt,
-        expiresAt: marketplace.expiresAt
+        updatedAt: marketplace.updatedAt
       }
     });
 
@@ -277,8 +292,8 @@ export class TrustEconomySystem {
       where: { id: listingId }
     });
 
-    if (!listing || listing.expiresAt < new Date()) {
-      throw new Error('Listing not found or expired');
+    if (!listing || listing.isActive === false) {
+      throw new Error('Listing not found or inactive');
     }
 
     // Process payment
@@ -310,7 +325,7 @@ export class TrustEconomySystem {
     const claimedRewards = await prisma.trustReward.findMany({
       where: {
         userId,
-        status: 'CLAIMED'
+        isClaimed: true
       }
     });
 
@@ -331,7 +346,7 @@ export class TrustEconomySystem {
   }): Promise<TrustMarketplace[]> {
 
     const where: any = {
-      expiresAt: { gt: new Date() } // Only active listings
+      isActive: true // Only active listings
     };
 
     if (filters?.minTrustScore) {
