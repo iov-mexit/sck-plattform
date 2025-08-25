@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { trustEconomySystem } from "../../../../../lib/trust-economy/trust-token-system";
+import { trustEconomySystem } from "../../../../lib/trust-economy/trust-token-system";
 
 export async function POST(req: NextRequest) {
   try {
