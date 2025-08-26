@@ -118,40 +118,11 @@ jobs:
         run: yarn audit --level high
         continue-on-error: true
 
-  # Deploy to Vercel
-  deploy:
-    name: Deploy to Vercel
-    runs-on: ubuntu-latest
-    needs: [quality-gates, security-scan]
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy to Vercel
-        run: |
-          # Install Vercel CLI
-          yarn global add vercel@latest
-          
-          # Set environment variables
-          export VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}"
-          export VERCEL_ORG_ID="${{ secrets.VERCEL_ORG_ID }}"
-          export VERCEL_PROJECT_ID="${{ secrets.VERCEL_PROJECT_ID }}"
-          
-          # Debug: Show what we're using (without exposing the actual token)
-          echo "Using Vercel Project ID: $VERCEL_PROJECT_ID"
-          echo "Using Vercel Org ID: $VERCEL_ORG_ID"
-          echo "Token length: ${#VERCEL_TOKEN} characters"
-          
-          # Deploy directly with token (no linking needed)
-          echo "Deploying to Vercel..."
-          vercel --prod --yes --token "$VERCEL_TOKEN"
-
   # Quality Gate Summary
   quality-summary:
     name: Quality Gate Summary
     runs-on: ubuntu-latest
-    needs: [quality-gates, security-scan, deploy]
+    needs: [quality-gates, security-scan]
     if: always()
     steps:
       - name: Quality Gate Summary
@@ -171,18 +142,11 @@ jobs:
             echo "❌ **Security Scan**: FAILED" >> $GITHUB_STEP_SUMMARY
           fi
           
-          echo "✅ **Build**: Handled by Vercel" >> $GITHUB_STEP_SUMMARY
-
-          if [ "${{ needs.deploy.result }}" == "success" ]; then
-            echo "✅ **Deploy to Vercel**: PASSED" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "❌ **Deploy to Vercel**: FAILED" >> $GITHUB_STEP_SUMMARY
-          fi
+          echo "✅ **Deployment**: Managed by Vercel Git Integration (auto-deploy on push)" >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "## 🔒 Quality Gates Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "- **Code Quality**: ${{ needs.quality-gates.result }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Security**: ${{ needs.security-scan.result }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Build**: Handled by Vercel" >> $GITHUB_STEP_SUMMARY
-          echo "- **Deploy**: ${{ needs.deploy.result }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Deployment**: Vercel Git Integration" >> $GITHUB_STEP_SUMMARY
