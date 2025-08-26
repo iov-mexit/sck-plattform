@@ -1,8 +1,6 @@
 name: PAM MCP CI/CD Pipeline
 
 on:
-  push:
-    branches: [ main, develop, feat/pam-mcp-gateway ]
   pull_request:
     branches: [ main, develop ]
     types: [ opened, synchronize, reopened ]
