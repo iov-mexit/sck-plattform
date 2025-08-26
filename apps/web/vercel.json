@@ -1,10 +1,35 @@
 {
-  "buildCommand": "npm install --registry=https://registry.npmjs.com/ --fetch-retries=20 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=120000 && npm run build",
-  "installCommand": "npm install --registry=https://registry.npmjs.com/ --fetch-retries=20 --fetch-retry-mintimeout=10000 --fetch-retry-maxtimeout=120000",
+  "version": 2,
+  "buildCommand": "yarn build",
+  "installCommand": "yarn install --immutable",
   "framework": "nextjs",
+  "outputDirectory": ".next",
+  "rootDirectory": "apps/web",
   "functions": {
     "app/api/v1/rag/search/route.ts": {
       "maxDuration": 30
     }
-  }
+  },
+  "env": {
+    "NEXT_PUBLIC_ENVIRONMENT": "production"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ]
 }
