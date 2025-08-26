@@ -21,48 +21,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "yarn"
 
       - name: Enable Corepack (Yarn 4)
         run: |
           corepack enable
           corepack prepare yarn@4.0.2 --activate
-
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
-
-      - name: Cache Yarn packages
-        uses: actions/cache@v4
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        id: node-modules-cache
-        with:
-          path: |
-            node_modules
-            apps/web/node_modules
-            packages/*/node_modules
-          key: ${{ runner.os }}-node-modules-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-modules-
-
-      - name: Cache Prisma generated
-        uses: actions/cache@v4
-        id: prisma-cache
-        with:
-          path: |
-            apps/web/node_modules/.prisma
-            apps/web/prisma/generated
-          key: ${{ runner.os }}-prisma-${{ hashFiles('apps/web/prisma/schema.prisma') }}
-          restore-keys: |
-            ${{ runner.os }}-prisma-
+          echo "✅ Yarn version: $(yarn --version)"
 
       - name: Prepare Yarn Workspace
         working-directory: ./
