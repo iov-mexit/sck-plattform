@@ -23,24 +23,28 @@ jobs:
           corepack enable
           corepack prepare yarn@4.0.2 --activate
 
-      - name: Yarn cache dir
-        id: yarn-cache-dir
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
         run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
 
-      - name: Cache Yarn
+      - name: Cache Yarn packages
         uses: actions/cache@v4
+        id: yarn-cache
         with:
-          path: ${{ steps.yarn-cache-dir.outputs.dir }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - name: Install deps (immutable)
+      - name: Install dependencies
         run: yarn install --immutable
 
       - name: Build web app
         working-directory: apps/web
         run: yarn build
 
-      - name: Typecheck
-        run: yarn -v && node -v && echo OK
+      - name: Verify versions
+        run: |
+          echo "Yarn version: $(yarn --version)"
+          echo "Node version: $(node --version)"
+          echo "CI build successful!"
