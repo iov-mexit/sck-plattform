@@ -36,6 +36,7 @@ jobs:
           yarn install --immutable || yarn install
 
       - name: Fix Prisma Client lockfile mismatch
+        working-directory: ./apps/web
         run: |
           echo "🔧 Ensuring @prisma/client matches schema..."
           if [ ! -f node_modules/.prisma/client/index.js ]; then
@@ -43,26 +44,31 @@ jobs:
           fi
 
       - name: Generate Prisma client
+        working-directory: ./apps/web
         run: |
           echo "🔨 Generating Prisma client..."
           yarn prisma generate
 
       - name: Pin ethers v5 for Next.js build
+        working-directory: ./apps/web
         run: |
           yarn add ethers@^5.7.2
 
       - name: Build Next.js
+        working-directory: ./apps/web
         run: |
           echo "🚀 Building Next.js..."
           yarn next build
 
       - name: Run Tests
+        working-directory: ./apps/web
         run: |
           echo "🧪 Running tests..."
           yarn test || echo "Tests failed but continue"
 
       - name: Optional Vercel Deploy
         if: github.ref == 'refs/heads/main'
+        working-directory: ./apps/web
         run: |
           echo "📦 Deploying to Vercel..."
           npx vercel --prod --confirm
