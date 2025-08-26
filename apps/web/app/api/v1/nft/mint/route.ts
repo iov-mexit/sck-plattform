@@ -214,14 +214,14 @@ export async function POST(request: NextRequest) {
       }
 
       // Connect to Sepolia
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
+      const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
 
       // Test the connection
       try {
         const network = await provider.getNetwork();
         console.log('✅ Connected to network:', network.name, 'Chain ID:', network.chainId.toString());
 
-        if (network.chainId !== 11155111n) {
+        if (network.chainId !== 11155111) {
           throw new Error(`Wrong network. Expected Sepolia (11155111), got ${network.chainId}`);
         }
       } catch (networkError) {
@@ -233,9 +233,9 @@ export async function POST(request: NextRequest) {
 
       // Check wallet balance
       const balance = await provider.getBalance(wallet.address);
-      console.log('💰 Wallet balance:', ethers.formatEther(balance), 'ETH');
+      console.log('💰 Wallet balance:', ethers.utils.formatEther(balance), 'ETH');
 
-      if (balance === 0n) {
+      if (balance.isZero()) {
         throw new Error(`Wallet ${wallet.address} has no ETH for gas fees`);
       }
 
@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
       for (const log of receipt.logs) {
         try {
           const parsedLog = contract.interface.parseLog(log);
-          if (parsedLog && parsedLog.name === 'Transfer' && parsedLog.args.from === ethers.ZeroAddress) {
+          if (parsedLog && parsedLog.name === 'Transfer' && parsedLog.args.from === ethers.constants.ZeroAddress) {
             tokenId = parsedLog.args.tokenId.toString();
             break;
           }
