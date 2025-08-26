@@ -31,8 +31,12 @@ jobs:
           echo "Files in current directory:"
           ls -la
 
-      - name: Install dependencies
-        run: yarn install --immutable
+      - name: Install dependencies (skip build)
+        run: yarn install --immutable --mode=skip-build
+
+      - name: Generate Prisma client
+        working-directory: apps/web
+        run: yarn prisma generate
 
       - name: Build web app
         working-directory: apps/web
