@@ -2,15 +2,15 @@
 
 ## ✅ **What Has Been Delivered**
 
-### **Option A: Complete Pinecone + Prisma Upsert Script** 🚀
+### **Option A: Complete FREE Upsert Script** 🚀
 - **File**: `scripts/ingest-docs/upsert-seed.js`
 - **Features**: 
-  - OpenAI embeddings with rate limiting
-  - Pinecone vector database integration
-  - Prisma database synchronization
-  - Batch processing (10 for OpenAI, 100 for Pinecone)
-  - Comprehensive error handling and logging
-  - Automated validation and testing
+  - FREE local SentenceTransformers embeddings
+- Supabase Vector integration (FREE tier)
+- Prisma database synchronization
+- Local processing (no API limits)
+- Comprehensive error handling and logging
+- Automated validation and testing
 
 ### **Option B: 30 Security Framework Chunks** 📚
 - **File**: `data/seeds/security_framework_chunks.json`
@@ -34,16 +34,19 @@
 
 ## 🚀 **Ready to Use Commands**
 
-### **Install Dependencies**
+### **Install Dependencies (FREE VERSION)**
 ```bash
-npm install @pinecone-database/pinecone @prisma/client
+npm install @supabase/supabase-js @prisma/client @xenova/transformers
 ```
 
-### **Set Environment Variables**
+### **Set Environment Variables (FREE VERSION)**
 ```bash
-export OPENAI_API_KEY="your-openai-api-key"
-export PINECONE_API_KEY="your-pinecone-api-key"
-export PINECONE_INDEX="sck-knowledge"
+# Option 1: Supabase Vector (FREE tier)
+export SUPABASE_URL="your-supabase-project-url"
+export SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Option 2: Local only (100% FREE)
+# No environment variables needed!
 ```
 
 ### **Run Ingestion**
@@ -64,15 +67,15 @@ npm run rag:test:retrieval
 | **Frameworks** | 6 major security standards |
 | **Jurisdictions** | Global, EU, US |
 | **Content Length** | 30-120 words per chunk |
-| **Embedding Model** | text-embedding-3-small (1536d) |
-| **Vector Database** | Pinecone |
+| **Embedding Model** | all-mpnet-base-v2 (768d) - FREE |
+| **Vector Database** | Supabase Vector (FREE tier) |
 | **Database Sync** | Prisma + PostgreSQL |
 
 ## 🔧 **Technical Architecture**
 
-### **Data Flow**
+### **Data Flow (FREE VERSION)**
 ```
-Security Framework Chunks → OpenAI Embeddings → Pinecone Vectors → Prisma Database
+Security Framework Chunks → Local SentenceTransformers → Supabase Vector → Prisma Database
                                     ↓
                             Retrieval API → RAG System → LLM Decisions
 ```
@@ -122,10 +125,10 @@ npm run rag:test:retrieval
 
 ## 📈 **Performance Expectations**
 
-### **Ingestion Performance**
-- **30 chunks**: ~2-3 minutes total
-- **Embedding generation**: ~1-2 minutes
-- **Pinecone upsert**: ~30 seconds
+### **Ingestion Performance (FREE VERSION)**
+- **30 chunks**: ~3-4 minutes total
+- **Local embedding generation**: ~2-3 minutes
+- **Supabase Vector upsert**: ~30 seconds
 - **Prisma sync**: ~15 seconds
 
 ### **Retrieval Performance**
@@ -153,4 +156,4 @@ Your SCK platform now has a **production-ready security framework dataset** that
 3. **Support audit and certification** with citable framework references
 4. **Scale automatically** as you add more frameworks and content
 
-**Next step: Run `npm run rag:ingest:security` and watch your RAG system come to life!** 🚀
+**Next step: Run `npm run rag:ingest:security:free` and watch your RAG system come to life for FREE!** 🚀

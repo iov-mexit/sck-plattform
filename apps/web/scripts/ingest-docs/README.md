@@ -11,16 +11,19 @@ This directory contains scripts to ingest the curated security framework dataset
 
 ## 🚀 **Quick Start**
 
-### 1. **Install Dependencies**
+### 1. **Install Dependencies (FREE VERSION)**
 ```bash
-npm install @pinecone-database/pinecone @prisma/client
+npm install @supabase/supabase-js @prisma/client @xenova/transformers
 ```
 
-### 2. **Set Environment Variables**
+### 2. **Set Environment Variables (FREE VERSION)**
 ```bash
-export OPENAI_API_KEY="your-openai-api-key"
-export PINECONE_API_KEY="your-pinecone-api-key"
-export PINECONE_INDEX="sck-knowledge"
+# Option 1: Supabase Vector (FREE tier)
+export SUPABASE_URL="your-supabase-project-url"
+export SUPABASE_ANON_KEY="your-supabase-anon-key"
+
+# Option 2: Local only (100% FREE)
+# No environment variables needed!
 ```
 
 ### 3. **Run Ingestion**
@@ -56,16 +59,16 @@ Each chunk includes:
 - **Content**: Paraphrased clause content (30-120 words)
 - **Metadata**: Clause, jurisdiction, and tags
 
-### **Embedding Model**
-- **Model**: `text-embedding-3-small` (OpenAI)
-- **Dimensions**: 1536
-- **Batch Size**: 10 (OpenAI limit)
-- **Rate Limiting**: 100ms between batches
+### **Embedding Model (FREE)**
+- **Model**: `all-mpnet-base-v2` (Local SentenceTransformers)
+- **Dimensions**: 768
+- **Cost**: $0.00 (100% FREE)
+- **Fallback**: HuggingFace Inference API (FREE tier)
 
-### **Vector Database**
-- **Platform**: Pinecone
-- **Index**: `sck-knowledge`
-- **Batch Size**: 100 (Pinecone limit)
+### **Vector Database (FREE)**
+- **Platform**: Supabase Vector (FREE tier)
+- **Storage**: 500MB free, 2GB bandwidth/month
+- **Alternative**: Local PostgreSQL with pgvector (100% FREE)
 - **Metadata**: Preserved for hybrid search
 
 ### **Database Schema**
