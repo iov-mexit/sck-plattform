@@ -148,6 +148,7 @@ function HomeContent() {
               <span>Privacy Policy</span>
               <span>Terms of Service</span>
               <span>Support</span>
+              <a href="/SCK_PLATFORM_SITEMAP.md" target="_blank" className="text-blue-600 hover:underline">Sitemap</a>
             </div>
           </div>
         </div>

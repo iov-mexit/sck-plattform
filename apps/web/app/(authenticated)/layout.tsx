@@ -42,9 +42,21 @@ export default function AuthenticatedLayout({
 
   // Render authenticated layout
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <NavBar />
-      <main>{children}</main>
+      <main className="flex-1">{children}</main>
+      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex justify-between items-center">
+            <div className="text-sm text-gray-600">
+              © 2024 Secure Code KnAIght. All rights reserved.
+            </div>
+            <div className="flex items-center space-x-4 text-sm text-gray-600">
+              <a href="/SCK_PLATFORM_SITEMAP.md" target="_blank" className="text-blue-600 hover:underline">Sitemap</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 } 
