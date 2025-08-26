@@ -29,29 +29,46 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+
+      - name: Enable Corepack (Yarn 4)
+        run: |
+          corepack enable
+          corepack prepare yarn@4.0.2 --activate
+
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache Yarn packages
+        uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install --immutable
 
       - name: Install turbo globally
-        run: npm install -g turbo
+        run: yarn global add turbo
 
       - name: Generate Prisma client first
         run: |
           cd apps/web
           echo "Generating Prisma client for quality gates..."
-          npx prisma generate --schema=./prisma/schema.prisma
+          yarn prisma generate --schema=./prisma/schema.prisma
 
       - name: TypeScript strict mode check
-        run: npm run type-check
+        run: yarn type-check
         continue-on-error: true
 
       - name: ESLint check
         run: |
           cd apps/web
           set +e
-          npm run lint
+          yarn lint
           lint_exit_code=$?
           if [ $lint_exit_code -ne 0 ]; then
             echo "ESLint completed with exit code $lint_exit_code (non-blocking)"
@@ -72,19 +89,34 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+
+      - name: Enable Corepack (Yarn 4)
+        run: |
+          corepack enable
+          corepack prepare yarn@4.0.2 --activate
+
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn config get cacheFolder)" >> $GITHUB_OUTPUT
+
+      - name: Cache Yarn packages
+        uses: actions/cache@v4
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install --immutable
 
       - name: Install turbo globally
-        run: npm install -g turbo
+        run: yarn global add turbo
 
       - name: Run dependency audit
-        run: npm audit --audit-level=high
+        run: yarn audit --level high
         continue-on-error: true
-
-
 
   # Deploy to Vercel
   deploy:
@@ -99,7 +131,7 @@ jobs:
       - name: Deploy to Vercel
         run: |
           # Install Vercel CLI
-          npm install -g vercel@latest
+          yarn global add vercel@latest
           
           # Set environment variables
           export VERCEL_TOKEN="${{ secrets.VERCEL_TOKEN }}"
