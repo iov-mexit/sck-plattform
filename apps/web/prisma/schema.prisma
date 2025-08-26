@@ -105,6 +105,7 @@ model RoleAgent {
   roleTemplate           RoleTemplate            @relation(fields: [roleTemplateId], references: [id])
   signals                Signal[]
   trustHistories         TrustHistory[]
+  aiDecisions            AiDecision[]
 
   @@index([assignedToDid], map: "idx_role_agents_assigned_did")
   @@index([assignedToUserId], map: "idx_role_agents_assigned_user")
@@ -169,6 +170,7 @@ model Organization {
   policyComponents    PolicyComponent[]
   policyCompositions  PolicyComposition[]
   trustTokens         TrustToken[]
+  aiDecisions         AiDecision[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
@@ -805,4 +807,74 @@ model TrustMarketplace {
   @@index([sellerId])
   @@index([currency])
   @@index([isActive])
+}
+
+// --- AI MCP Layer ---
+model McpPolicy {
+  id             String   @id @default(cuid())
+  roleTemplateId String
+  environment    String   // prod|staging|dev
+  minTrustLevel  Int      // L1=1, L2=2, L3=3, L4=4, L5=5
+  allowedEndpoints Json   // Array of allowed endpoint patterns
+  constraints     Json    // Time windows, dual control, rate limits
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@index([roleTemplateId, environment])
+  @@index([minTrustLevel])
+}
+
+model AiDecision {
+  id                String   @id @default(cuid())
+  agentId           String
+  organizationId    String
+  promptHash        String   // SHA256 of full prompt context
+  retrievedDocs     Json     // Array of {docId, score, excerpt}
+  llmResponse       Json     // Raw LLM output
+  policyResult      Json     // OPA evaluation result
+  decision          String   // ALLOW|DENY|REQUIRES_APPROVAL
+  signature         String   // HMAC of decision + timestamp
+  requiresApproval  Boolean  @default(false)
+  approvalsNeeded   Json     // Array of required approval roles
+  confidence        Float    // 0.0-1.0 confidence score
+  metadata          Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  agent             RoleAgent @relation(fields: [agentId], references: [id])
+  organization      Organization @relation(fields: [organizationId], references: [id])
+  
+  @@index([agentId])
+  @@index([organizationId])
+  @@index([createdAt])
+  @@index([promptHash])
+}
+
+model KnowledgeDocument {
+  id                String    @id @default(cuid())
+  source            String    // "ISO_27001", "SOC2", "EU_AI_ACT"
+  version           String    // Document version
+  title             String    // Human-readable title
+  content           String    // Full document text
+  chunks            KnowledgeChunk[]
+  metadata          Json      // Source URL, publication date, etc.
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@index([source, version])
+}
+
+model KnowledgeChunk {
+  id                String    @id @default(cuid())
+  documentId        String
+  chunkIndex        Int       // Order within document
+  content           String    // Chunk text
+  embedding         Unsupported("vector(1536)") // pgvector embedding
+  metadata          Json      // Section, clause, tags
+  createdAt         DateTime  @default(now())
+  
+  document          KnowledgeDocument @relation(fields: [documentId], references: [id])
+  
+  @@index([documentId, chunkIndex])
+  @@index([embedding vector_cosine_ops]) // Vector similarity search
 }

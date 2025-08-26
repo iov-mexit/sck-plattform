@@ -87,19 +87,19 @@ export class TrustEconomySystem {
     reason: string;
   }): Promise<TrustReward> {
 
-          const reward: TrustReward = {
-        id: `reward_${Date.now()}`,
-        userId: params.userId,
-        organizationId: params.organizationId,
-        rewardType: params.rewardType,
-        amount: params.amount,
-        reason: params.reason,
-        metadata: null,
-        isClaimed: false,
-        claimedAt: null,
-        createdAt: new Date(),
-        updatedAt: new Date()
-      };
+    const reward: TrustReward = {
+      id: `reward_${Date.now()}`,
+      userId: params.userId,
+      organizationId: params.organizationId,
+      rewardType: params.rewardType,
+      amount: params.amount,
+      reason: params.reason,
+      metadata: null,
+      isClaimed: false,
+      claimedAt: null,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
 
     // Store reward in database
     await prisma.trustReward.create({
