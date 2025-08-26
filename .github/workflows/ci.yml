@@ -71,8 +71,7 @@ jobs:
         working-directory: ./
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
         run: |
           echo "📦 Deploying to Vercel (sck-plattform project)..."
-          npx vercel --prod --yes --token $VERCEL_TOKEN --scope ${{ github.repository_owner }}
+          npx vercel --prod --yes --token $VERCEL_TOKEN
         continue-on-error: true
