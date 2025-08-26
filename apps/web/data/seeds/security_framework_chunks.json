@@ -1,0 +1,272 @@
+[
+  {
+    "id": "iso27001:A.5.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Leadership and commitment",
+    "chunkIndex": 1,
+    "content": "Top management must demonstrate leadership and commitment to the information security management system (ISMS) by assigning roles, ensuring resources, and integrating ISMS requirements into business processes.",
+    "metadata": {"clause":"A.5.1","jurisdiction":"global","tags":["governance","leadership","isms"]}
+  },
+  {
+    "id": "iso27001:A.6.1.2",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Information security roles & responsibilities",
+    "chunkIndex": 2,
+    "content": "Organizations must define, allocate, and communicate information security responsibilities across roles and ensure that individuals understand their duties and necessary competence.",
+    "metadata": {"clause":"A.6.1.2","jurisdiction":"global","tags":["roles","responsibility","training"]}
+  },
+  {
+    "id": "iso27001:A.7.2.2",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Competence and awareness",
+    "chunkIndex": 3,
+    "content": "Employees and contractors must receive training and maintain competence in information security relevant to their role; awareness programs should reduce human risk vectors.",
+    "metadata": {"clause":"A.7.2.2","jurisdiction":"global","tags":["training","awareness","human-risk"]}
+  },
+  {
+    "id": "iso27001:A.8.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Asset management overview",
+    "chunkIndex": 4,
+    "content": "Identify and maintain an inventory of information assets, classify assets by sensitivity, and assign asset owners responsible for protection measures.",
+    "metadata": {"clause":"A.8.1","jurisdiction":"global","tags":["asset-management","classification","ownership"]}
+  },
+  {
+    "id": "iso27001:A.9.4",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Access control policy",
+    "chunkIndex": 5,
+    "content": "Access to systems and data must follow a formal access control policy based on the principle of least privilege and need-to-know; access reviews should be periodic.",
+    "metadata": {"clause":"A.9.4","jurisdiction":"global","tags":["access-control","least-privilege","reviews"]}
+  },
+  {
+    "id": "iso27001:A.12.6.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Technical vulnerability and patch management",
+    "chunkIndex": 6,
+    "content": "Organizations must identify, assess, and remediate technical vulnerabilities promptly, with a documented patch management and change control process for critical systems.",
+    "metadata": {"clause":"A.12.6.1","jurisdiction":"global","tags":["vulnerability-management","patching","change-control"]}
+  },
+  {
+    "id": "iso27001:A.12.4.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Event logging and monitoring",
+    "chunkIndex": 7,
+    "content": "Implement logging and monitoring to detect security events; retain logs for investigations and tie detection to incident response playbooks.",
+    "metadata": {"clause":"A.12.4.1","jurisdiction":"global","tags":["monitoring","logging","forensics"]}
+  },
+  {
+    "id": "iso27001:A.16.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Reporting information security events",
+    "chunkIndex": 8,
+    "content": "Define incident reporting channels and responsibilities; incidents must be recorded, classified, and escalated according to impact and regulatory obligations.",
+    "metadata": {"clause":"A.16.1","jurisdiction":"global","tags":["incident-response","escalation","reporting"]}
+  },
+  {
+    "id": "iso42001:4.1",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "AI management system scope and context",
+    "chunkIndex": 9,
+    "content": "Establish an AI management system scope aligned with organizational objectives, defining AI use-cases, stakeholders, data sources, and governance boundaries for risk management.",
+    "metadata": {"clause":"4.1","jurisdiction":"global","tags":["ai-governance","scope","risk-management"]}
+  },
+  {
+    "id": "iso42001:5.3",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "Roles and responsibilities for AI governance",
+    "chunkIndex": 10,
+    "content": "Assign roles for AI lifecycle oversight (owners, data stewards, model stewards), and ensure accountability for model development, deployment, and monitoring.",
+    "metadata": {"clause":"5.3","jurisdiction":"global","tags":["ai-roles","ownership","model-governance"]}
+  },
+  {
+    "id": "iso42001:6.1",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "AI risk assessment",
+    "chunkIndex": 11,
+    "content": "Perform risk assessments specific to AI systems that consider data bias, model misuse, accuracy, explainability, and potential safety impacts; document mitigations.",
+    "metadata": {"clause":"6.1","jurisdiction":"global","tags":["ai-risk","bias","explainability"]}
+  },
+  {
+    "id": "iso42001:7.5",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "Model validation and testing",
+    "chunkIndex": 12,
+    "content": "Model validation must include performance, fairness, and robustness tests; maintain test datasets and versioned validation reports prior to production deployment.",
+    "metadata": {"clause":"7.5","jurisdiction":"global","tags":["validation","testing","model-versioning"]}
+  },
+  {
+    "id": "soc2:CC1.1",
+    "source": "SOC2_AICPA",
+    "version": "Trust-Criteria",
+    "title": "Control environment & organization",
+    "chunkIndex": 13,
+    "content": "Design and maintain a control environment with documented responsibilities, code of conduct, and governance that support security and privacy objectives.",
+    "metadata": {"clause":"CC1","jurisdiction":"US","tags":["soc2","control-environment","governance"]}
+  },
+  {
+    "id": "soc2:CC6.1",
+    "source": "SOC2_AICPA",
+    "version": "Trust-Criteria",
+    "title": "Change management controls",
+    "chunkIndex": 14,
+    "content": "Change management must ensure authorized, tested, and documented changes with rollback plans and segregation of duties to prevent unauthorized production changes.",
+    "metadata": {"clause":"CC6","jurisdiction":"US","tags":["change-management","segregation-of-duties","testing"]}
+  },
+  {
+    "id": "eu_ai:high_risk_defs",
+    "source": "EU_AI_Act",
+    "version": "regulatory",
+    "title": "High-risk AI systems criteria",
+    "chunkIndex": 15,
+    "content": "The EU AI Act classifies certain AI systems as high-risk (e.g., safety-critical, HR, law enforcement); these require stricter governance, conformity assessments, and documentation.",
+    "metadata": {"clause":"high-risk","jurisdiction":"EU","tags":["eu-ai-act","high-risk","compliance"]}
+  },
+  {
+    "id": "eu_ai:transparency",
+    "source": "EU_AI_Act",
+    "version": "regulatory",
+    "title": "Transparency obligations",
+    "chunkIndex": 16,
+    "content": "Operators must provide meaningful information on system capabilities and limitations; where applicable, provide user-facing transparency and documentation on intended use.",
+    "metadata": {"clause":"transparency","jurisdiction":"EU","tags":["transparency","documentation","user-notice"]}
+  },
+  {
+    "id": "nist:800-53-AC",
+    "source": "NIST_SP_800-53",
+    "version": "control-families",
+    "title": "Access Control family (AC)",
+    "chunkIndex": 17,
+    "content": "Access Control family requires mechanisms for identification, authentication, authorization, session management, and least privilege enforcement across systems.",
+    "metadata": {"clause":"AC","jurisdiction":"US","tags":["nist","access-control","authentication"]}
+  },
+  {
+    "id": "nist:800-53-RA",
+    "source": "NIST_SP_800-53",
+    "version": "control-families",
+    "title": "Risk assessment family (RA)",
+    "chunkIndex": 18,
+    "content": "Risk assessment processes must categorize information systems, identify threats and vulnerabilities, and prioritize mitigations based on impact and likelihood.",
+    "metadata": {"clause":"RA","jurisdiction":"US","tags":["risk-assessment","prioritization","mitigation"]}
+  },
+  {
+    "id": "owasp:top10:injection",
+    "source": "OWASP_TOP10",
+    "version": "guidance",
+    "title": "Injection prevention guidance",
+    "chunkIndex": 19,
+    "content": "Validate and sanitize inputs, use parameterized queries, and enforce strict parsing to prevent injection vulnerabilities (SQL, command, template injections).",
+    "metadata": {"clause":"A1","jurisdiction":"global","tags":["owasp","injection","input-validation"]}
+  },
+  {
+    "id": "owasp:ai-threats",
+    "source": "OWASP_AI",
+    "version": "guidance",
+    "title": "AI-specific threat modeling patterns",
+    "chunkIndex": 20,
+    "content": "Consider prompt injection, model inversion, data poisoning, and adversarial inputs; include mitigations in the SDLC and runtime monitoring for anomalies.",
+    "metadata": {"clause":"ai-threats","jurisdiction":"global","tags":["ai-security","threat-modeling","monitoring"]}
+  },
+  {
+    "id": "iso27001:A.9.2.3",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "User access provisioning and deprovisioning",
+    "chunkIndex": 21,
+    "content": "Implement formal user provisioning/deprovisioning processes, including timely revocation on role change or termination and periodic access certification.",
+    "metadata": {"clause":"A.9.2.3","jurisdiction":"global","tags":["provisioning","deprovisioning","access-reviews"]}
+  },
+  {
+    "id": "iso27001:A.10.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Cryptographic controls",
+    "chunkIndex": 22,
+    "content": "Use well-vetted cryptographic algorithms and key lifecycle management: generation, distribution, rotation, storage, and retirement with documented policies.",
+    "metadata": {"clause":"A.10.1","jurisdiction":"global","tags":["cryptography","key-management","rotation"]}
+  },
+  {
+    "id": "iso42001:8.2",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "Operational monitoring of AI systems",
+    "chunkIndex": 23,
+    "content": "Monitor AI models in production for performance drift, data distribution changes, and safety violations; trigger retraining or mitigation when thresholds are breached.",
+    "metadata": {"clause":"8.2","jurisdiction":"global","tags":["monitoring","drift-detection","retraining"]}
+  },
+  {
+    "id": "eu_ai:data-governance",
+    "source": "EU_AI_Act",
+    "version": "regulatory",
+    "title": "Data quality & governance requirements",
+    "chunkIndex": 24,
+    "content": "High-risk AI systems must ensure data quality, provenance, and documentation of datasets used for training and testing to reduce bias and maintain traceability.",
+    "metadata": {"clause":"data-quality","jurisdiction":"EU","tags":["data-governance","bias","traceability"]}
+  },
+  {
+    "id": "soc2:CC3.1",
+    "source": "SOC2_AICPA",
+    "version": "Trust-Criteria",
+    "title": "System operations and availability",
+    "chunkIndex": 25,
+    "content": "Establish operational procedures, capacity planning, backups and disaster recovery to maintain system availability and meet defined SLA commitments.",
+    "metadata": {"clause":"CC3","jurisdiction":"US","tags":["operations","availability","dr"]}
+  },
+  {
+    "id": "soc2:CC4.1",
+    "source": "SOC2_AICPA",
+    "version": "Trust-Criteria",
+    "title": "System change monitoring",
+    "chunkIndex": 26,
+    "content": "Monitor and log system changes; correlate change events with approvals and deployments to ensure traceability and detect unauthorized changes.",
+    "metadata": {"clause":"CC4","jurisdiction":"US","tags":["change-monitoring","traceability","logging"]}
+  },
+  {
+    "id": "nist:800-171-CI",
+    "source": "NIST_SP_800-171",
+    "version": "controls",
+    "title": "Controlled unclassified information (CUI) protections",
+    "chunkIndex": 27,
+    "content": "Protect sensitive but unclassified information with controls for access, encryption, guarding against exfiltration, and secure handling across supply chains.",
+    "metadata": {"clause":"CUI","jurisdiction":"US","tags":["cui","supply-chain","data-protection"]}
+  },
+  {
+    "id": "owasp:scoring",
+    "source": "OWASP_TOP10",
+    "version": "guidance",
+    "title": "Risk-based prioritization",
+    "chunkIndex": 28,
+    "content": "Use evidence-driven risk scoring to prioritize fixes: impact, exploitability, exposure, and asset criticality drive remediation order and resource allocation.",
+    "metadata": {"clause":"risk-prioritization","jurisdiction":"US","tags":["risk-scoring","prioritization","remediation"]}
+  },
+  {
+    "id": "iso27001:A.11.1",
+    "source": "ISO_IEC_27001",
+    "version": "standard",
+    "title": "Physical and environmental security",
+    "chunkIndex": 29,
+    "content": "Protect physical assets and facilities through controlled entry, environmental protections, and asset location management to prevent unauthorized access and damage.",
+    "metadata": {"clause":"A.11.1","jurisdiction":"global","tags":["physical-security","environmental-controls","asset-protection"]}
+  },
+  {
+    "id": "iso42001:9.1",
+    "source": "ISO_IEC_42001",
+    "version": "AI-Management",
+    "title": "Continual improvement of AI systems",
+    "chunkIndex": 30,
+    "content": "Implement continual improvement processes for AI systems: lessons learned from incidents, model performance reviews, and updates to governance based on outcomes.",
+    "metadata": {"clause":"9.1","jurisdiction":"global","tags":["continuous-improvement","post-incident","model-governance"]}
+  }
+]

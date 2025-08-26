@@ -1,0 +1,45 @@
+{
+  "testSuite": "SCK Security Framework Retrieval Tests",
+  "description": "Test prompts and expected results for RAG system validation",
+  "tests": [
+    {
+      "id": "test-001",
+      "name": "ISO 27001 Key Rotation Requirements",
+      "prompt": "What does ISO 27001 require for key rotation?",
+      "expectedTopResult": "iso27001:A.12.6.1",
+      "expectedSource": "ISO_IEC_27001",
+      "expectedTags": ["vulnerability-management", "patching", "change-control"],
+      "expectedContent": "Organizations must identify, assess, and remediate technical vulnerabilities promptly, with a documented patch management and change control process for critical systems.",
+      "confidenceThreshold": 0.8,
+      "description": "Should retrieve ISO 27001 clause A.12.6.1 about technical vulnerability and patch management"
+    },
+    {
+      "id": "test-002", 
+      "name": "EU AI Act High-Risk Systems",
+      "prompt": "Which AI systems are high-risk under EU rules?",
+      "expectedTopResult": "eu_ai:high_risk_defs",
+      "expectedSource": "EU_AI_Act",
+      "expectedTags": ["eu-ai-act", "high-risk", "compliance"],
+      "expectedContent": "The EU AI Act classifies certain AI systems as high-risk (e.g., safety-critical, HR, law enforcement); these require stricter governance, conformity assessments, and documentation.",
+      "confidenceThreshold": 0.85,
+      "description": "Should retrieve EU AI Act definition of high-risk AI systems"
+    },
+    {
+      "id": "test-003",
+      "name": "SOC2 Change Management Controls",
+      "prompt": "What are the SOC2 requirements for change management?",
+      "expectedTopResult": "soc2:CC6.1",
+      "expectedSource": "SOC2_AICPA",
+      "expectedTags": ["change-management", "segregation-of-duties", "testing"],
+      "expectedContent": "Change management must ensure authorized, tested, and documented changes with rollback plans and segregation of duties to prevent unauthorized production changes.",
+      "confidenceThreshold": 0.8,
+      "description": "Should retrieve SOC2 CC6.1 about change management controls"
+    }
+  ],
+  "metadata": {
+    "totalTests": 3,
+    "frameworksCovered": ["ISO_27001", "EU_AI_Act", "SOC2_AICPA"],
+    "jurisdictions": ["global", "EU", "US"],
+    "tags": ["governance", "compliance", "risk-management", "change-control"]
+  }
+}

@@ -18,6 +18,8 @@
     "db:push": "prisma db push --schema=./prisma/schema.prisma",
     "ai:status": "echo LLM_PROVIDER=$LLM_PROVIDER OLLAMA_HOST=$OLLAMA_HOST",
     "rag:ingest:sample": "tsx scripts/ingest-sample.ts",
+    "rag:ingest:security": "node scripts/ingest-docs/upsert-seed.js",
+    "rag:test:retrieval": "node tests/run-retrieval-tests.js",
     "deploy:supabase": "node scripts/deploy-ai-tables.js",
     "deploy:quick": "node scripts/quick-deploy-ai.js",
     "deploy:production": "node scripts/deploy-to-production.js",
