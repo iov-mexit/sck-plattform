@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
     // Call Policy LLM service
     const policyLlmUrl = process.env.POLICY_LLM_URL || "http://localhost:8080";
-    
+
     const decisionRequest = {
       agentId,
       roleTemplate,
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
     };
 
     console.log(`🤖 Calling Policy LLM for agent ${agentId}...`);
-    
+
     const llmResponse = await fetch(`${policyLlmUrl}/api/v1/ai/decide`, {
       method: "POST",
       headers: {

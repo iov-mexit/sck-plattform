@@ -810,20 +810,6 @@ model TrustMarketplace {
 }
 
 // --- AI MCP Layer ---
-model McpPolicy {
-  id             String   @id @default(cuid())
-  roleTemplateId String
-  environment    String   // prod|staging|dev
-  minTrustLevel  Int      // L1=1, L2=2, L3=3, L4=4, L5=5
-  allowedEndpoints Json   // Array of allowed endpoint patterns
-  constraints     Json    // Time windows, dual control, rate limits
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@index([roleTemplateId, environment])
-  @@index([minTrustLevel])
-}
-
 model AiDecision {
   id                String   @id @default(cuid())
   agentId           String
@@ -848,33 +834,4 @@ model AiDecision {
   @@index([organizationId])
   @@index([createdAt])
   @@index([promptHash])
-}
-
-model KnowledgeDocument {
-  id                String    @id @default(cuid())
-  source            String    // "ISO_27001", "SOC2", "EU_AI_ACT"
-  version           String    // Document version
-  title             String    // Human-readable title
-  content           String    // Full document text
-  chunks            KnowledgeChunk[]
-  metadata          Json      // Source URL, publication date, etc.
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  @@index([source, version])
-}
-
-model KnowledgeChunk {
-  id                String    @id @default(cuid())
-  documentId        String
-  chunkIndex        Int       // Order within document
-  content           String    // Chunk text
-  embedding         Unsupported("vector(1536)") // pgvector embedding
-  metadata          Json      // Section, clause, tags
-  createdAt         DateTime  @default(now())
-  
-  document          KnowledgeDocument @relation(fields: [documentId], references: [id])
-  
-  @@index([documentId, chunkIndex])
-  @@index([embedding vector_cosine_ops]) // Vector similarity search
 }
