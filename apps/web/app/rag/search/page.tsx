@@ -27,19 +27,36 @@ export default function RagSearchPage() {
     setDraft(null);
 
     try {
-      const res = await fetch("/api/v1/rag/search", {
+      console.log("🔍 Searching for:", query);
+      
+      // Try relative path first, fallback to full URL if needed
+      let apiUrl = "/api/v1/rag/search";
+      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        // In production, ensure we have the full URL
+        apiUrl = `${window.location.origin}/api/v1/rag/search`;
+      }
+      
+      console.log("🌐 Using API URL:", apiUrl);
+      
+      const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query }),
       });
 
+      console.log("📡 Response status:", res.status);
       const data = await res.json();
+      console.log("📊 Response data:", data);
+      
       if (Array.isArray(data?.results) && data.results.length > 0) {
+        console.log("✅ Setting results:", data.results.length);
         setResults(data.results);
       } else {
+        console.log("❌ No results array or empty");
         setResultMsg("No results found. Try rephrasing your query.");
       }
     } catch (error) {
+      console.error("💥 Search error:", error);
       setResultMsg("Error searching frameworks. Please try again.");
     }
 
