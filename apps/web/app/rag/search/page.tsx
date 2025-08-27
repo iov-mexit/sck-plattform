@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type RagResult = {
   id: string;
@@ -20,6 +20,21 @@ export default function RagSearchPage() {
   const [draft, setDraft] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log("🔄 Results state changed:", results);
+    console.log("🔄 Results length:", results.length);
+    console.log("🔄 Results array type:", Array.isArray(results));
+  }, [results]);
+
+  useEffect(() => {
+    console.log("🔄 ResultMsg state changed:", resultMsg);
+  }, [resultMsg]);
+
+  useEffect(() => {
+    console.log("🔄 Loading state changed:", loading);
+  }, [loading]);
+
   async function handleSearch() {
     setLoading(true);
     setResults([]);
@@ -27,7 +42,7 @@ export default function RagSearchPage() {
     setDraft(null);
 
     try {
-      console.log("🔍 Searching for:", query);
+      console.log("🔍 Starting search for:", query);
       
       // Try relative path first, fallback to full URL if needed
       let apiUrl = "/api/v1/rag/search";
@@ -37,6 +52,7 @@ export default function RagSearchPage() {
       }
       
       console.log("🌐 Using API URL:", apiUrl);
+      console.log("📤 Request payload:", { query });
       
       const res = await fetch(apiUrl, {
         method: "POST",
@@ -44,23 +60,57 @@ export default function RagSearchPage() {
         body: JSON.stringify({ query }),
       });
 
-      console.log("📡 Response status:", res.status);
-      const data = await res.json();
-      console.log("📊 Response data:", data);
+      console.log("📡 Response received:");
+      console.log("  - Status:", res.status);
+      console.log("  - Status Text:", res.statusText);
+      console.log("  - Headers:", Object.fromEntries(res.headers.entries()));
+      console.log("  - OK:", res.ok);
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+
+      const responseText = await res.text();
+      console.log("📄 Raw response text:", responseText);
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        console.log("📊 Parsed JSON data:", data);
+      } catch (parseError) {
+        console.error("💥 JSON parse error:", parseError);
+        throw new Error(`Failed to parse response: ${parseError.message}`);
+      }
+      
+      console.log("🔍 Data validation:");
+      console.log("  - Has results property:", 'results' in data);
+      console.log("  - Results is array:", Array.isArray(data.results));
+      console.log("  - Results length:", data.results?.length);
+      console.log("  - Full data structure:", data);
       
       if (Array.isArray(data?.results) && data.results.length > 0) {
-        console.log("✅ Setting results:", data.results.length);
+        console.log("✅ Setting results array with", data.results.length, "items");
         setResults(data.results);
+        console.log("✅ Results state updated");
       } else {
-        console.log("❌ No results array or empty");
+        console.log("❌ No valid results array found");
+        console.log("  - data.results:", data.results);
+        console.log("  - Array.isArray(data.results):", Array.isArray(data.results));
+        console.log("  - data.results?.length:", data.results?.length);
         setResultMsg("No results found. Try rephrasing your query.");
       }
     } catch (error) {
-      console.error("💥 Search error:", error);
-      setResultMsg("Error searching frameworks. Please try again.");
+      console.error("💥 Search error occurred:", error);
+      console.error("💥 Error details:", {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      setResultMsg(`Error searching frameworks: ${error.message}`);
+    } finally {
+      console.log("🏁 Search function completed");
+      setLoading(false);
     }
-
-    setLoading(false);
   }
 
   async function handleDraftPolicy() {
