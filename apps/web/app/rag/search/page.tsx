@@ -45,7 +45,7 @@ export default function RagSearchPage() {
       console.log("🔍 Starting search for:", query);
 
       // Try relative path first, fallback to full URL if needed
-      let apiUrl = "/api/rag/search"; // Use advanced RAG system instead of basic v1
+      let apiUrl = "/api/rag/search"; // Use advanced RAG system now that DB is fixed
       if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
         // In production, ensure we have the full URL
         apiUrl = `${window.location.origin}/api/rag/search`;
@@ -58,7 +58,7 @@ export default function RagSearchPage() {
       const res = await fetch(apiUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           query,
           organizationId: null // No org filtering for public search
         }),
@@ -91,10 +91,10 @@ export default function RagSearchPage() {
       console.log("  - Snippets is array:", Array.isArray(data.snippets));
       console.log("  - Snippets length:", data.snippets?.length);
       console.log("  - Full data structure:", data);
-      
+
       if (Array.isArray(data?.snippets) && data.snippets.length > 0) {
         console.log("✅ Setting snippets array with", data.snippets.length, "items");
-        
+
         // Convert advanced RAG format to our UI format
         const convertedResults = data.snippets.map((snippet: any) => ({
           id: snippet.id,
@@ -106,7 +106,7 @@ export default function RagSearchPage() {
             tags: []
           }
         }));
-        
+
         setResults(convertedResults);
         console.log("✅ Results state updated with converted snippets");
       } else {
