@@ -54,14 +54,28 @@ export default function RagSearchPage() {
       console.log("🌐 Using API URL:", apiUrl);
       console.log("📤 Request payload:", { query });
       console.log("📤 Request headers:", { "Content-Type": "application/json" });
-      
+
       // Use GET endpoint with query params since POST seems to have issues
       const getUrl = `${apiUrl}?query=${encodeURIComponent(query)}&topK=5`;
       console.log("🌐 GET URL:", getUrl);
       
+      // Add more headers to match curl behavior
+      const headers = {
+        "Content-Type": "application/json",
+        "User-Agent": "SCK-Frontend/1.0",
+        "Accept": "application/json"
+      };
+      console.log("📤 Request headers:", headers);
+      
+      // Test: Make the exact same request as curl
+      console.log("🧪 Testing exact curl request...");
+      const testRes = await fetch(getUrl, { method: "GET" });
+      const testData = await testRes.text();
+      console.log("🧪 Test response:", testData);
+      
       const res = await fetch(getUrl, {
         method: "GET",
-        headers: { "Content-Type": "application/json" },
+        headers: headers,
       });
 
       console.log("📡 Response received:");
