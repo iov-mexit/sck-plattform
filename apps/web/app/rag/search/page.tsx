@@ -45,37 +45,23 @@ export default function RagSearchPage() {
       console.log("🔍 Starting search for:", query);
 
       // Try relative path first, fallback to full URL if needed
-      let apiUrl = "/api/v1/rag/search";
+      let apiUrl = "/api/rag/search"; // Use advanced RAG system instead of basic v1
       if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
         // In production, ensure we have the full URL
-        apiUrl = `${window.location.origin}/api/v1/rag/search`;
+        apiUrl = `${window.location.origin}/api/rag/search`;
       }
-
-      console.log("🌐 Using API URL:", apiUrl);
+      
+      console.log("🌐 Using Advanced RAG API URL:", apiUrl);
       console.log("📤 Request payload:", { query });
-      console.log("📤 Request headers:", { "Content-Type": "application/json" });
-
-      // Use GET endpoint with query params since POST seems to have issues
-      const getUrl = `${apiUrl}?query=${encodeURIComponent(query)}&topK=5`;
-      console.log("🌐 GET URL:", getUrl);
       
-      // Add more headers to match curl behavior
-      const headers = {
-        "Content-Type": "application/json",
-        "User-Agent": "SCK-Frontend/1.0",
-        "Accept": "application/json"
-      };
-      console.log("📤 Request headers:", headers);
-      
-      // Test: Make the exact same request as curl
-      console.log("🧪 Testing exact curl request...");
-      const testRes = await fetch(getUrl, { method: "GET" });
-      const testData = await testRes.text();
-      console.log("🧪 Test response:", testData);
-      
-      const res = await fetch(getUrl, {
-        method: "GET",
-        headers: headers,
+      // Advanced RAG system expects POST with JSON body
+      const res = await fetch(apiUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          query,
+          organizationId: null // No org filtering for public search
+        }),
       });
 
       console.log("📡 Response received:");
@@ -101,20 +87,33 @@ export default function RagSearchPage() {
       }
 
       console.log("🔍 Data validation:");
-      console.log("  - Has results property:", 'results' in data);
-      console.log("  - Results is array:", Array.isArray(data.results));
-      console.log("  - Results length:", data.results?.length);
+      console.log("  - Has snippets property:", 'snippets' in data);
+      console.log("  - Snippets is array:", Array.isArray(data.snippets));
+      console.log("  - Snippets length:", data.snippets?.length);
       console.log("  - Full data structure:", data);
-
-      if (Array.isArray(data?.results) && data.results.length > 0) {
-        console.log("✅ Setting results array with", data.results.length, "items");
-        setResults(data.results);
-        console.log("✅ Results state updated");
+      
+      if (Array.isArray(data?.snippets) && data.snippets.length > 0) {
+        console.log("✅ Setting snippets array with", data.snippets.length, "items");
+        
+        // Convert advanced RAG format to our UI format
+        const convertedResults = data.snippets.map((snippet: any) => ({
+          id: snippet.id,
+          similarity: 0.85, // Default similarity
+          metadata: {
+            title: `Document ${snippet.documentId}`,
+            source: "Advanced RAG System",
+            content: snippet.content,
+            tags: []
+          }
+        }));
+        
+        setResults(convertedResults);
+        console.log("✅ Results state updated with converted snippets");
       } else {
-        console.log("❌ No valid results array found");
-        console.log("  - data.results:", data.results);
-        console.log("  - Array.isArray(data.results):", Array.isArray(data.results));
-        console.log("  - data.results?.length:", data.results?.length);
+        console.log("❌ No valid snippets array found");
+        console.log("  - data.snippets:", data.snippets);
+        console.log("  - Array.isArray(data.snippets):", Array.isArray(data.snippets));
+        console.log("  - data.snippets?.length:", data.snippets?.length);
         setResultMsg("No results found. Try rephrasing your query.");
       }
     } catch (error) {
