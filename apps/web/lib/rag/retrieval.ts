@@ -1,8 +1,12 @@
-import prisma from "@/lib/database";
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 type RetrievalOptions = {
   query: string;
-  organizationId?: string;
+  organizationId?: string | null;
   maxDocs?: number;
   maxChunks?: number;
 };
@@ -18,89 +22,80 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
   snippets: { id: string; content: string; documentId: string; ordinal: number }[];
   usedMode: "curated" | "lexical" | "vector";
 }> {
-  const maxDocs = opts.maxDocs ?? Number(process.env.RAG_MAX_DOCS ?? 6);
   const maxChunks = opts.maxChunks ?? Number(process.env.RAG_MAX_CHUNKS ?? 20);
-  const useVectors = String(process.env.RAG_VECTORS ?? "false") === "true";
-
-  // 1) Curated snippets first (if any)
+  
   try {
-    const curatedDocs = await prisma.knowledgeDocument.findMany({
-      where: {
-        sourceType: "CURATED",
-        ...(opts.organizationId ? { OR: [{ organizationId: opts.organizationId }, { organizationId: null }] } : {})
-      },
-      take: maxDocs
+    // Use Supabase vector search for semantic similarity
+    const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
+      query_embedding: opts.query, // Supabase will handle embedding generation
+      similarity_threshold: 0.7,
+      match_count: maxChunks
     });
-    
-    if (curatedDocs.length > 0) {
-      const docIds = curatedDocs.map(d => d.id);
-      const curatedChunks = await prisma.knowledgeChunk.findMany({
-        where: { documentId: { in: docIds } },
-        orderBy: { ordinal: "asc" },
-        take: maxChunks
-      });
+
+    if (vectorError) {
+      console.warn('Vector search failed, falling back to lexical:', vectorError);
       
-      if (curatedChunks.length > 0) {
-        const grouped = groupChunksByDoc(curatedChunks);
+      // Fallback to lexical search using Supabase text search
+      const { data: lexicalResults, error: lexicalError } = await supabase
+        .from('knowledge_chunks')
+        .select('id, content, document_id, ordinal')
+        .textSearch('content', opts.query)
+        .limit(maxChunks);
+
+      if (lexicalError) {
+        console.error('Lexical search also failed:', lexicalError);
         return {
-          usedMode: "curated",
-          snippets: curatedChunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
-          citations: Object.entries(grouped).map(([docId, chunks]) => ({
-            documentId: docId,
-            chunkIds: chunks.map(c => c.id)
-          }))
+          usedMode: "lexical",
+          snippets: [],
+          citations: []
         };
       }
-    }
-  } catch (error) {
-    console.error("💥 Error in curated search:", error);
-  }
 
-  // 2) Lexical (fast, default)
-  if (!useVectors) {
-    try {
-      const chunks = await prisma.$queryRawUnsafe<any[]>(`
-        SELECT c.id, c."documentId", c.ordinal, c.content
-        FROM "KnowledgeChunk" c
-        WHERE c.content ILIKE '%' || $1 || '%'
-        ORDER BY c.ordinal ASC
-        LIMIT ${maxChunks};
-      `, opts.query);
-      
-      const grouped = groupChunksByDoc(chunks);
+      // Convert Supabase results to our format
+      const snippets = lexicalResults.map((chunk: any) => ({
+        id: chunk.id,
+        content: chunk.content,
+        documentId: chunk.document_id,
+        ordinal: chunk.ordinal || 0
+      }));
+
+      const grouped = groupChunksByDoc(snippets);
       return {
         usedMode: "lexical",
-        snippets: chunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
-        citations: Object.entries(grouped).map(([docId, rows]) => ({
+        snippets,
+        citations: Object.entries(grouped).map(([docId, chunks]) => ({
           documentId: docId,
-          chunkIds: rows.map((r: any) => r.id)
+          chunkIds: chunks.map(c => c.id)
         }))
       };
-    } catch (error) {
-      console.error("💥 Error in lexical search:", error);
-      throw error;
     }
+
+    // Vector search succeeded
+    const snippets = vectorResults.map((chunk: any) => ({
+      id: chunk.id,
+      content: chunk.content,
+      documentId: chunk.document_id,
+      ordinal: chunk.ordinal || 0
+    }));
+
+    const grouped = groupChunksByDoc(snippets);
+    return {
+      usedMode: "vector",
+      snippets,
+      citations: Object.entries(grouped).map(([docId, chunks]) => ({
+        documentId: docId,
+        chunkIds: chunks.map(c => c.id)
+      }))
+    };
+
+  } catch (error) {
+    console.error('RAG retrieval error:', error);
+    return {
+      usedMode: "lexical",
+      snippets: [],
+      citations: []
+    };
   }
-
-  // 3) Vector (Phase 3 migration will replace; keep stub)
-  // For now, we emulate vector with lexical to keep behavior consistent.
-  const vecChunks = await prisma.$queryRawUnsafe<any[]>(`
-    SELECT c.id, c."documentId", c.ordinal, c.content
-    FROM "KnowledgeChunk" c
-    WHERE c.content ILIKE '%' || $1 || '%'
-    ORDER BY c.ordinal ASC
-    LIMIT ${maxChunks};
-  `, opts.query);
-
-  const groupedVec = groupChunksByDoc(vecChunks);
-  return {
-    usedMode: "vector",
-    snippets: vecChunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
-    citations: Object.entries(groupedVec).map(([docId, rows]) => ({
-      documentId: docId,
-      chunkIds: rows.map((r: any) => r.id)
-    }))
-  };
 }
 
 function groupChunksByDoc<T extends { documentId: string }>(rows: T[]) {

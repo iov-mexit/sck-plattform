@@ -50,10 +50,10 @@ export default function RagSearchPage() {
         // In production, ensure we have the full URL
         apiUrl = `${window.location.origin}/api/rag/search`;
       }
-      
+
       console.log("🌐 Using Advanced RAG API URL:", apiUrl);
       console.log("📤 Request payload:", { query });
-      
+
       // Advanced RAG system expects POST with JSON body
       const res = await fetch(apiUrl, {
         method: "POST",

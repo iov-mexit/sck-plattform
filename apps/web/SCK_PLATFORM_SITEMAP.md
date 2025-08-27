@@ -103,7 +103,7 @@
 - **`POST /api/v1/ai/decide`** - AI decision service
 
 #### RAG (Retrieval-Augmented Generation)
-- **`POST /api/v1/rag/search`** - Search knowledge base
+- **`POST /api/rag/search`** - Advanced RAG search with Supabase
 
 #### Enforcement & OPA
 - **`GET /api/v1/enforcement/bundles/active`** - Active policy bundles
@@ -151,7 +151,7 @@ POST /api/v1/role-agents/[agent_id]/register-ans
 ### 3. RAG Search Testing
 ```bash
 # Test knowledge retrieval
-POST /api/v1/rag/search
+POST /api/rag/search
 {
   "query": "What does ISO 27001 require for key rotation?",
   "limit": 5

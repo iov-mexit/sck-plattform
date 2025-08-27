@@ -27,7 +27,7 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const status = searchParams.get("status") || "pending";
-    
+
     const policies = await prisma.policyDraft.findMany({
       where: { status },
       orderBy: { createdAt: "desc" },
