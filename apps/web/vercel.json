@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": null,
   "installCommand": null,
-  "framework": null,
+  "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_ENVIRONMENT": "production"
