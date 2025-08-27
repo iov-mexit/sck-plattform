@@ -835,3 +835,15 @@ model AiDecision {
   @@index([createdAt])
   @@index([promptHash])
 }
+
+// --- Policy Management ---
+model PolicyDraft {
+  id        String   @id @default(cuid())
+  query     String
+  draft     String
+  status    String   @default("pending") // pending, approved, rejected
+  createdAt DateTime @default(now())
+  
+  @@index([status])
+  @@index([createdAt])
+}
