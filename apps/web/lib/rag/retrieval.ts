@@ -18,16 +18,11 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
   snippets: { id: string; content: string; documentId: string; ordinal: number }[];
   usedMode: "curated" | "lexical" | "vector";
 }> {
-  console.log("🔍 retrieveHybrid called with:", opts);
-  
   const maxDocs = opts.maxDocs ?? Number(process.env.RAG_MAX_DOCS ?? 6);
   const maxChunks = opts.maxChunks ?? Number(process.env.RAG_MAX_CHUNKS ?? 20);
   const useVectors = String(process.env.RAG_VECTORS ?? "false") === "true";
-  
-  console.log("⚙️ Configuration:", { maxDocs, maxChunks, useVectors });
 
   // 1) Curated snippets first (if any)
-  console.log("🔍 Step 1: Checking for curated documents...");
   try {
     const curatedDocs = await prisma.knowledgeDocument.findMany({
       where: {
@@ -37,8 +32,6 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
       take: maxDocs
     });
     
-    console.log("📊 Curated docs found:", curatedDocs.length);
-    
     if (curatedDocs.length > 0) {
       const docIds = curatedDocs.map(d => d.id);
       const curatedChunks = await prisma.knowledgeChunk.findMany({
@@ -47,11 +40,8 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
         take: maxChunks
       });
       
-      console.log("📊 Curated chunks found:", curatedChunks.length);
-      
       if (curatedChunks.length > 0) {
         const grouped = groupChunksByDoc(curatedChunks);
-        console.log("✅ Returning curated results");
         return {
           usedMode: "curated",
           snippets: curatedChunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
@@ -67,11 +57,8 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
   }
 
   // 2) Lexical (fast, default)
-  console.log("🔍 Step 2: Performing lexical search...");
   if (!useVectors) {
     try {
-      console.log("🔍 Executing lexical SQL query for:", opts.query);
-      
       const chunks = await prisma.$queryRawUnsafe<any[]>(`
         SELECT c.id, c."documentId", c.ordinal, c.content
         FROM "KnowledgeChunk" c
@@ -80,10 +67,7 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
         LIMIT ${maxChunks};
       `, opts.query);
       
-      console.log("📊 Lexical search found chunks:", chunks.length);
-      
       const grouped = groupChunksByDoc(chunks);
-      console.log("✅ Returning lexical results");
       return {
         usedMode: "lexical",
         snippets: chunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
@@ -100,7 +84,6 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
 
   // 3) Vector (Phase 3 migration will replace; keep stub)
   // For now, we emulate vector with lexical to keep behavior consistent.
-  console.log("🔍 Step 3: Performing vector search (emulated lexical)...");
   const vecChunks = await prisma.$queryRawUnsafe<any[]>(`
     SELECT c.id, c."documentId", c.ordinal, c.content
     FROM "KnowledgeChunk" c
@@ -109,10 +92,7 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
     LIMIT ${maxChunks};
   `, opts.query);
 
-  console.log("📊 Vector search found chunks:", vecChunks.length);
-
   const groupedVec = groupChunksByDoc(vecChunks);
-  console.log("✅ Returning vector results");
   return {
     usedMode: "vector",
     snippets: vecChunks.map(c => ({ id: c.id, content: c.content, documentId: c.documentId, ordinal: c.ordinal })),
