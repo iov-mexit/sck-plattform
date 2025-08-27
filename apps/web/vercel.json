@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "buildCommand": "yarn build",
-  "installCommand": "yarn install --immutable",
-  "framework": "nextjs",
+  "buildCommand": null,
+  "installCommand": null,
+  "framework": null,
   "outputDirectory": ".next",
   "functions": {
     "app/api/v1/rag/search/route.ts": {
