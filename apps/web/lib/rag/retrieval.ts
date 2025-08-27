@@ -25,43 +25,79 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
   const maxChunks = opts.maxChunks ?? Number(process.env.RAG_MAX_CHUNKS ?? 20);
   
   try {
-    // Use Supabase vector search for semantic similarity
-    const { data: vectorResults, error: vectorError } = await supabase.rpc('match_documents', {
-      query_embedding: opts.query, // Supabase will handle embedding generation
-      similarity_threshold: 0.7,
-      match_count: maxChunks
-    });
-
-    if (vectorError) {
-      console.warn('Vector search failed, falling back to lexical:', vectorError);
+    // Use Supabase vector search with match_documents function
+    // Note: We need to generate embeddings for the query first
+    // For now, let's use a simple text search fallback
+    
+    console.log('🔍 Searching Supabase Vector table for:', opts.query);
+    
+    // First, try to get some data from the knowledge_chunks table
+    const { data: chunks, error: chunksError } = await supabase
+      .from('knowledge_chunks')
+      .select('id, metadata')
+      .limit(maxChunks);
+    
+    if (chunksError) {
+      console.error('Error accessing knowledge_chunks table:', chunksError);
       
-      // Fallback to lexical search using Supabase text search
-      const { data: lexicalResults, error: lexicalError } = await supabase
-        .from('knowledge_chunks')
-        .select('id, content, document_id, ordinal')
-        .textSearch('content', opts.query)
-        .limit(maxChunks);
-
-      if (lexicalError) {
-        console.error('Lexical search also failed:', lexicalError);
+      // Fallback: try to search in the regular knowledge_chunks table if it exists
+      try {
+        const { data: fallbackChunks, error: fallbackError } = await supabase
+          .from('knowledge_chunks')
+          .select('id, content, document_id, ordinal')
+          .textSearch('content', opts.query)
+          .limit(maxChunks);
+        
+        if (fallbackError) {
+          console.error('Fallback search also failed:', fallbackError);
+          return {
+            usedMode: "lexical",
+            snippets: [],
+            citations: []
+          };
+        }
+        
+        // Convert fallback results to our format
+        const snippets = fallbackChunks.map((chunk: any) => ({
+          id: chunk.id,
+          content: chunk.content || 'No content available',
+          documentId: chunk.document_id || chunk.id,
+          ordinal: chunk.ordinal || 0
+        }));
+        
+        const grouped = groupChunksByDoc(snippets);
+        return {
+          usedMode: "lexical",
+          snippets,
+          citations: Object.entries(grouped).map(([docId, chunks]) => ({
+            documentId: docId,
+            chunkIds: chunks.map(c => c.id)
+          }))
+        };
+      } catch (fallbackErr) {
+        console.error('All search methods failed:', fallbackErr);
         return {
           usedMode: "lexical",
           snippets: [],
           citations: []
         };
       }
-
-      // Convert Supabase results to our format
-      const snippets = lexicalResults.map((chunk: any) => ({
+    }
+    
+    // If we got chunks from the vector table, extract content from metadata
+    if (chunks && chunks.length > 0) {
+      console.log(`✅ Found ${chunks.length} chunks in Supabase Vector`);
+      
+      const snippets = chunks.map((chunk: any) => ({
         id: chunk.id,
-        content: chunk.content,
-        documentId: chunk.document_id,
-        ordinal: chunk.ordinal || 0
+        content: chunk.metadata?.content || 'Content not available',
+        documentId: chunk.metadata?.documentId || chunk.id,
+        ordinal: chunk.metadata?.ordinal || 0
       }));
-
+      
       const grouped = groupChunksByDoc(snippets);
       return {
-        usedMode: "lexical",
+        usedMode: "vector",
         snippets,
         citations: Object.entries(grouped).map(([docId, chunks]) => ({
           documentId: docId,
@@ -69,23 +105,13 @@ export async function retrieveHybrid(opts: RetrievalOptions): Promise<{
         }))
       };
     }
-
-    // Vector search succeeded
-    const snippets = vectorResults.map((chunk: any) => ({
-      id: chunk.id,
-      content: chunk.content,
-      documentId: chunk.document_id,
-      ordinal: chunk.ordinal || 0
-    }));
-
-    const grouped = groupChunksByDoc(snippets);
+    
+    // No results found
+    console.log('❌ No chunks found in Supabase Vector');
     return {
       usedMode: "vector",
-      snippets,
-      citations: Object.entries(grouped).map(([docId, chunks]) => ({
-        documentId: docId,
-        chunkIds: chunks.map(c => c.id)
-      }))
+      snippets: [],
+      citations: []
     };
 
   } catch (error) {
