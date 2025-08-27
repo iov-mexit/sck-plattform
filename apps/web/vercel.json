@@ -6,7 +6,9 @@
   "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_ENVIRONMENT": "production",
-    "DATABASE_URL": "postgres://postgres.vqftrdxexmsdvhbbyjff:CPGQ3DOml9iD3QID@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require"
+    "DATABASE_URL": "postgresql://postgres.vqftrdxexmsdvhbbyjff:CPGQ3DOml9iD3QID@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true",
+    "NEXT_PUBLIC_SUPABASE_URL": "https://vqftrdxexmsdvhbbyjff.supabase.co",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZnRyZHhleG1zZHZoYmJ5amZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4NTgwNzUsImV4cCI6MjA3MTQzNDA3NX0.-AMvB0s5UQrAM9d6GKwxPoKJymcCSlymLUGhirTeEWs"
   },
   "headers": [
     {
