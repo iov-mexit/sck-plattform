@@ -2,15 +2,28 @@
 
 import { useState } from "react";
 
+type RagResult = {
+  id: string;
+  similarity: number;
+  metadata: {
+    title?: string;
+    source?: string;
+    content?: string;
+    tags?: string[];
+  };
+};
+
 export default function RagSearchPage() {
   const [query, setQuery] = useState("");
-  const [result, setResult] = useState<string | null>(null);
+  const [results, setResults] = useState<RagResult[]>([]);
+  const [resultMsg, setResultMsg] = useState<string | null>(null);
   const [draft, setDraft] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   async function handleSearch() {
     setLoading(true);
-    setResult(null);
+    setResults([]);
+    setResultMsg(null);
     setDraft(null);
 
     try {
@@ -21,16 +34,15 @@ export default function RagSearchPage() {
       });
 
       const data = await res.json();
-      if (data.results && data.results.length > 0) {
-        const topResult = data.results[0];
-        setResult(`📚 ${topResult.metadata?.title || 'Security Framework Result'}\n\n${topResult.metadata?.content || 'Content not available'}\n\nSimilarity Score: ${(topResult.similarity * 100).toFixed(1)}%`);
+      if (Array.isArray(data?.results) && data.results.length > 0) {
+        setResults(data.results);
       } else {
-        setResult("No results found. Try rephrasing your query.");
+        setResultMsg("No results found. Try rephrasing your query.");
       }
     } catch (error) {
-      setResult("Error searching frameworks. Please try again.");
+      setResultMsg("Error searching frameworks. Please try again.");
     }
-    
+
     setLoading(false);
   }
 
@@ -68,7 +80,8 @@ export default function RagSearchPage() {
       alert("✅ Policy draft submitted for approval");
       // Reset form
       setQuery("");
-      setResult(null);
+      setResults([]);
+      setResultMsg(null);
       setDraft(null);
     } catch (error) {
       alert("❌ Error submitting for approval. Please try again.");
@@ -96,14 +109,32 @@ export default function RagSearchPage() {
           {loading ? "Searching..." : "Search Frameworks"}
         </button>
 
-        {result && (
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold">📖 RAG Result:</h2>
-            <p className="p-3 bg-gray-100 rounded-lg whitespace-pre-wrap">{result}</p>
-          </div>
-        )}
+        <div className="mt-6">
+          <h2 className="text-lg font-semibold mb-2">📖 RAG Result:</h2>
 
-        {result && !draft && (
+          {results.length > 0 ? (
+            <div className="space-y-3">
+              {results.slice(0, 5).map((r) => (
+                <div key={r.id} className="p-3 bg-gray-100 rounded-lg">
+                  <div className="text-sm text-gray-600 mb-1">{r.metadata?.source} • {r.id} • {(r.similarity * 100).toFixed(1)}%</div>
+                  <div className="font-medium">{r.metadata?.title || "Result"}</div>
+                  <div className="text-gray-800 whitespace-pre-wrap">
+                    {r.metadata?.content}
+                  </div>
+                  {r.metadata?.tags?.length ? (
+                    <div className="mt-2 text-xs text-gray-600">
+                      Tags: {r.metadata.tags.join(", ")}
+                    </div>
+                  ) : null}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="p-3 bg-gray-100 rounded-lg">{resultMsg || "No results yet. Try a query."}</p>
+          )}
+        </div>
+
+        {results.length > 0 && !draft && (
           <button
             onClick={handleDraftPolicy}
             className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
