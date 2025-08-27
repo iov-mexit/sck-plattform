@@ -43,21 +43,25 @@ export default function RagSearchPage() {
 
     try {
       console.log("🔍 Starting search for:", query);
-      
+
       // Try relative path first, fallback to full URL if needed
       let apiUrl = "/api/v1/rag/search";
       if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
         // In production, ensure we have the full URL
         apiUrl = `${window.location.origin}/api/v1/rag/search`;
       }
-      
+
       console.log("🌐 Using API URL:", apiUrl);
       console.log("📤 Request payload:", { query });
+      console.log("📤 Request headers:", { "Content-Type": "application/json" });
       
-      const res = await fetch(apiUrl, {
-        method: "POST",
+      // Use GET endpoint with query params since POST seems to have issues
+      const getUrl = `${apiUrl}?query=${encodeURIComponent(query)}&topK=5`;
+      console.log("🌐 GET URL:", getUrl);
+      
+      const res = await fetch(getUrl, {
+        method: "GET",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
       });
 
       console.log("📡 Response received:");
@@ -65,14 +69,14 @@ export default function RagSearchPage() {
       console.log("  - Status Text:", res.statusText);
       console.log("  - Headers:", Object.fromEntries(res.headers.entries()));
       console.log("  - OK:", res.ok);
-      
+
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
 
       const responseText = await res.text();
       console.log("📄 Raw response text:", responseText);
-      
+
       let data;
       try {
         data = JSON.parse(responseText);
@@ -81,13 +85,13 @@ export default function RagSearchPage() {
         console.error("💥 JSON parse error:", parseError);
         throw new Error(`Failed to parse response: ${parseError.message}`);
       }
-      
+
       console.log("🔍 Data validation:");
       console.log("  - Has results property:", 'results' in data);
       console.log("  - Results is array:", Array.isArray(data.results));
       console.log("  - Results length:", data.results?.length);
       console.log("  - Full data structure:", data);
-      
+
       if (Array.isArray(data?.results) && data.results.length > 0) {
         console.log("✅ Setting results array with", data.results.length, "items");
         setResults(data.results);
