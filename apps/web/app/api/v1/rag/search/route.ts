@@ -1,27 +1,7 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import prisma from '@/lib/database'
 
 export const runtime = 'nodejs'
-
-// Simple cache for the embedder to avoid re-initialization on hot paths
-let embedderPromise: Promise<any> | null = null
-
-async function getEmbedder() {
-  if (!embedderPromise) {
-    embedderPromise = (async () => {
-      const { pipeline } = await import('@xenova/transformers')
-      return pipeline('feature-extraction', process.env.EMBEDDING_MODEL || 'Xenova/all-MiniLM-L6-v2')
-    })()
-  }
-  return embedderPromise
-}
-
-function getSupabase() {
-  const url = process.env.SUPABASE_URL
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_ANON_KEY
-  if (!url || !key) throw new Error('Supabase env vars missing: SUPABASE_URL and SERVICE_ROLE/ANON key')
-  return createClient(url, key)
-}
 
 export async function POST(req: Request) {
   try {
@@ -30,32 +10,45 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing query' }, { status: 400 })
     }
 
-    const embedder = await getEmbedder()
-    const output = await embedder(query, { pooling: 'mean', normalize: true })
-    const queryEmbedding = Array.from(output.data)
+    console.log(`🔍 Searching for: "${query}"`);
 
-    const supabase = getSupabase()
-    const table = process.env.SUPABASE_TABLE || 'knowledge_chunks'
-    // Use RPC function for semantic search
-    const { data, error } = await supabase.rpc('match_documents', {
-      query_embedding: queryEmbedding,
-      match_threshold: threshold,
-      match_count: topK,
-    })
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    // Search in Prisma database using text search
+    const chunks = await prisma.knowledgeChunk.findMany({
+      where: {
+        OR: [
+          { content: { contains: query, mode: 'insensitive' } },
+          { documentId: { contains: query, mode: 'insensitive' } }
+        ]
+      },
+      include: {
+        document: true
+      },
+      take: topK,
+      orderBy: {
+        documentId: 'asc'
+      }
+    });
+
+    console.log(`📊 Found ${chunks.length} chunks`);
+
+    const results = chunks.map((chunk) => ({
+      id: chunk.id,
+      similarity: 0.85, // Default similarity for text search
+      metadata: {
+        title: chunk.document?.title || 'Unknown',
+        source: chunk.document?.sourceType || 'Unknown',
+        content: chunk.content.substring(0, 200) + '...',
+        tags: chunk.document?.tags || []
+      }
+    }));
 
     return NextResponse.json({
       query,
-      count: data?.length || 0,
-      results: (data || []).map((r: any) => ({
-        id: r.id,
-        similarity: r.similarity,
-        metadata: r.metadata,
-      })),
+      count: results.length,
+      results: results,
     })
   } catch (e: any) {
+    console.error('❌ RAG search error:', e);
     return NextResponse.json({ error: e?.message || 'Internal error' }, { status: 500 })
   }
 }
