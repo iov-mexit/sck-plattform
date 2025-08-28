@@ -150,7 +150,7 @@ sck_1/
 │       ├── tsconfig.tsbuildinfo
 │       ├── VALIDATION_SUMMARY.md
 │       ├── VALIDATION_SYSTEM.md
-│       ├── vercel.json
+│       ├── 
 │       └── ZOD_VALIDATION.md
 ├── check-duplicates.ts
 ├── clean-duplicates.sh
