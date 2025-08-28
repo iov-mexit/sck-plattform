@@ -1,39 +1,33 @@
 {
-  "name": "sck-monorepo",
+  "name": "sck-plattform",
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@4.0.2",
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0",
-    "yarn": ">=4.0.2"
-  },
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/web"
   ],
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "start": "turbo start",
-    "lint": "turbo run lint",
-    "type-check": "turbo run type-check",
-    "test": "turbo run test",
-    "clean": "turbo run clean",
-    "db:generate": "turbo run db:generate",
-    "db:push": "turbo run db:push",
-    "db:studio": "turbo run db:studio",
+    "dev": "yarn workspace @sck/web dev",
+    "build": "yarn workspace @sck/web build",
+    "start": "yarn workspace @sck/web start",
+    "lint": "yarn workspaces foreach run lint",
+    "generate": "yarn workspaces foreach run generate",
     "vercel-build": "yarn build",
     "vercel-dev": "yarn dev",
     "vercel-start": "yarn start",
     "deploy:vercel": "vercel --prod",
     "deploy:preview": "vercel",
-    "setup:production": "yarn db:generate && yarn build",
+    "setup:production": "yarn generate && yarn build",
     "health:check": "curl -f http://localhost:3000/api/v1/health || exit 1",
     "postinstall": "corepack enable && corepack prepare yarn@4.0.2 --activate"
   },
   "devDependencies": {
     "turbo": "^2.5.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0",
+    "yarn": ">=4.0.2"
   },
   "repository": {
     "type": "git",
