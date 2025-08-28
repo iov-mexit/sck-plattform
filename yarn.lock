@@ -12462,9 +12462,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sck-monorepo@workspace:.":
+"sck-plattform@workspace:.":
   version: 0.0.0-use.local
-  resolution: "sck-monorepo@workspace:."
+  resolution: "sck-plattform@workspace:."
   dependencies:
     turbo: "npm:^2.5.5"
   languageName: unknown
