@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@4.0.2",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0",
+    "yarn": ">=4.0.2"
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
@@ -10,7 +15,7 @@
   "scripts": {
     "dev": "turbo run dev",
     "build": "turbo run build",
-    "start": "turbo run start",
+    "start": "turbo start",
     "lint": "turbo run lint",
     "type-check": "turbo run type-check",
     "test": "turbo run test",
@@ -24,14 +29,11 @@
     "deploy:vercel": "vercel --prod",
     "deploy:preview": "vercel",
     "setup:production": "yarn db:generate && yarn build",
-    "health:check": "curl -f http://localhost:3000/api/v1/health || exit 1"
+    "health:check": "curl -f http://localhost:3000/api/v1/health || exit 1",
+    "postinstall": "corepack enable && corepack prepare yarn@4.0.2 --activate"
   },
   "devDependencies": {
     "turbo": "^2.5.5"
-  },
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=8.0.0"
   },
   "repository": {
     "type": "git",
