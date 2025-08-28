@@ -39,7 +39,7 @@ jobs:
 
       # 5️⃣ Install dependencies at root (workspace-aware, no builds)
       - name: 📦 Install dependencies only
-        run: yarn workspaces focus --all --mode=skip-build
+        run: yarn install --immutable --mode=skip-build
 
       # 6️⃣ Ensure @prisma/client matches schema
       - name: 🔧 Prisma Generate
