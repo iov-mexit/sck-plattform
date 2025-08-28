@@ -30,25 +30,32 @@ jobs:
           corepack prepare yarn@4.0.2 --activate
           echo "✅ Yarn version: $(yarn --version)"
 
-      # 4️⃣ Install dependencies at root (workspace-aware)
+      # 4️⃣ Clear Yarn cache to fix corruption
+      - name: 🧹 Clear Yarn cache
+        run: |
+          yarn cache clean
+          rm -rf ~/.cache/yarn
+          echo "✅ Yarn cache cleared"
+
+      # 5️⃣ Install dependencies at root (workspace-aware)
       - name: 📦 Install Yarn dependencies
         run: yarn install --immutable --immutable-cache --check-cache
 
-      # 5️⃣ Ensure @prisma/client matches schema
+      # 6️⃣ Ensure @prisma/client matches schema
       - name: 🔧 Prisma Generate
         run: yarn workspace @sck/web prisma generate
 
-      # 6️⃣ Install Sharp for Linux platform
+      # 7️⃣ Install Sharp for Linux platform
       - name: 🖼️ Install Sharp (Linux)
         run: |
           cd apps/web
           npm install --platform=linux --arch=x64 sharp
 
-      # 7️⃣ Build Next.js App
+      # 8️⃣ Build Next.js App
       - name: 🔨 Build Next.js
         run: yarn workspace @sck/web build
 
-      # 8️⃣ Deploy to Vercel
+      # 9️⃣ Deploy to Vercel
       - name: 📦 Deploy to Vercel
         run: |
           echo "Deploying @sck/web to Vercel..."
