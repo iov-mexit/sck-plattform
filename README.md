@@ -3,6 +3,7 @@
 > **Trust-based credentialing platform with external signal funneling architecture**
 
 <!-- CI Test: Yarn 4.0.2 fixes - $(date) -->
+<!-- CI Refresh: 2025-01-28 16:45 UTC - Force latest lockfile usage -->
 
 ## 🎯 **Platform Vision**
 
