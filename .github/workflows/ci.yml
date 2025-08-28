@@ -18,11 +18,10 @@ jobs:
       # 1️⃣ Checkout repo
       - uses: actions/checkout@v3
 
-      # 2️⃣ Setup Node.js + Corepack
+      # 2️⃣ Setup Node.js (NO YARN CACHE - let Corepack handle it)
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-          cache: 'yarn'
 
       # 3️⃣ Enable Corepack and set Yarn 4.0.2
       - name: ⚙️ Enable Corepack & Yarn 4
