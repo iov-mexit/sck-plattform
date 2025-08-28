@@ -43,7 +43,9 @@ jobs:
 
       # 6️⃣ Ensure @prisma/client matches schema
       - name: 🔧 Prisma Generate
-        run: yarn workspace @sck/web prisma generate
+        run: |
+          cd apps/web
+          yarn prisma generate
 
       # 7️⃣ Install Sharp for Linux platform
       - name: 🖼️ Install Sharp (Linux)
@@ -53,10 +55,13 @@ jobs:
 
       # 8️⃣ Build Next.js App
       - name: 🔨 Build Next.js
-        run: yarn workspace @sck/web build
+        run: |
+          cd apps/web
+          yarn build
 
       # 9️⃣ Deploy to Vercel
       - name: 📦 Deploy to Vercel
         run: |
           echo "Deploying @sck/web to Vercel..."
-          yarn workspace @sck/web vercel --prod --yes --token $VERCEL_TOKEN
+          cd apps/web
+          yarn vercel --prod --yes --token $VERCEL_TOKEN
