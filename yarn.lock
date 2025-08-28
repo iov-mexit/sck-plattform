@@ -2,7 +2,7 @@ __metadata:
   version: 5
   cacheKey: 2
 
-"framer-motion@npm:^11.0.0, framer-motion@npm:11.18.2":
+"framer-motion@npm:11.18.2":
   version: 11.18.2
   resolution: "framer-motion@npm:11.18.2"
   dependencies:
@@ -34,7 +34,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch@npm:^3.3.2, node-fetch@npm:3.3.2":
+"node-fetch@npm:3.3.2":
   version: 3.3.2
   resolution: "node-fetch@npm:3.3.2"
   dependencies:
