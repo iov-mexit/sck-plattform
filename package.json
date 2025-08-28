@@ -1,10 +1,10 @@
 {
-  "name": "sck-plattform",
   "version": "0.1.0",
   "private": true,
   "packageManager": "yarn@4.0.2",
   "workspaces": [
-    "apps/web"
+    "apps/*",
+    "packages/*"
   ],
   "scripts": {
     "dev": "yarn workspace @sck/web dev",
