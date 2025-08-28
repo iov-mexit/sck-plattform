@@ -277,7 +277,7 @@ export async function POST(request: NextRequest) {
       for (const log of receipt.logs) {
         try {
           const parsedLog = contract.interface.parseLog(log);
-          if (parsedLog && parsedLog.name === 'Transfer' && parsedLog.args.from === ethers.constants.ZeroAddress) {
+          if (parsedLog && parsedLog.name === 'Transfer' && parsedLog.args.from === ethers.ZeroAddress) {
             tokenId = parsedLog.args.tokenId.toString();
             break;
           }
