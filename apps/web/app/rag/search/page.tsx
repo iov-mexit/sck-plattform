@@ -1,243 +1,214 @@
 "use client";
+import { useState } from "react";
 
-import { useState, useEffect } from "react";
-
-type RagResult = {
+interface SearchResult {
   id: string;
-  similarity: number;
-  metadata: {
-    title?: string;
-    source?: string;
-    content?: string;
-    tags?: string[];
-  };
-};
+  framework: string;
+  highlights: string;
+  text_chunk: string;
+  source_url: string;
+  score: number;
+}
 
 export default function RagSearchPage() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<RagResult[]>([]);
-  const [resultMsg, setResultMsg] = useState<string | null>(null);
-  const [draft, setDraft] = useState<string | null>(null);
+  const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
 
-  // Debug logging for state changes
-  useEffect(() => {
-    console.log("🔄 Results state changed:", results);
-    console.log("🔄 Results length:", results.length);
-    console.log("🔄 Results array type:", Array.isArray(results));
-  }, [results]);
+  const handleSearch = async () => {
+    if (!query.trim()) return;
 
-  useEffect(() => {
-    console.log("🔄 ResultMsg state changed:", resultMsg);
-  }, [resultMsg]);
-
-  useEffect(() => {
-    console.log("🔄 Loading state changed:", loading);
-  }, [loading]);
-
-  async function handleSearch() {
     setLoading(true);
     setResults([]);
-    setResultMsg(null);
-    setDraft(null);
+    setMessage(null);
 
     try {
-      console.log("🔍 Starting search for:", query);
-
-      // Try relative path first, fallback to full URL if needed
-      let apiUrl = "/api/rag/search"; // Use advanced RAG system now that DB is fixed
-      if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-        // In production, ensure we have the full URL
-        apiUrl = `${window.location.origin}/api/rag/search`;
-      }
-
-      console.log("🌐 Using Advanced RAG API URL:", apiUrl);
-      console.log("📤 Request payload:", { query });
-
-      // Advanced RAG system expects POST with JSON body
-      const res = await fetch(apiUrl, {
+      const res = await fetch("/api/rag/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          query,
-          organizationId: null // No org filtering for public search
-        }),
+        body: JSON.stringify({ query: query.trim() }),
       });
-
-      console.log("📡 Response received:");
-      console.log("  - Status:", res.status);
-      console.log("  - Status Text:", res.statusText);
-      console.log("  - Headers:", Object.fromEntries(res.headers.entries()));
-      console.log("  - OK:", res.ok);
 
       if (!res.ok) {
         throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       }
 
-      const responseText = await res.text();
-      console.log("📄 Raw response text:", responseText);
+      const data = await res.json();
 
-      let data;
-      try {
-        data = JSON.parse(responseText);
-        console.log("📊 Parsed JSON data:", data);
-      } catch (parseError) {
-        console.error("💥 JSON parse error:", parseError);
-        throw new Error(`Failed to parse response: ${parseError.message}`);
-      }
-
-      console.log("🔍 Data validation:");
-      console.log("  - Has snippets property:", 'snippets' in data);
-      console.log("  - Snippets is array:", Array.isArray(data.snippets));
-      console.log("  - Snippets length:", data.snippets?.length);
-      console.log("  - Full data structure:", data);
-
-      if (Array.isArray(data?.snippets) && data.snippets.length > 0) {
-        console.log("✅ Setting snippets array with", data.snippets.length, "items");
-
-        // Convert advanced RAG format to our UI format
-        const convertedResults = data.snippets.map((snippet: any) => ({
-          id: snippet.id,
-          similarity: 0.85, // Default similarity
-          metadata: {
-            title: `Document ${snippet.documentId}`,
-            source: "Advanced RAG System",
-            content: snippet.content,
-            tags: []
-          }
-        }));
-
-        setResults(convertedResults);
-        console.log("✅ Results state updated with converted snippets");
+      if (data.results && data.results.length > 0) {
+        setResults(data.results);
+        setMessage(`Found ${data.results.length} results using ${data.usedMode} search`);
       } else {
-        console.log("❌ No valid snippets array found");
-        console.log("  - data.snippets:", data.snippets);
-        console.log("  - Array.isArray(data.snippets):", Array.isArray(data.snippets));
-        console.log("  - data.snippets?.length:", data.snippets?.length);
-        setResultMsg("No results found. Try rephrasing your query.");
+        setMessage(data.message || "No results found. Try rephrasing your query.");
       }
-    } catch (error) {
-      console.error("💥 Search error occurred:", error);
-      console.error("💥 Error details:", {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      });
-      setResultMsg(`Error searching frameworks: ${error.message}`);
+    } catch (error: any) {
+      setMessage(`Error: ${error.message}`);
     } finally {
-      console.log("🏁 Search function completed");
       setLoading(false);
     }
-  }
+  };
 
-  async function handleDraftPolicy() {
-    if (!query) return;
-
+  const handleDraftPolicy = async (result: SearchResult) => {
     try {
-      const res = await fetch("/api/v1/ai/policy-draft", {
+      const res = await fetch("/api/ai/policy-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query }),
+        body: JSON.stringify({
+          framework: result.framework,
+          reference: result.text_chunk,
+          source: result.source_url,
+          highlights: result.highlights,
+          query: query
+        }),
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
 
       const data = await res.json();
-      if (data.policy) {
-        setDraft(data.policy);
-      } else {
-        setDraft("No policy draft generated. Please try again.");
-      }
-    } catch (error) {
-      setDraft("Error generating policy draft. Please try again.");
+      setMessage(`✅ Policy draft created! ID: ${data.draftId}`);
+
+      // Clear message after 3 seconds
+      setTimeout(() => setMessage(null), 3000);
+
+    } catch (error: any) {
+      setMessage(`❌ Failed to create policy draft: ${error.message}`);
     }
-  }
+  };
 
-  async function handleSubmitForApproval() {
-    if (!query || !draft) return;
-
-    try {
-      await fetch("/api/v1/policy/submit-approval", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query, draft }),
-      });
-
-      alert("✅ Policy draft submitted for approval");
-      // Reset form
-      setQuery("");
-      setResults([]);
-      setResultMsg(null);
-      setDraft(null);
-    } catch (error) {
-      alert("❌ Error submitting for approval. Please try again.");
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !loading) {
+      handleSearch();
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-2xl p-6">
-        <h1 className="text-2xl font-bold mb-4">🔎 Security Policy RAG Search</h1>
-
-        <textarea
-          className="w-full border rounded-lg p-2 mb-4"
-          rows={3}
-          placeholder="Ask: What does ISO 27001 require for key rotation?"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-
-        <button
-          onClick={handleSearch}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          {loading ? "Searching..." : "Search Frameworks"}
-        </button>
-
-        <div className="mt-6">
-          <h2 className="text-lg font-semibold mb-2">📖 RAG Result:</h2>
-
-          {results.length > 0 ? (
-            <div className="space-y-3">
-              {results.slice(0, 5).map((r) => (
-                <div key={r.id} className="p-3 bg-gray-100 rounded-lg">
-                  <div className="text-sm text-gray-600 mb-1">{r.metadata?.source} • {r.id} • {(r.similarity * 100).toFixed(1)}%</div>
-                  <div className="font-medium">{r.metadata?.title || "Result"}</div>
-                  <div className="text-gray-800 whitespace-pre-wrap">
-                    {r.metadata?.content}
-                  </div>
-                  {r.metadata?.tags?.length ? (
-                    <div className="mt-2 text-xs text-gray-600">
-                      Tags: {r.metadata.tags.join(", ")}
-                    </div>
-                  ) : null}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="p-3 bg-gray-100 rounded-lg">{resultMsg || "No results yet. Try a query."}</p>
-          )}
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+            🔎 Regulatory RAG Search
+          </h1>
+          <p className="text-lg text-gray-600">
+            Search across GDPR, EU AI Act, NIS2, NIST CSF, and OWASP frameworks
+          </p>
         </div>
 
-        {results.length > 0 && !draft && (
-          <button
-            onClick={handleDraftPolicy}
-            className="mt-4 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            ✍️ Draft Policy from Result
-          </button>
+        {/* Search Input */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 mb-8">
+          <div className="flex gap-4">
+            <input
+              type="text"
+              className="flex-1 border-2 border-gray-200 rounded-xl p-4 text-lg focus:border-blue-500 focus:outline-none transition-colors"
+              placeholder="Ask about ISO 27001, GDPR compliance, AI risk assessment..."
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              onKeyPress={handleKeyPress}
+              disabled={loading}
+            />
+            <button
+              onClick={handleSearch}
+              disabled={loading || !query.trim()}
+              className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold text-lg"
+            >
+              {loading ? "🔍 Searching..." : "Search"}
+            </button>
+          </div>
+
+          {/* Search Tips */}
+          <div className="mt-4 text-sm text-gray-500">
+            💡 Try queries like: "GDPR data protection", "EU AI Act compliance", "NIST cybersecurity framework"
+          </div>
+        </div>
+
+        {/* Message Display */}
+        {message && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-blue-800">{message}</p>
+          </div>
         )}
 
-        {draft && (
-          <div className="mt-6">
-            <h2 className="text-lg font-semibold">📝 Draft Policy:</h2>
-            <p className="p-3 bg-yellow-50 rounded-lg whitespace-pre-wrap">{draft}</p>
+        {/* Results */}
+        {results.length > 0 && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-semibold text-gray-900">
+              📖 Search Results ({results.length})
+            </h2>
 
-            <button
-              onClick={handleSubmitForApproval}
-              className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
-            >
-              ✅ Submit for Approval
-            </button>
+            {results.map((result, index) => (
+              <div key={result.id} className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                <div className="p-6">
+                  {/* Header */}
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                        {result.framework}
+                      </span>
+                      <span className="text-sm text-gray-500">
+                        Score: {(result.score * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => handleDraftPolicy(result)}
+                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                    >
+                      ✍️ Draft Policy
+                    </button>
+                  </div>
+
+                  {/* Content */}
+                  <div className="mb-4">
+                    <h3 className="font-medium text-gray-900 mb-2">Content:</h3>
+                    <div className="bg-gray-50 rounded-lg p-4 text-gray-800 whitespace-pre-wrap">
+                      {result.text_chunk}
+                    </div>
+                  </div>
+
+                  {/* Highlights */}
+                  {result.highlights && result.highlights !== result.text_chunk && (
+                    <div className="mb-4">
+                      <h3 className="font-medium text-gray-900 mb-2">Relevant Highlights:</h3>
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-gray-800">
+                        {result.highlights}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Footer */}
+                  <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <a
+                      href={result.source_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-2"
+                    >
+                      🔗 View Source
+                      <span className="text-xs">({result.source_url})</span>
+                    </a>
+                    <span className="text-xs text-gray-500">
+                      Result #{index + 1}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* No Results State */}
+        {!loading && results.length === 0 && query && !message && (
+          <div className="text-center py-12">
+            <div className="text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">No Results Found</h3>
+            <p className="text-gray-600 mb-4">
+              Try rephrasing your query or using different keywords.
+            </p>
+            <div className="text-sm text-gray-500">
+              💡 Example queries: "data protection", "cybersecurity", "AI compliance"
+            </div>
           </div>
         )}
       </div>

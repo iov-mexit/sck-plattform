@@ -1,0 +1,37 @@
+{
+  "name": "sck-rag-ingestion",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "RAG ingestion package for SCK Platform - ingests regulatory frameworks into Supabase",
+  "scripts": {
+    "seed": "ts-node --esm scripts/seed-rag-with-sml.ts",
+    "test": "echo 'No tests yet'",
+    "clean": "rm -rf data/*"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.44.0",
+    "@xenova/transformers": "^2.14.0",
+    "cheerio": "^1.0.0-rc.12",
+    "langchain": "^0.2.14",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5",
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "rag",
+    "supabase",
+    "embeddings",
+    "regulations",
+    "gdpr",
+    "ai-act",
+    "nist",
+    "owasp",
+    "sck"
+  ]
+}

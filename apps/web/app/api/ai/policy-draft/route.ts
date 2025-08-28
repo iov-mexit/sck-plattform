@@ -1,108 +1,96 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { retrieveHybrid } from '@/lib/rag/retrieval';
-import { llmChat } from '@/lib/ai/llm';
-import prisma from '@/lib/database';
-import crypto from 'crypto';
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from '@supabase/supabase-js';
 
-export const runtime = 'nodejs';
+// Initialize Supabase client
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://vqftrdxexmsdvhbbyjff.supabase.co';
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZxZnRyZHhleG1zZHZoYmJ5amZmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU4NTgwNzUsImV4cCI6MjA3MTQzNDA3NX0.-AMvB0s5UQrAM9d6GKwxPoKJymcCSlymLUGhirTeEWs';
 
-const SYSTEM = `You are the Policy Intelligence Agent for Secure Knaight (SCK).
-- OUTPUT JSON ONLY with keys: policyRego, suggestedLoA, rationale, citations.
-- NEVER auto-approve. Always recommend and explain.
-- Incorporate the provided knowledge snippets as citations.
-- Assume LoA scale 1..5 where 5 is highest authority/human oversight.
-`;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const {
-      artifact = { type: 'MCP', id: 'mcp-temp' },
-      organizationId = null,
-      goal = 'Create initial MCP access policy',
-      riskHint = 'medium'
-    } = body;
+    const { framework, reference, source, highlights, query } = body;
 
-    // 1) Retrieve context
-    const query = `${artifact.type} ${goal} ${riskHint}`;
-    const ctx = await retrieveHybrid({ query, organizationId, maxChunks: 5 });
-
-    // 2) Prompt LLM
-    const contextText = ctx.snippets.map((c, i) => `[#${i + 1}] ${c.content.slice(0, 200)}...`).join('\n\n');
-    const user = `Artifact: ${JSON.stringify(artifact)}
-OrganizationId: ${organizationId}
-Goal: ${goal}
-RiskHint: ${riskHint}
-
-Knowledge:
-${contextText}
-
-Return JSON exactly with:
-{
-  "policyRego": "string",
-  "suggestedLoA": number,
-  "rationale": "string",
-  "citations": ["id-or-url", "..."]
-}`;
-
-    const content = await llmChat([
-      { role: 'system', content: SYSTEM },
-      { role: 'user', content: user }
-    ]);
-
-    // 3) Parse model output safely
-    let parsed: any = null;
-    try {
-      // attempt to find JSON block
-      const start = content.indexOf('{');
-      const end = content.lastIndexOf('}');
-      const json = start >= 0 && end > start ? content.slice(start, end + 1) : '{}';
-      parsed = JSON.parse(json);
-    } catch {
-      parsed = { policyRego: '', suggestedLoA: 3, rationale: 'LLM parse fallback', citations: [] };
+    if (!framework || !reference) {
+      return NextResponse.json({
+        error: "Framework and reference are required"
+      }, { status: 400 });
     }
 
-    // 4) Persist recommendation + ledger
-    const rec = await prisma.ai_recommendations.create({
-      data: {
-        organizationId,
-        agentType: 'PolicyIntelligence',
-        inputRef: `${artifact.type}:${artifact.id}`,
-        outputJson: parsed,
-        confidence: 0.6,
-        rationale: parsed.rationale?.slice(0, 1000) || null,
-        citations: Array.isArray(parsed.citations) ? parsed.citations : []
-      }
+    console.log(`📝 Policy draft request:`, {
+      framework,
+      reference: reference.substring(0, 100) + '...',
+      source: source || 'Unknown'
     });
 
-    const payload = {
-      recommendationId: rec.id,
-      artifact,
-      organizationId,
-      output: parsed,
-      knowledgeRefs: ctx.snippets.map(d => d.id)
-    };
-    const payloadHash = crypto.createHash('sha256').update(JSON.stringify(payload)).digest('hex');
+    // Create policy draft record
+    const { data, error } = await supabase
+      .from('policy_drafts')
+      .insert([{
+        framework,
+        reference: reference.substring(0, 1000), // Limit length
+        source: source || 'RAG Search',
+        highlights: highlights || reference.substring(0, 200),
+        query: query || '',
+        status: 'pending',
+        created_at: new Date().toISOString()
+      }])
+      .select();
 
-    await prisma.trustLedgerEvent.create({
-      data: {
-        artifactType: 'AI_RECOMMENDATION',
-        artifactId: `${artifact.type}:${artifact.id}`,
-        action: 'RECOMMENDATION_GENERATED',
-        payload,
-        contentHash: payloadHash,
-        prevHash: null // can thread later
-      }
-    });
+    if (error) {
+      console.error('❌ Failed to store policy draft:', error);
+      return NextResponse.json({
+        error: "Failed to store policy draft",
+        details: error.message
+      }, { status: 500 });
+    }
+
+    console.log(`✅ Policy draft stored successfully:`, data[0]?.id);
 
     return NextResponse.json({
-      ok: true,
-      recommendationId: rec.id,
-      output: parsed,
-      knowledge: ctx.snippets
+      message: "Policy draft stored for approval",
+      draftId: data[0]?.id,
+      status: 'pending',
+      framework,
+      timestamp: new Date().toISOString()
     });
-  } catch (e: any) {
-    console.error('policy-draft error', e);
-    return NextResponse.json({ error: e?.message || 'unknown error' }, { status: 500 });
+
+  } catch (error: any) {
+    console.error("💥 Policy draft API error:", error);
+    return NextResponse.json({
+      error: error.message,
+      message: "Failed to process policy draft request"
+    }, { status: 500 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    // Get all policy drafts (for admin dashboard)
+    const { data, error } = await supabase
+      .from('policy_drafts')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('❌ Failed to fetch policy drafts:', error);
+      return NextResponse.json({
+        error: "Failed to fetch policy drafts",
+        details: error.message
+      }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      drafts: data || [],
+      total: data?.length || 0
+    });
+
+  } catch (error: any) {
+    console.error("💥 Policy draft GET error:", error);
+    return NextResponse.json({
+      error: error.message,
+      message: "Failed to fetch policy drafts"
+    }, { status: 500 });
   }
 }
