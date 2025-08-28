@@ -2,6 +2,8 @@
 
 > **Trust-based credentialing platform with external signal funneling architecture**
 
+<!-- CI Test: Yarn 4.0.2 fixes - $(date) -->
+
 ## 🎯 **Platform Vision**
 
 Knaight is a **security control-plane for AI and distributed compute**, where only ANS-registered Role Agents with sufficient externally-sourced trust can invoke privileged MCP/control endpoints, with auditable and revocable decisions.
