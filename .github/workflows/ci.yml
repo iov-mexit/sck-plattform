@@ -39,7 +39,7 @@ jobs:
 
       # 5️⃣ Install dependencies at root (workspace-aware)
       - name: 📦 Install Yarn dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+        run: yarn install --immutable
 
       # 6️⃣ Ensure @prisma/client matches schema
       - name: 🔧 Prisma Generate
