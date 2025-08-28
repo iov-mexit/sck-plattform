@@ -37,9 +37,9 @@ jobs:
           rm -rf ~/.cache/yarn
           echo "✅ Yarn cache cleared"
 
-      # 5️⃣ Install dependencies at root (workspace-aware)
-      - name: 📦 Install Yarn dependencies
-        run: yarn install --immutable
+      # 5️⃣ Install dependencies at root (workspace-aware, no builds)
+      - name: 📦 Install dependencies only
+        run: yarn workspaces focus --all --mode=skip-build
 
       # 6️⃣ Ensure @prisma/client matches schema
       - name: 🔧 Prisma Generate
