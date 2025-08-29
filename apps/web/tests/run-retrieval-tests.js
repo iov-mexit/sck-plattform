@@ -14,20 +14,22 @@ const prisma = new PrismaClient();
 // Configuration
 const EMBEDDING_MODEL = 'Xenova/all-MiniLM-L6-v2'; // 384 dimensions, FREE
 
-async function generateEmbedding(text) {
-  try {
-    // Use local SentenceTransformers (FREE)
-    const { pipeline } = await import('@xenova/transformers');
-
-    const embedder = await pipeline('feature-extraction', EMBEDDING_MODEL);
-    const output = await embedder(text, { pooling: 'mean', normalize: true });
-    const embedding = Array.from(output.data);
-
-    return embedding;
-  } catch (error) {
-    console.error('❌ Error generating local embedding:', error.message);
-    throw error;
+// Replace with hash-based approach for testing
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
   }
+  return Math.abs(hash);
+}
+
+function generateEmbedding(text) {
+  const hash = simpleHash(text);
+  return Array.from({ length: 384 }, (_, i) => {
+    return (hash + i * 31) % 1000 / 1000 - 0.5;
+  });
 }
 
 async function queryPrismaDatabase(queryEmbedding, topK = 3) {

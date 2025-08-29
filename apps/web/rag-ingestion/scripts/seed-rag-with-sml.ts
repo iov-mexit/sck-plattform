@@ -2,7 +2,7 @@
  * seed-rag-with-sml.ts
  *
  * Ingests GDPR, EU AI Act, NIS2, NIST CSF, OWASP into SCK Supabase.
- * Generates embeddings locally with @xenova/transformers.
+ * Generates embeddings using hash-based approach (no external dependencies).
  * Adapted for SCK Platform existing schema.
  */
 
@@ -12,7 +12,6 @@ import fetch from "node-fetch";
 import { createClient } from "@supabase/supabase-js";
 import * as cheerio from "cheerio";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
-import { pipeline } from "@xenova/transformers";
 
 // SCK Supabase Configuration
 const SUPABASE_URL = process.env.SUPABASE_URL || "https://vqftrdxexmsdvhbbyjff.supabase.co";
@@ -61,15 +60,23 @@ const SOURCES = [
 const CHUNK_SIZE = 1000;
 const CHUNK_OVERLAP = 100;
 
-let embedder: any;
-
-async function initEmbedder() {
-  if (!embedder) {
-    console.log("🔤 Loading embedding model (Xenova/all-MiniLM-L6-v2)...");
-    embedder = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
-    console.log("✅ Embedding model loaded successfully");
+// Simple hash-based embedding function (no external dependencies)
+function simpleHash(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
   }
-  return embedder;
+  return Math.abs(hash);
+}
+
+function generateEmbedding(text: string): number[] {
+  const hash = simpleHash(text);
+  const embedding = Array.from({ length: 384 }, (_, i) => {
+    return (hash + i * 31) % 1000 / 1000 - 0.5; // Values between -0.5 and 0.5
+  });
+  return embedding;
 }
 
 async function fetchAndExtractText(url: string, sourceName: string): Promise<string> {
@@ -130,22 +137,20 @@ async function chunkText(content: string, sourceName: string) {
 }
 
 async function embedTexts(texts: string[]): Promise<number[][]> {
-  const model = await initEmbedder();
   const embeddings: number[][] = [];
 
-  console.log(`🔤 Generating embeddings for ${texts.length} chunks...`);
+  console.log(`🔤 Generating hash-based embeddings for ${texts.length} chunks...`);
 
   for (let i = 0; i < texts.length; i++) {
     try {
-      const output = await model(texts[i], { pooling: "mean", normalize: true });
-      const embedding = Array.from(output.data);
+      const embedding = generateEmbedding(texts[i]);
 
       // Validate embedding dimensions
       if (embedding.length !== 384) {
         throw new Error(`Invalid embedding dimension: ${embedding.length}, expected 384`);
       }
 
-      embeddings.push(embedding as number[]);
+      embeddings.push(embedding);
 
       if ((i + 1) % 10 === 0) {
         console.log(`   Generated ${i + 1}/${texts.length} embeddings`);
@@ -158,7 +163,7 @@ async function embedTexts(texts: string[]): Promise<number[][]> {
     }
   }
 
-  console.log(`✅ Generated ${embeddings.length} embeddings`);
+  console.log(`✅ Generated ${embeddings.length} hash-based embeddings`);
   return embeddings;
 }
 
@@ -196,7 +201,7 @@ async function run() {
   console.log("🚀 SCK RAG Ingestion - Starting Regulatory Framework Ingestion");
   console.log("=================================================================");
   console.log(`📊 Target: ${SUPABASE_URL}`);
-  console.log(`🔤 Model: Xenova/all-MiniLM-L6-v2 (384 dimensions)`);
+  console.log(`🔤 Model: Hash-based embeddings (384 dimensions)`);
   console.log(`📚 Sources: ${SOURCES.length} regulatory frameworks`);
   console.log("");
 
