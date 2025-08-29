@@ -9,9 +9,6 @@ globalThis.jest = {
   resetModules: () => (globalThis as any).vi.resetModules(),
 } as any;
 
-// Basic environment defaults expected by env-validation tests
-process.env.NODE_ENV = process.env.NODE_ENV || 'test';
-
 export { };
 
 
