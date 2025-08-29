@@ -23,6 +23,12 @@ export interface DomainConfig {
   walletRequired: boolean;
   authMethod: 'magic-link' | 'web3';
   isDevelopment: boolean;
+  // Additional flags expected by tests/UI helpers
+  isProduction?: boolean;
+  isOrg?: boolean;
+  isLocal?: boolean;
+  analytics?: boolean;
+  payments?: boolean;
 }
 
 export interface ANSRegistrationPayload {
@@ -64,7 +70,12 @@ export function getDomainConfig(hostname?: string): DomainConfig {
       isANSRegistry: false,
       walletRequired: false,
       authMethod: 'magic-link',
-      isDevelopment: true
+      isDevelopment: true,
+      isProduction: false,
+      isOrg: false,
+      isLocal: true,
+      analytics: false,
+      payments: false
     };
   }
 
@@ -78,7 +89,12 @@ export function getDomainConfig(hostname?: string): DomainConfig {
       isANSRegistry: false,
       walletRequired: false,
       authMethod: 'magic-link',
-      isDevelopment: false
+      isDevelopment: false,
+      isProduction: true,
+      isOrg: false,
+      isLocal: false,
+      analytics: true,
+      payments: true
     };
   }
 
@@ -92,7 +108,12 @@ export function getDomainConfig(hostname?: string): DomainConfig {
       isANSRegistry: false,
       walletRequired: false,
       authMethod: 'magic-link',
-      isDevelopment: false
+      isDevelopment: false,
+      isProduction: true,
+      isOrg: false,
+      isLocal: false,
+      analytics: false,
+      payments: true
     };
   }
 
@@ -106,21 +127,46 @@ export function getDomainConfig(hostname?: string): DomainConfig {
       isANSRegistry: true,
       walletRequired: true,
       authMethod: 'web3',
-      isDevelopment: false
+      isDevelopment: false,
+      isProduction: true,
+      isOrg: false,
+      isLocal: false,
+      analytics: true,
+      payments: true
     };
   }
 
   // Default: SCK Platform
+  const isOrg = host.includes('secure-knaight.org');
+  const isEU = host.includes('secure-knaight.eu');
   return {
     baseUrl: process.env.NEXT_PUBLIC_BASE_URL || `https://${host}`,
     ansRegistry: process.env.NEXT_PUBLIC_ANS_REGISTRY_URL || 'https://knaight.site',
     autoRegisterANS: true,
-    isEU: false,
+    isEU,
     isANSRegistry: false,
     walletRequired: false,
     authMethod: 'magic-link',
-    isDevelopment: false
+    isDevelopment: false,
+    isProduction: true,
+    isOrg,
+    isLocal: false,
+    analytics: !isEU,
+    payments: !isOrg
   };
+}
+
+/**
+ * Derive current primary domain from env or URL
+ */
+export function getCurrentDomain(): string {
+  if (process.env.NEXT_PUBLIC_PRIMARY_DOMAIN) return process.env.NEXT_PUBLIC_PRIMARY_DOMAIN;
+  const base = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+  try {
+    return new URL(base).hostname;
+  } catch {
+    return 'localhost';
+  }
 }
 
 /**
