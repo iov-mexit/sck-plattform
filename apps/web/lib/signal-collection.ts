@@ -128,26 +128,8 @@ export class SignalCollectionService {
         throw new Error(`Digital twin not found: ${validatedData.roleAgentId}`);
       }
 
-      // Create the signal - shape args to match unit tests when running tests
-      const isTest = process.env.NODE_ENV === 'test';
-      const createArgs = isTest ? {
-        data: {
-          type: validatedData.type,
-          title: validatedData.title,
-          description: validatedData.description,
-          value: validatedData.value,
-          source: validatedData.source,
-          verified: validatedData.verified ?? false,
-          metadata: JSON.stringify(validatedData.metadata ?? undefined),
-          roleAgentId: validatedData.roleAgentId,
-          externalId: validatedData.externalId,
-        },
-        include: {
-          roleAgent: {
-            include: { organization: true, roleTemplate: true },
-          },
-        },
-      } : {
+      // Create the signal - always stringify metadata for consistency
+      const createArgs = {
         data: {
           type: validatedData.type,
           title: validatedData.title,
@@ -156,7 +138,7 @@ export class SignalCollectionService {
           source: validatedData.source,
           verified: validatedData.verified ?? false,
           url: validatedData.url,
-          metadata: validatedData.metadata as any,
+          metadata: JSON.stringify(validatedData.metadata ?? {}),
           roleAgentId: validatedData.roleAgentId,
           externalId: validatedData.externalId,
         },
@@ -307,7 +289,7 @@ export class SignalCollectionService {
       where: { id },
       data: {
         verified: data.verified,
-        metadata: process.env.NODE_ENV === 'test' ? JSON.stringify(merged) : (merged as any),
+        metadata: JSON.stringify(merged),
       },
       include: {
         roleAgent: { include: { organization: true, roleTemplate: true } },
