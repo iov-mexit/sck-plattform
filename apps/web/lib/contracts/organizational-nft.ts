@@ -1,4 +1,5 @@
-import { ethers, Log, EventLog } from 'ethers';
+import { ethers } from 'ethers';
+import type { Log, EventLog, TransactionReceipt, Provider } from 'ethers';
 
 // Organizational NFT Contract ABI
 export const ORGANIZATIONAL_NFT_ABI = [
@@ -422,12 +423,12 @@ export interface Achievement {
 export class OrganizationalNFTService {
   private contract: ethers.Contract;
   private signer?: ethers.Signer;
-  private provider: ethers.Provider;
+  private provider: Provider;
 
   constructor(
     contractAddress: string,
     signer?: ethers.Signer,
-    provider?: ethers.Provider
+    provider?: Provider
   ) {
     this.signer = signer;
     this.provider = (provider || signer?.provider)!;

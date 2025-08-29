@@ -214,14 +214,14 @@ export async function POST(request: NextRequest) {
       }
 
       // Connect to Sepolia
-      const provider = new ethers.providers.JsonRpcProvider(rpcUrl);
+      const provider = new ethers.JsonRpcProvider(rpcUrl);
 
       // Test the connection
       try {
         const network = await provider.getNetwork();
         console.log('✅ Connected to network:', network.name, 'Chain ID:', network.chainId.toString());
 
-        if (network.chainId !== 11155111) {
+        if (network.chainId !== 11155111n) {
           throw new Error(`Wrong network. Expected Sepolia (11155111), got ${network.chainId}`);
         }
       } catch (networkError) {
@@ -233,9 +233,9 @@ export async function POST(request: NextRequest) {
 
       // Check wallet balance
       const balance = await provider.getBalance(wallet.address);
-      console.log('💰 Wallet balance:', ethers.utils.formatEther(balance), 'ETH');
+      console.log('💰 Wallet balance:', ethers.formatEther(balance), 'ETH');
 
-      if (balance.isZero()) {
+      if (balance === 0n) {
         throw new Error(`Wallet ${wallet.address} has no ETH for gas fees`);
       }
 

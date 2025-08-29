@@ -34,8 +34,8 @@ export class TrustEconomySystem {
   }): Promise<TrustToken> {
 
     // Generate contract address (in real implementation, this would deploy a smart contract)
-    const contractAddress = ethers.utils.getAddress(
-      ethers.utils.hexlify(ethers.utils.randomBytes(20))
+    const contractAddress = ethers.getAddress(
+      ethers.hexlify(ethers.randomBytes(20))
     );
 
     const trustToken: TrustToken = {
@@ -394,7 +394,7 @@ export class TrustEconomySystem {
     console.log(`Processing ${params.currency} payment of ${params.amount}`);
 
     // Return mock transaction hash
-    return ethers.utils.hexlify(ethers.utils.randomBytes(32));
+    return ethers.hexlify(ethers.randomBytes(32));
   }
 
   /**

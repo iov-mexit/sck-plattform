@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
       agent: {
         id: agent.id,
         name: agent.name,
-        roleTemplate: agent.roleTemplate,
+        roleTemplateId: agent.roleTemplateId,
         trustLevel: agent.level,
         organization: agent.organization.name
       }
@@ -139,7 +139,7 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             name: true,
-            roleTemplate: true,
+            roleTemplateId: true,
             level: true
           }
         },

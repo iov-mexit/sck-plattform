@@ -24,7 +24,7 @@ export async function generateEmbedding(text: string): Promise<number[]> {
       throw new Error(`Invalid embedding dimension: ${embedding.length}, expected 384`);
     }
 
-    return embedding;
+    return embedding as number[];
   } catch (error) {
     console.error('❌ Embedding generation failed:', error);
     throw error;
