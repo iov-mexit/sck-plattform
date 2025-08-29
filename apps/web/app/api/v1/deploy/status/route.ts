@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const status = {
       database: {
         connected: false,
-        error: null
+        error: null as string | null
       },
       seeding: {
         organizations: 0,
