@@ -1,3 +1,26 @@
+import { getEnvironmentConfig } from './env-validation';
+
+export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): boolean {
+  const cfg = getEnvironmentConfig();
+  if (method === 'stripe') return cfg.paymentStrategy === 'stripe';
+  if (method === 'crypto') return cfg.paymentStrategy === 'crypto';
+  if (method === 'ilp') return cfg.paymentStrategy === 'crypto';
+  return false;
+}
+
+export function validatePaymentForDomain(domain: string, method: 'stripe' | 'crypto' | 'ilp'): boolean {
+  // .eu: allow crypto/ilp, disallow stripe
+  if (domain.endsWith('.eu')) {
+    return method !== 'stripe';
+  }
+  // .org: docs-only, disallow all payments
+  if (domain.endsWith('.org')) {
+    return false;
+  }
+  // default (.io or others): allow all
+  return ['stripe', 'crypto', 'ilp'].includes(method);
+}
+
 /**
  * Payment Validation Utility
  * 

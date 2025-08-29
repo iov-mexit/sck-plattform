@@ -2,17 +2,17 @@
 import { z } from 'zod';
 
 const EnvSchema = z.object({
-  NEXT_PUBLIC_BASE_URL: z.string().url({ message: 'BASE_URL must be a valid URL' }),
-  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'production']),
+  NEXT_PUBLIC_BASE_URL: z.string().url({ message: 'BASE_URL must be a valid URL' }).default('http://localhost:3000'),
+  NEXT_PUBLIC_ENVIRONMENT: z.enum(['development', 'production']).default('development'),
   NEXT_PUBLIC_PAYMENT_STRATEGY: z.enum(['stripe', 'crypto', 'none']).default('none'),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().optional(),
   NEXT_PUBLIC_MAGIC_API_KEY: z.string().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_ANALYTICS_ID: z.string().optional(),
-  NEXT_PUBLIC_EU_COMPLIANCE: z.string().optional().transform((v: string | undefined) => v === 'true'),
-  NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: z.string().optional().transform((v: string | undefined) => v === 'true'),
-  NEXT_PUBLIC_DEBUG_MODE: z.string().optional().transform((v: string | undefined) => v === 'true'),
+  NEXT_PUBLIC_EU_COMPLIANCE: z.string().optional().transform((v: string | undefined) => v === 'true').default('false' as any),
+  NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: z.string().optional().transform((v: string | undefined) => v === 'true').default('false' as any),
+  NEXT_PUBLIC_DEBUG_MODE: z.string().optional().transform((v: string | undefined) => v === 'true').default('false' as any),
   NEXT_PUBLIC_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).optional().default('info'),
   NEXT_PUBLIC_VALIDATE_ENVIRONMENT: z.string().optional().transform((v: string | undefined) => v !== 'false'),
 });
@@ -99,7 +99,7 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
       errors.push('CRITICAL: Production cannot run with localhost as base URL');
     }
     if (!config.baseUrl.startsWith('https://')) {
-      warnings.push('Production should use HTTPS base URLs');
+      errors.push('Production URLs must use HTTPS');
     }
   }
 
@@ -110,8 +110,10 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
 
   // Payment strategy check
   if (config.paymentStrategy === 'stripe') {
-    if (!config.stripeKey || config.stripeKey.startsWith('pk_test_your_stripe_key')) {
-      errors.push('Stripe is selected but the publishable key is missing or a placeholder');
+    if (!config.stripeKey) {
+      errors.push('Stripe key is required when payment strategy is "stripe"');
+    } else if (!config.stripeKey.startsWith('pk_')) {
+      errors.push('Invalid Stripe key format. Must start with "pk_"');
     }
   }
 
