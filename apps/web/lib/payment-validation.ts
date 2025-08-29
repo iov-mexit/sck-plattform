@@ -1,5 +1,5 @@
+// Simple helpers required by tests
 import { getEnvironmentConfig } from './env-validation';
-
 export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): boolean {
   const cfg = getEnvironmentConfig();
   if (method === 'stripe') return cfg.paymentStrategy === 'stripe';
@@ -7,17 +7,9 @@ export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): bool
   if (method === 'ilp') return cfg.paymentStrategy === 'crypto';
   return false;
 }
-
 export function validatePaymentForDomain(domain: string, method: 'stripe' | 'crypto' | 'ilp'): boolean {
-  // .eu: allow crypto/ilp, disallow stripe
-  if (domain.endsWith('.eu')) {
-    return method !== 'stripe';
-  }
-  // .org: docs-only, disallow all payments
-  if (domain.endsWith('.org')) {
-    return false;
-  }
-  // default (.io or others): allow all
+  if (domain.endsWith('.eu')) return method !== 'stripe';
+  if (domain.endsWith('.org')) return false;
   return ['stripe', 'crypto', 'ilp'].includes(method);
 }
 
@@ -28,7 +20,7 @@ export function validatePaymentForDomain(domain: string, method: 'stripe' | 'cry
  * for the SCK multi-domain architecture.
  */
 
-import { getEnvironmentConfig } from './env-validation';
+// Extended validation (kept for app usage)
 import { getDomainConfig } from './domains';
 
 export interface PaymentConfig {

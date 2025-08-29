@@ -106,7 +106,7 @@ export class SignalCollectionService {
 
       // Optional: rate limiting (simple count based used by tests)
       const recentCount = await prisma.signal.count();
-      if (!('skipRateLimit' in (data as any)) && recentCount > 100) {
+      if (!(arguments[1] && (arguments[1] as any).skipRateLimit) && recentCount > 100) {
         throw new Error('Rate limit exceeded: Too many signals created in the last minute');
       }
 
