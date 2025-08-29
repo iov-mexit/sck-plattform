@@ -10,10 +10,8 @@ globalThis.jest = {
 } as any;
 
 // Basic environment defaults expected by env-validation tests
-process.env.NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://secure-knaight.io';
-process.env.NEXT_PUBLIC_ENVIRONMENT = process.env.NEXT_PUBLIC_ENVIRONMENT || 'development';
 process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
-export {};
+export { };
 
 
