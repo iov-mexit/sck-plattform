@@ -1,14 +1,13 @@
-import { signalCollection } from '../signal-collection';
+import { signalCollection, SignalSchema, MetadataSchema } from '../signal-collection';
 import { prisma } from '../database';
 import { SignalSchema, MetadataSchema } from '../signal-collection';
 
 // Mock Prisma for testing (Vitest compatible)
 vi.mock('../database', () => {
-  return {
+  const mock = {
     prisma: {
-      role_agents: {
-        findUnique: vi.fn(),
-      },
+      roleAgent: { findUnique: vi.fn() },
+      role_agents: { findUnique: vi.fn() },
       signal: {
         create: vi.fn(),
         findMany: vi.fn(),
@@ -16,11 +15,10 @@ vi.mock('../database', () => {
         update: vi.fn(),
         count: vi.fn(),
       },
-      auditLog: {
-        create: vi.fn(),
-      },
+      auditLog: { create: vi.fn() },
     },
-  };
+  } as any;
+  return { ...mock, default: mock.prisma };
 });
 
 describe('Signal Collection System', () => {
@@ -186,10 +184,10 @@ describe('Signal Collection System', () => {
     };
 
     beforeEach(() => {
-      (prisma.role_agents.findUnique as jest.Mock).mockResolvedValue(mockDigitalTwin);
-      (prisma.signal.create as jest.Mock).mockResolvedValue(mockSignal);
-      (prisma.signal.count as jest.Mock).mockResolvedValue(0);
-      (prisma.auditLog.create as jest.Mock).mockResolvedValue({});
+      (prisma.role_agents.findUnique as any).mockResolvedValue(mockDigitalTwin);
+      (prisma.signal.create as any).mockResolvedValue(mockSignal);
+      (prisma.signal.count as any).mockResolvedValue(0);
+      (prisma.auditLog.create as any).mockResolvedValue({});
     });
 
     it('should create signal with proper metadata serialization', async () => {
@@ -233,7 +231,7 @@ describe('Signal Collection System', () => {
     });
 
     it('should enforce rate limiting', async () => {
-      (prisma.signal.count as jest.Mock).mockResolvedValue(101); // Over limit
+      (prisma.signal.count as any).mockResolvedValue(101); // Over limit
 
       const signalData = {
         type: 'certification' as const,
@@ -248,7 +246,7 @@ describe('Signal Collection System', () => {
     });
 
     it('should skip rate limiting for bulk operations', async () => {
-      (prisma.signal.count as jest.Mock).mockResolvedValue(101); // Over limit
+      (prisma.signal.count as any).mockResolvedValue(101); // Over limit
 
       const signalData = {
         type: 'certification' as const,
@@ -359,7 +357,7 @@ describe('Signal Collection System', () => {
     ];
 
     beforeEach(() => {
-      (prisma.signal.findMany as jest.Mock).mockResolvedValue(mockSignals);
+      (prisma.signal.findMany as any).mockResolvedValue(mockSignals);
     });
 
     it('should parse metadata when retrieving signals', async () => {
@@ -386,7 +384,7 @@ describe('Signal Collection System', () => {
         }
       ];
 
-      (prisma.signal.findMany as jest.Mock).mockResolvedValue(signalsWithoutMetadata);
+      (prisma.signal.findMany as any).mockResolvedValue(signalsWithoutMetadata);
 
       const signals = await signalCollection.getSignalsByDigitalTwin('dt-123');
 
