@@ -22,17 +22,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ⚙️ Setup Node.js & Yarn 4
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
-
+      # ✅ Enable Corepack FIRST (fixes the Yarn 1.x cache issue)
       - name: 🔧 Enable Corepack & Yarn 4.0.2
         run: |
           corepack enable
           corepack prepare yarn@${{ env.YARN_VERSION }} --activate
           yarn --version
+
+      - name: ⚙️ Setup Node.js & Yarn 4
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
 
       - name: ♻️ Cache Yarn Dependencies
         uses: actions/cache@v3
@@ -68,17 +69,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: ⚙️ Setup Node.js & Yarn 4
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
-
+      # ✅ Enable Corepack FIRST (fixes the Yarn 1.x cache issue)
       - name: 🔧 Enable Corepack & Yarn 4.0.2
         run: |
           corepack enable
           corepack prepare yarn@${{ env.YARN_VERSION }} --activate
           yarn --version
+
+      - name: ⚙️ Setup Node.js & Yarn 4
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
 
       - name: ♻️ Cache Yarn Dependencies
         uses: actions/cache@v3
