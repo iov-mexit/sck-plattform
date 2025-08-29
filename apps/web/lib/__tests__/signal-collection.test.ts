@@ -35,7 +35,7 @@ describe('Signal Collection System', () => {
         value: 100,
         source: 'certification_provider' as const,
         verified: true,
-        digitalTwinId: 'dt-123',
+        roleAgentId: 'ra-123',
         metadata: {
           type: 'certification' as const,
           credentialId: 'CISSP-12345',
@@ -57,7 +57,7 @@ describe('Signal Collection System', () => {
         value: 50,
         source: 'manual' as const,
         verified: false,
-        digitalTwinId: 'dt-123',
+        roleAgentId: 'ra-123',
         metadata: {
           type: 'activity' as const,
           duration: 120, // 2 hours
@@ -77,7 +77,7 @@ describe('Signal Collection System', () => {
         type: 'certification' as const,
         title: 'Test Certification',
         source: 'manual' as const,
-        digitalTwinId: 'dt-123',
+        roleAgentId: 'ra-123',
         metadata: {
           type: 'activity' as const, // Wrong type for certification
           duration: 60
@@ -108,7 +108,7 @@ describe('Signal Collection System', () => {
           type,
           title: `Test ${type} signal`,
           source: 'manual' as const,
-          digitalTwinId: 'dt-123',
+          roleAgentId: 'ra-123',
           metadata: {
             type,
             // Add type-specific fields as needed
@@ -165,7 +165,7 @@ describe('Signal Collection System', () => {
 
   describe('Signal Collection Service', () => {
     const mockDigitalTwin = {
-      id: 'dt-123',
+      id: 'ra-123',
       name: 'Test Twin',
       organizationId: 'org-123',
       roleTemplateId: 'role-123'
@@ -195,7 +195,7 @@ describe('Signal Collection System', () => {
         type: 'certification' as const,
         title: 'Test Certification',
         source: 'manual' as const,
-        digitalTwinId: 'dt-123',
+        roleAgentId: 'ra-123',
         metadata: {
           type: 'certification' as const,
           credentialId: 'TEST-123'
@@ -216,11 +216,11 @@ describe('Signal Collection System', () => {
             type: 'certification',
             credentialId: 'TEST-123'
           }),
-          digitalTwinId: 'dt-123',
+          roleAgentId: 'ra-123',
           externalId: undefined,
         },
         include: {
-          digitalTwin: {
+          roleAgent: {
             include: {
               organization: true,
               roleTemplate: true
@@ -237,7 +237,7 @@ describe('Signal Collection System', () => {
         type: 'certification' as const,
         title: 'Test Certification',
         source: 'manual' as const,
-        digitalTwinId: 'dt-123'
+        roleAgentId: 'ra-123'
       };
 
       await expect(signalCollection.createSignal(signalData)).rejects.toThrow(
@@ -252,7 +252,7 @@ describe('Signal Collection System', () => {
         type: 'certification' as const,
         title: 'Test Certification',
         source: 'manual' as const,
-        digitalTwinId: 'dt-123'
+        roleAgentId: 'ra-123'
       };
 
       // Should not throw when skipRateLimit is true
@@ -361,7 +361,7 @@ describe('Signal Collection System', () => {
     });
 
     it('should parse metadata when retrieving signals', async () => {
-      const signals = await signalCollection.getSignalsByDigitalTwin('dt-123');
+      const signals = await signalCollection.getSignalsByRoleAgent('ra-123');
 
       expect(signals).toHaveLength(2);
       expect(signals[0].metadata).toEqual({
@@ -386,7 +386,7 @@ describe('Signal Collection System', () => {
 
       (prisma.signal.findMany as any).mockResolvedValue(signalsWithoutMetadata);
 
-      const signals = await signalCollection.getSignalsByDigitalTwin('dt-123');
+      const signals = await signalCollection.getSignalsByRoleAgent('ra-123');
 
       expect(signals[0].metadata).toBeNull();
     });

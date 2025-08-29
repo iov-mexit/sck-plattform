@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 // Privacy-by-design: Trust validation without PII
 const TrustValidationSchema = z.object({
-  digitalTwinId: z.string().cuid(),
+  roleAgentId: z.string().cuid(),
   roleTitle: z.string().min(1),
   trustScore: z.number().min(0).max(100),
 });
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     // Privacy: Verify role agent exists
     const roleAgent = await prisma.roleAgent.findUnique({
-      where: { id: validatedData.digitalTwinId },
+      where: { id: validatedData.roleAgentId },
       include: {
         organization: {
           select: {
@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     // Update role agent trust score if valid
     if (isValid) {
       await prisma.roleAgent.update({
-        where: { id: validatedData.digitalTwinId },
+        where: { id: validatedData.roleAgentId },
         data: {
           trustScore: validatedData.trustScore,
           isEligibleForMint: true,
@@ -79,7 +79,7 @@ export async function POST(request: Request) {
         id: `audit-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         action: 'validate_trust',
         entity: 'role_agent',
-        entityId: validatedData.digitalTwinId,
+        entityId: validatedData.roleAgentId,
         metadata: {
           roleTitle: validatedData.roleTitle,
           trustScore: validatedData.trustScore,

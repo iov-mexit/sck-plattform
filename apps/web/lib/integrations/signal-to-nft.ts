@@ -84,12 +84,12 @@ export class SignalToNFTIntegration {
   private async getTokenIdForSignal(signal: Signal): Promise<number | null> {
     try {
       // Check if the digital twin exists in the contract
-      const exists = await sckNFTService.doesDIDExist(signal.digitalTwinId);
+      const exists = await sckNFTService.doesDIDExist(signal.roleAgentId);
       if (!exists) {
         return null;
       }
 
-      return await sckNFTService.getTokenIdByDID(signal.digitalTwinId);
+      return await sckNFTService.getTokenIdByDID(signal.roleAgentId);
     } catch (error) {
       console.error('Error getting token ID for signal:', error);
       return null;
@@ -122,7 +122,7 @@ export class SignalToNFTIntegration {
       }
 
       // Check achievement thresholds
-      const signalCount = await signalCollection.getSignalCount(signal.digitalTwinId);
+      const signalCount = await signalCollection.getSignalCount(signal.roleAgentId);
 
       if (signal.type === 'certification' && signalCount < this.config.certificationThreshold) {
         return {
@@ -187,7 +187,7 @@ export class SignalToNFTIntegration {
       url: signal.url,
       value: signal.value,
       timestamp: new Date().toISOString(),
-      signalId: signal.digitalTwinId
+      signalId: signal.roleAgentId
     };
 
     // Add signal-specific metadata
@@ -208,14 +208,14 @@ export class SignalToNFTIntegration {
   /**
    * Get achievement statistics for a digital twin
    */
-  async getAchievementStats(digitalTwinId: string): Promise<{
+  async getAchievementStats(roleAgentId: string): Promise<{
     totalAchievements: number;
     certifications: number;
     activities: number;
     soulboundAchievements: number;
   }> {
     try {
-      const tokenId = await sckNFTService.getTokenIdByDID(digitalTwinId);
+      const tokenId = await sckNFTService.getTokenIdByDID(roleAgentId);
       if (!tokenId) {
         return {
           totalAchievements: 0,
@@ -248,9 +248,9 @@ export class SignalToNFTIntegration {
   /**
    * Check if a digital twin has a specific achievement
    */
-  async hasAchievement(digitalTwinId: string, achievementType: string, title: string): Promise<boolean> {
+  async hasAchievement(roleAgentId: string, achievementType: string, title: string): Promise<boolean> {
     try {
-      const tokenId = await sckNFTService.getTokenIdByDID(digitalTwinId);
+      const tokenId = await sckNFTService.getTokenIdByDID(roleAgentId);
       if (!tokenId) {
         return false;
       }
@@ -272,9 +272,9 @@ export class SignalToNFTIntegration {
   /**
    * Get all achievements for a digital twin
    */
-  async getDigitalTwinAchievements(digitalTwinId: string): Promise<Achievement[]> {
+  async getDigitalTwinAchievements(roleAgentId: string): Promise<Achievement[]> {
     try {
-      const tokenId = await sckNFTService.getTokenIdByDID(digitalTwinId);
+      const tokenId = await sckNFTService.getTokenIdByDID(roleAgentId);
       if (!tokenId) {
         return [];
       }

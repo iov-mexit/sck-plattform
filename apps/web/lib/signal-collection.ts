@@ -71,7 +71,7 @@ export const SignalSchema = z.object({
   verified: z.boolean().optional(),
   externalId: z.string().optional(),
   metadata: MetadataSchema.optional(),
-  digitalTwinId: z.string(),
+  roleAgentId: z.string(),
 }).refine(
   (data) => {
     if (!data.metadata) return true;
@@ -99,10 +99,15 @@ export class SignalCollectionService {
   }
 
   // Create a new signal
-  async createSignal(data: Signal): Promise<unknown> {
+  async createSignal(data: any): Promise<unknown> {
     try {
       // Validate the signal data
-      const validatedData = SignalSchema.parse(data);
+      // Accept legacy digitalTwinId by mapping to roleAgentId
+      const normalized = { ...data };
+      if ((normalized as any).digitalTwinId && !(normalized as any).roleAgentId) {
+        (normalized as any).roleAgentId = (normalized as any).digitalTwinId;
+      }
+      const validatedData = SignalSchema.parse(normalized);
 
       // Optional: rate limiting (simple count based used by tests)
       const recentCount = await prisma.signal.count();
@@ -112,14 +117,14 @@ export class SignalCollectionService {
 
       // Check if role agent exists (name in codebase is roleAgent; tests use role_agents mock)
       const roleAgent = await (prisma as any).roleAgent?.findUnique?.({
-        where: { id: validatedData.digitalTwinId },
+        where: { id: validatedData.roleAgentId },
         include: { organization: true, roleTemplate: true },
       }) ?? await (prisma as any).role_agents?.findUnique?.({
-        where: { id: validatedData.digitalTwinId },
+        where: { id: validatedData.roleAgentId },
       });
 
       if (!roleAgent) {
-        throw new Error(`Role agent not found: ${validatedData.digitalTwinId}`);
+        throw new Error(`Role agent not found: ${validatedData.roleAgentId}`);
       }
 
       // Create the signal - shape args to match unit tests when running tests
@@ -133,11 +138,11 @@ export class SignalCollectionService {
           source: validatedData.source,
           verified: validatedData.verified ?? false,
           metadata: JSON.stringify(validatedData.metadata ?? undefined),
-          digitalTwinId: validatedData.digitalTwinId,
+          roleAgentId: validatedData.roleAgentId,
           externalId: validatedData.externalId,
         },
         include: {
-          digitalTwin: {
+          roleAgent: {
             include: { organization: true, roleTemplate: true },
           },
         },
@@ -151,7 +156,7 @@ export class SignalCollectionService {
           verified: validatedData.verified ?? false,
           url: validatedData.url,
           metadata: validatedData.metadata as any,
-          roleAgentId: validatedData.digitalTwinId,
+          roleAgentId: validatedData.roleAgentId,
           externalId: validatedData.externalId,
         },
         include: {
