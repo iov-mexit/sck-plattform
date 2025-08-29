@@ -48,6 +48,12 @@ export interface ValidationResult {
  * Parses and validates raw .env values using Zod.
  */
 export function getEnvironmentConfig(): EnvironmentConfig {
+  // Provide safe defaults in test environment if not explicitly set by tests
+  if (process.env.NODE_ENV === 'test') {
+    if (!process.env.NEXT_PUBLIC_BASE_URL) process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+    if (!process.env.NEXT_PUBLIC_ENVIRONMENT) process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+  }
+
   const parsed = EnvSchema.safeParse(process.env);
 
   if (!parsed.success) {

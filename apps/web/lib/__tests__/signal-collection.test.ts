@@ -1,6 +1,5 @@
 import { signalCollection, SignalSchema, MetadataSchema } from '../signal-collection';
 import { prisma } from '../database';
-import { SignalSchema, MetadataSchema } from '../signal-collection';
 
 // Mock Prisma for testing (Vitest compatible)
 vi.mock('../database', () => {
