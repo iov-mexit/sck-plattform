@@ -101,12 +101,6 @@ jobs:
       - name: 🔧 Prisma Generate
         run: yarn workspace @sck/web prisma generate
 
-      - name: 🔧 Rebuild Sharp for Linux
-        run: |
-          cd apps/web
-          yarn add --force sharp
-          yarn install --check-files
-
       - name: 🔨 Build Next.js App
         run: yarn workspace @sck/web build
 

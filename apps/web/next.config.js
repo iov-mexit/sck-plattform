@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Use unoptimized images since we removed sharp
+  images: {
+    unoptimized: true,
+  },
   // Exclude dist directories from compilation to prevent duplicate file warnings
   webpack: (config, { isServer }) => {
     config.watchOptions = {
