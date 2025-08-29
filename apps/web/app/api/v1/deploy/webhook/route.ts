@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deploySeed } from '@/scripts/deploy-seed';
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,16 +11,22 @@ export async function POST(request: NextRequest) {
     // Only run seeding for successful deployments
     if (event === 'deployment.success') {
       console.log(`✅ Deployment successful for project: ${project?.name}`);
-      console.log(`🌱 Triggering post-deployment seeding...`);
+      console.log(`🌱 Triggering comprehensive post-deployment seeding...`);
+
+      // Set default seeding configuration for webhook-triggered seeding
+      process.env.SEED_DEMO_DATA = 'true';
+      process.env.SEED_EXTENDED_ORGS = 'false';
+      process.env.SEED_AI_FEATURES = 'false';
 
       // Run comprehensive seeding
-      await deploySeed();
+      const { fullSeed } = require('../../../../../scripts/full-seed.js');
+      await fullSeed();
 
-      console.log('✅ Post-deployment seeding completed successfully');
+      console.log('✅ Post-deployment comprehensive seeding completed successfully');
 
       return NextResponse.json({
         success: true,
-        message: 'Post-deployment seeding completed',
+        message: 'Post-deployment comprehensive seeding completed',
         deployment: deployment?.id,
         project: project?.name,
         event,

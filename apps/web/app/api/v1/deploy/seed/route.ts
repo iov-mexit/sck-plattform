@@ -1,25 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { deploySeed } from '@/scripts/deploy-seed';
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('🌱 Post-deployment seeding triggered via API');
+    console.log('🌱 Post-deployment comprehensive seeding triggered via API');
 
     // Validate request (optional: add authentication/authorization)
     const body = await request.json();
-    const { force = false, organizationId } = body;
+    const {
+      force = false,
+      organizationId,
+      extendedOrgs = false,
+      demoData = true,
+      aiFeatures = false
+    } = body;
+
+    // Set environment variables for seeding configuration
+    if (extendedOrgs) process.env.SEED_EXTENDED_ORGS = 'true';
+    if (demoData) process.env.SEED_DEMO_DATA = 'true';
+    if (aiFeatures) process.env.SEED_AI_FEATURES = 'true';
 
     // Run the comprehensive seeding
-    await deploySeed();
+    const { fullSeed } = require('../../../../../scripts/full-seed.js');
+    await fullSeed();
 
     return NextResponse.json({
       success: true,
-      message: 'Post-deployment seeding completed successfully',
+      message: 'Post-deployment comprehensive seeding completed successfully',
       timestamp: new Date().toISOString(),
       data: {
         seeded: true,
         force,
-        organizationId
+        organizationId,
+        extendedOrgs,
+        demoData,
+        aiFeatures
       }
     });
 

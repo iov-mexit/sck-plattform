@@ -34,7 +34,9 @@
     "deploy:milestone3:direct": "node scripts/deploy-milestone3-direct.js",
     "deploy:production": "node scripts/deploy-production.js",
     "deploy:seed:api": "curl -X POST https://sck-plattform.vercel.app/api/v1/deploy/seed",
-    "deploy:status": "curl https://sck-plattform.vercel.app/api/v1/deploy/status"
+    "deploy:status": "curl https://sck-plattform.vercel.app/api/v1/deploy/status",
+    "seed:full": "node scripts/full-seed.js",
+    "seed:full:extended": "SEED_EXTENDED_ORGS=true SEED_DEMO_DATA=true SEED_AI_FEATURES=true node scripts/full-seed.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
