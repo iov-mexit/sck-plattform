@@ -7,10 +7,26 @@ export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): bool
   if (method === 'ilp') return cfg.paymentStrategy === 'crypto';
   return false;
 }
-export function validatePaymentForDomain(domain: string, method: 'stripe' | 'crypto' | 'ilp'): boolean {
-  if (domain.endsWith('.eu')) return method !== 'stripe';
-  if (domain.endsWith('.org')) return false;
-  return ['stripe', 'crypto', 'ilp'].includes(method);
+export function validatePaymentForDomain(domain: string, paymentMethod: PaymentMethod): boolean {
+  const domainConfig = getDomainConfig(domain);
+
+  // .org domains don't support any payments
+  if (domainConfig.isOrg) {
+    return false;
+  }
+
+  // .eu domains don't support Stripe
+  if (domainConfig.isEU && paymentMethod === 'stripe') {
+    return false;
+  }
+
+  // localhost doesn't support Stripe
+  if (domain === 'localhost' && paymentMethod === 'stripe') {
+    return false;
+  }
+
+  // All other combinations are valid
+  return true;
 }
 
 /**

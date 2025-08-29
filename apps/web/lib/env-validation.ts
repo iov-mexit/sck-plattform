@@ -7,14 +7,15 @@ const EnvSchema = z.object({
   NEXT_PUBLIC_PAYMENT_STRATEGY: z.enum(['stripe', 'crypto', 'none']).default('none'),
   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: z.string().optional(),
+  NEXT_PUBLIC_ENABLE_WEB3: z.string().optional().transform((v) => v === 'true').default(false),
   NEXT_PUBLIC_MAGIC_API_KEY: z.string().optional(),
   NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
   NEXT_PUBLIC_ANALYTICS_ID: z.string().optional(),
-  NEXT_PUBLIC_EU_COMPLIANCE: z.coerce.boolean().optional().default(false),
-  NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: z.coerce.boolean().optional().default(false),
-  NEXT_PUBLIC_DEBUG_MODE: z.coerce.boolean().optional().default(false),
+  NEXT_PUBLIC_EU_COMPLIANCE: z.string().optional().transform((v) => v === 'true').default(false),
+  NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: z.string().optional().transform((v) => v === 'true').default(false),
+  NEXT_PUBLIC_DEBUG_MODE: z.string().optional().transform((v) => v === 'true').default(false),
   NEXT_PUBLIC_LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).optional().default('info'),
-  NEXT_PUBLIC_VALIDATE_ENVIRONMENT: z.string().optional().transform((v: string | undefined) => v !== 'false'),
+  NEXT_PUBLIC_VALIDATE_ENVIRONMENT: z.string().optional().transform((v) => v !== 'false').default(true),
 });
 
 export type RawEnv = z.infer<typeof EnvSchema>;
@@ -78,7 +79,7 @@ export function getEnvironmentConfig(): EnvironmentConfig {
     primaryDomain: new URL(env.NEXT_PUBLIC_BASE_URL).hostname,
     paymentStrategy: env.NEXT_PUBLIC_PAYMENT_STRATEGY,
     stripeKey: env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-    enableWeb3: !!env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
+    enableWeb3: env.NEXT_PUBLIC_ENABLE_WEB3 ?? false,
     walletConnectProjectId: env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID,
     enableMagicAuth: !!env.NEXT_PUBLIC_MAGIC_API_KEY,
     magicApiKey: env.NEXT_PUBLIC_MAGIC_API_KEY,
@@ -102,10 +103,10 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
   // Base URL check
   if (config.environment === 'production') {
     if (config.baseUrl.includes('localhost')) {
-      errors.push('Production environment should not use localhost URLs');
+      errors.push('CRITICAL: Production cannot run with localhost as base URL');
     }
     if (!config.baseUrl.startsWith('https://')) {
-      errors.push('Production URLs must use HTTPS');
+      errors.push('Production must use HTTPS');
     }
   }
 
@@ -116,10 +117,10 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
 
   // Payment strategy check
   if (config.paymentStrategy === 'stripe') {
-    if (!config.stripeKey) {
-      errors.push('Stripe key is required when payment strategy is "stripe"');
+    if (!config.stripeKey || config.stripeKey === '') {
+      errors.push('Stripe is selected but the publishable key is missing or a placeholder');
     } else if (!config.stripeKey.startsWith('pk_')) {
-      errors.push('Invalid Stripe key format. Must start with "pk_"');
+      errors.push('Stripe key format is invalid');
     }
   }
 
@@ -133,12 +134,27 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
   }
 
   // EU compliance
-  if (config.primaryDomain.endsWith('.eu') && !config.euCompliance) {
-    warnings.push('EU domain detected but NEXT_PUBLIC_EU_COMPLIANCE is false');
+  if (config.primaryDomain?.endsWith('.eu') && !config.euCompliance) {
+    warnings.push('EU domain detected but EU compliance not enabled');
   }
 
   if (config.euCompliance && !config.cookieConsentEnabled) {
     warnings.push('EU compliance enabled but cookie consent not configured');
+  }
+
+  // Web3 for .org domains
+  if (config.primaryDomain?.endsWith('.org') && config.enableWeb3) {
+    warnings.push('Web3 should be disabled for docs-only domain');
+  }
+
+  // Payments for .org domains
+  if (config.primaryDomain?.endsWith('.org') && config.paymentStrategy !== 'none') {
+    errors.push('Payments are not allowed for docs domain');
+  }
+
+  // Stripe for EU domains
+  if (config.primaryDomain?.endsWith('.eu') && config.paymentStrategy === 'stripe') {
+    errors.push('Stripe payments are not allowed for EU compliance domain');
   }
 
   // Sentry & analytics

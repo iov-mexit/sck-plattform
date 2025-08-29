@@ -151,7 +151,7 @@ export function getDomainConfig(hostname?: string): DomainConfig {
     isProduction: true,
     isOrg,
     isLocal: false,
-    analytics: !isEU,
+    analytics: !isEU && !isOrg, // .org domains don't support analytics
     payments: !isOrg
   };
 }

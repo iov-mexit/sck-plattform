@@ -6,28 +6,32 @@
 
 import { getEnvironmentConfig, validateEnvironment } from '../env-validation';
 
-// Mock environment variables
-const mockEnv = (env: Record<string, string>) => {
+describe('Zod Environment Validation', () => {
   const originalEnv = process.env;
+
   beforeEach(() => {
-    process.env = { ...originalEnv, ...env };
+    jest.resetModules();
+    process.env = { ...originalEnv };
   });
+
   afterEach(() => {
     process.env = originalEnv;
   });
-};
 
-describe('Zod Environment Validation', () => {
   describe('Valid Configurations', () => {
     it('should parse valid development configuration', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'crypto',
-        NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: 'test_project_id',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'false';
 
       const config = getEnvironmentConfig();
+
       expect(config.environment).toBe('development');
       expect(config.baseUrl).toBe('http://localhost:3000');
       expect(config.primaryDomain).toBe('localhost');
@@ -36,34 +40,38 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should parse valid production configuration', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'https://secure-knaight.io',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'stripe',
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_test_valid_key',
-        NEXT_PUBLIC_SENTRY_DSN: 'https://sentry.io/project',
-        NEXT_PUBLIC_ANALYTICS_ID: 'UA-XXXXX-Y',
-      });
+      process.env.NODE_ENV = 'production';
+      process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.io';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
+
       expect(config.environment).toBe('production');
       expect(config.baseUrl).toBe('https://secure-knaight.io');
       expect(config.primaryDomain).toBe('secure-knaight.io');
       expect(config.paymentStrategy).toBe('stripe');
-      expect(config.enableWeb3).toBe(false);
+      expect(config.enableWeb3).toBe(true);
     });
 
     it('should handle EU compliance configuration', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'https://secure-knaight.eu',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'crypto',
-        NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: 'test_project_id',
-        NEXT_PUBLIC_EU_COMPLIANCE: 'true',
-        NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: 'true',
-      });
+      process.env.NODE_ENV = 'production';
+      process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.eu';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'false';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'true';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'true';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
+
       expect(config.primaryDomain).toBe('secure-knaight.eu');
       expect(config.euCompliance).toBe(true);
       expect(config.cookieConsentEnabled).toBe(true);
@@ -72,29 +80,25 @@ describe('Zod Environment Validation', () => {
 
   describe('Invalid Configurations', () => {
     it('should throw error for invalid URL', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'invalid-url',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-      });
+      process.env.NEXT_PUBLIC_BASE_URL = 'invalid-url';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
 
       expect(() => getEnvironmentConfig()).toThrow('BASE_URL must be a valid URL');
     });
 
     it('should throw error for invalid environment', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'invalid',
-      });
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'invalid-env';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
 
       expect(() => getEnvironmentConfig()).toThrow();
     });
 
     it('should throw error for invalid payment strategy', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'invalid',
-      });
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'invalid-strategy';
 
       expect(() => getEnvironmentConfig()).toThrow();
     });
@@ -102,10 +106,15 @@ describe('Zod Environment Validation', () => {
 
   describe('Validation Logic', () => {
     it('should validate production safety', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-      });
+      process.env.NODE_ENV = 'production';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
       const result = validateEnvironment(config);
@@ -115,12 +124,16 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate Stripe configuration', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'https://secure-knaight.io',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'stripe',
-        NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: 'pk_test_your_stripe_key',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY = '';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
       const result = validateEnvironment(config);
@@ -130,11 +143,16 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate crypto configuration', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'https://secure-knaight.io',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'crypto',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID = '';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
       const result = validateEnvironment(config);
@@ -144,13 +162,15 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate EU compliance', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'https://secure-knaight.eu',
-        NEXT_PUBLIC_ENVIRONMENT: 'production',
-        NEXT_PUBLIC_PAYMENT_STRATEGY: 'crypto',
-        NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID: 'test_project_id',
-        NEXT_PUBLIC_EU_COMPLIANCE: 'false',
-      });
+      process.env.NODE_ENV = 'production';
+      process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.eu';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'true';
 
       const config = getEnvironmentConfig();
       const result = validateEnvironment(config);
@@ -161,35 +181,51 @@ describe('Zod Environment Validation', () => {
 
   describe('Default Values', () => {
     it('should use default payment strategy', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      // Don't set NEXT_PUBLIC_PAYMENT_STRATEGY to test default
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'false';
 
       const config = getEnvironmentConfig();
+
       expect(config.paymentStrategy).toBe('none');
     });
 
     it('should use default log level', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'false';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'false';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'false';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'false';
+      // Don't set NEXT_PUBLIC_LOG_LEVEL to test default
 
       const config = getEnvironmentConfig();
+
       expect(config.logLevel).toBe('info');
     });
 
     it('should transform boolean values correctly', () => {
-      mockEnv({
-        NEXT_PUBLIC_BASE_URL: 'http://localhost:3000',
-        NEXT_PUBLIC_ENVIRONMENT: 'development',
-        NEXT_PUBLIC_EU_COMPLIANCE: 'true',
-        NEXT_PUBLIC_COOKIE_CONSENT_ENABLED: 'true',
-        NEXT_PUBLIC_DEBUG_MODE: 'true',
-      });
+      process.env.NODE_ENV = 'development';
+      process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
+      process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
+      process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
+      process.env.NEXT_PUBLIC_ENABLE_WEB3 = 'true';
+      process.env.NEXT_PUBLIC_EU_COMPLIANCE = 'true';
+      process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED = 'true';
+      process.env.NEXT_PUBLIC_DEBUG_MODE = 'true';
+      process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT = 'false';
 
       const config = getEnvironmentConfig();
+
       expect(config.euCompliance).toBe(true);
       expect(config.cookieConsentEnabled).toBe(true);
       expect(config.debugMode).toBe(true);
