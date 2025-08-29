@@ -2,12 +2,17 @@
   "name": "@sck/web",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "seed": "tsx seed-comprehensive-26.ts"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:clean": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && next dev -p 3000",
     "dev:force": "./scripts/start-dev.sh",
     "dev:ready": "npm run check:db && npm run prisma:generate && npm run dev",
     "build": "next build",
+    "postbuild": "node scripts/deploy-seed.js",
+    "deploy:seed": "node scripts/deploy-seed.js",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -30,7 +35,8 @@
     "deploy:phase1-2-bridge": "node scripts/deploy-phase1-2-bridge.js",
     "deploy:phase2": "node scripts/deploy-phase2-to-supabase.js",
     "deploy:milestone3": "node scripts/deploy-milestone3-to-supabase.js",
-    "deploy:milestone3:direct": "node scripts/deploy-milestone3-direct.js"
+    "deploy:milestone3:direct": "node scripts/deploy-milestone3-direct.js",
+    "deploy:production": "node scripts/deploy-production.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",

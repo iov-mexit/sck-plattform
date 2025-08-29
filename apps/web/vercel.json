@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "buildCommand": null,
-  "installCommand": null,
+  "buildCommand": "npm run prisma:generate && npm run build && npm run deploy:seed",
+  "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
   "env": {
