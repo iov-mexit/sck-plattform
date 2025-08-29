@@ -2,16 +2,12 @@
   "name": "@sck/web",
   "version": "0.1.0",
   "private": true,
-  "prisma": {
-    "seed": "tsx seed-comprehensive-26.ts"
-  },
   "scripts": {
     "dev": "next dev -p 3000",
     "dev:clean": "lsof -ti:3000 | xargs kill -9 2>/dev/null || true && next dev -p 3000",
     "dev:force": "./scripts/start-dev.sh",
     "dev:ready": "npm run check:db && npm run prisma:generate && npm run dev",
     "build": "next build",
-    "postbuild": "node scripts/deploy-seed.js",
     "deploy:seed": "node scripts/deploy-seed.js",
     "start": "next start",
     "lint": "next lint",
