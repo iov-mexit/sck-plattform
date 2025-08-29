@@ -1,7 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Completely disable images to prevent sharp loading
-  images: false,
   // Exclude dist directories from compilation to prevent duplicate file warnings
   webpack: (config, { isServer }) => {
     config.watchOptions = {
