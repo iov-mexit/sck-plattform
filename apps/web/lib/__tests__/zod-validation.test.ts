@@ -10,8 +10,17 @@ describe('Zod Environment Validation', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
-    jest.resetModules();
-    process.env = { ...originalEnv };
+    // Reset environment variables before each test
+    delete process.env.NEXT_PUBLIC_BASE_URL;
+    delete process.env.NEXT_PUBLIC_ENVIRONMENT;
+    delete process.env.NEXT_PUBLIC_PAYMENT_STRATEGY;
+    delete process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY;
+    delete process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+    delete process.env.NEXT_PUBLIC_ENABLE_WEB3;
+    delete process.env.NEXT_PUBLIC_EU_COMPLIANCE;
+    delete process.env.NEXT_PUBLIC_COOKIE_CONSENT_ENABLED;
+    delete process.env.NEXT_PUBLIC_DEBUG_MODE;
+    delete process.env.NEXT_PUBLIC_VALIDATE_ENVIRONMENT;
   });
 
   afterEach(() => {
@@ -20,7 +29,6 @@ describe('Zod Environment Validation', () => {
 
   describe('Valid Configurations', () => {
     it('should parse valid development configuration', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
@@ -40,7 +48,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should parse valid production configuration', () => {
-      process.env.NODE_ENV = 'production';
       process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.io';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
@@ -60,7 +67,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should handle EU compliance configuration', () => {
-      process.env.NODE_ENV = 'production';
       process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.eu';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
@@ -106,7 +112,6 @@ describe('Zod Environment Validation', () => {
 
   describe('Validation Logic', () => {
     it('should validate production safety', () => {
-      process.env.NODE_ENV = 'production';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
@@ -124,7 +129,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate Stripe configuration', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'stripe';
@@ -143,7 +147,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate crypto configuration', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
@@ -162,7 +165,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should validate EU compliance', () => {
-      process.env.NODE_ENV = 'production';
       process.env.NEXT_PUBLIC_BASE_URL = 'https://secure-knaight.eu';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'production';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
@@ -181,7 +183,6 @@ describe('Zod Environment Validation', () => {
 
   describe('Default Values', () => {
     it('should use default payment strategy', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       // Don't set NEXT_PUBLIC_PAYMENT_STRATEGY to test default
@@ -197,7 +198,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should use default log level', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';
@@ -214,7 +214,6 @@ describe('Zod Environment Validation', () => {
     });
 
     it('should transform boolean values correctly', () => {
-      process.env.NODE_ENV = 'development';
       process.env.NEXT_PUBLIC_BASE_URL = 'http://localhost:3000';
       process.env.NEXT_PUBLIC_ENVIRONMENT = 'development';
       process.env.NEXT_PUBLIC_PAYMENT_STRATEGY = 'crypto';

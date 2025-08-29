@@ -1,6 +1,9 @@
 // Simple helpers required by tests
 import { getEnvironmentConfig } from './env-validation';
-export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): boolean {
+
+export type PaymentMethod = 'stripe' | 'crypto' | 'ilp';
+
+export function supportsPaymentMethod(method: PaymentMethod): boolean {
   const cfg = getEnvironmentConfig();
   if (method === 'stripe') return cfg.paymentStrategy === 'stripe';
   if (method === 'crypto') return cfg.paymentStrategy === 'crypto';
