@@ -123,10 +123,7 @@ export function validatePaymentConfig(): PaymentValidation {
 /**
  * Check if a specific payment method is supported
  */
-export function supportsPaymentMethod(method: 'stripe' | 'crypto' | 'ilp'): boolean {
-  const validation = validatePaymentConfig();
-  return validation.supportedMethods.includes(method);
-}
+// consolidated: defined once at top of file
 
 /**
  * Get payment method configuration for UI
@@ -161,27 +158,7 @@ export function getPaymentMethodConfig() {
 /**
  * Validate payment for a specific domain
  */
-export function validatePaymentForDomain(domain: string, paymentMethod: 'stripe' | 'crypto' | 'ilp'): boolean {
-  // Domain-specific rules
-  if (domain === 'secure-knaight.eu') {
-    return paymentMethod === 'crypto' || paymentMethod === 'ilp';
-  }
-
-  if (domain === 'secure-knaight.org') {
-    return false; // No payments on docs domain
-  }
-
-  if (domain === 'secure-knaight.io') {
-    return true; // All payment methods allowed
-  }
-
-  // Local development
-  if (domain.includes('localhost') || domain.includes('127.0.0.1')) {
-    return paymentMethod === 'crypto' || paymentMethod === 'ilp'; // No Stripe in dev
-  }
-
-  return false;
-}
+// consolidated: defined once at top of file
 
 /**
  * Get payment error messages for UI
