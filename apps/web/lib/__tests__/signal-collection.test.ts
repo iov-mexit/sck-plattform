@@ -103,16 +103,18 @@ describe('Signal Collection System', () => {
       ] as const;
 
       signalTypes.forEach(type => {
-        const signal = {
+        const base: any = {
           type,
           title: `Test ${type} signal`,
           source: 'manual' as const,
           roleAgentId: 'ra-123',
-          metadata: {
-            type,
-            // Add type-specific fields as needed
-          }
         };
+        const meta: any = { type };
+        if (type === 'certification') meta.credentialId = 'ID-1';
+        if (type === 'activity') meta.duration = 1;
+        if (type === 'security_incident') meta.severity = 'low';
+        if (type === 'audit') meta.auditType = 'internal';
+        const signal = { ...base, metadata: meta };
 
         const result = SignalSchema.safeParse(signal);
         expect(result.success).toBe(true);
@@ -291,7 +293,7 @@ describe('Signal Collection System', () => {
           })
         },
         include: {
-          digitalTwin: {
+          roleAgent: {
             include: {
               organization: true,
               roleTemplate: true

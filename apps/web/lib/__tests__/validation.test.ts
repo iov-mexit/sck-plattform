@@ -5,15 +5,13 @@
  */
 
 import { validateEnvironment, getEnvironmentConfig } from '../env-validation';
-import { validatePaymentConfig, supportsPaymentMethod } from '../payment-validation';
+import { validatePaymentConfig, supportsPaymentMethod, validatePaymentForDomain } from '../payment-validation';
 import { getCurrentDomain, getDomainConfig } from '../domains';
 
 // Mock environment variables
 const mockEnv = (env: Record<string, string>) => {
   const originalEnv = process.env;
-  beforeEach(() => {
-    process.env = { ...originalEnv, ...env };
-  });
+  process.env = { ...originalEnv, ...env } as NodeJS.ProcessEnv;
   afterEach(() => {
     process.env = originalEnv;
   });

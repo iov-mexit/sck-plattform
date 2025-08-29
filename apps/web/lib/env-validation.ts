@@ -102,7 +102,7 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
   // Base URL check
   if (config.environment === 'production') {
     if (config.baseUrl.includes('localhost')) {
-      errors.push('CRITICAL: Production cannot run with localhost as base URL');
+      errors.push('Production environment should not use localhost URLs');
     }
     if (!config.baseUrl.startsWith('https://')) {
       errors.push('Production URLs must use HTTPS');
@@ -134,7 +134,7 @@ export function validateEnvironment(config: EnvironmentConfig): ValidationResult
 
   // EU compliance
   if (config.primaryDomain.endsWith('.eu') && !config.euCompliance) {
-    warnings.push('EU domain detected but EU compliance not enabled');
+    warnings.push('EU domain detected but NEXT_PUBLIC_EU_COMPLIANCE is false');
   }
 
   if (config.euCompliance && !config.cookieConsentEnabled) {
