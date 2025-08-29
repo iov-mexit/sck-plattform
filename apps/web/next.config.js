@@ -1,14 +1,23 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Use unoptimized images since we removed sharp
+  // Completely disable image optimization to avoid sharp
   images: {
     unoptimized: true,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
   },
   // Exclude dist directories from compilation to prevent duplicate file warnings
   webpack: (config, { isServer }) => {
     config.watchOptions = {
       ignored: ['**/node_modules/**', '**/dist/**', '**/.next/**']
     };
+    
+    // Force sharp to be ignored in webpack
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      sharp: false,
+    };
+    
     return config;
   },
   // Exclude packages from transpilation
