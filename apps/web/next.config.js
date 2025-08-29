@@ -1,11 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Completely disable image optimization to avoid sharp
-  images: {
-    unoptimized: true,
-    dangerouslyAllowSVG: true,
-    contentDispositionType: 'attachment',
-  },
+  // Completely disable images to prevent sharp loading
+  images: false,
   // Exclude dist directories from compilation to prevent duplicate file warnings
   webpack: (config, { isServer }) => {
     config.watchOptions = {
@@ -17,6 +13,12 @@ const nextConfig = {
       ...config.resolve.alias,
       sharp: false,
     };
+    
+    // Exclude sharp from being processed
+    config.externals = config.externals || [];
+    if (isServer) {
+      config.externals.push('sharp');
+    }
     
     return config;
   },
