@@ -2,28 +2,30 @@ import { signalCollection } from '../signal-collection';
 import { prisma } from '../database';
 import { SignalSchema, MetadataSchema } from '../signal-collection';
 
-// Mock Prisma for testing
-jest.mock('../database', () => ({
-  prisma: {
-    role_agents: {
-      findUnique: jest.fn(),
+// Mock Prisma for testing (Vitest compatible)
+vi.mock('../database', () => {
+  return {
+    prisma: {
+      role_agents: {
+        findUnique: vi.fn(),
+      },
+      signal: {
+        create: vi.fn(),
+        findMany: vi.fn(),
+        findUnique: vi.fn(),
+        update: vi.fn(),
+        count: vi.fn(),
+      },
+      auditLog: {
+        create: vi.fn(),
+      },
     },
-    signal: {
-      create: jest.fn(),
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
-      count: jest.fn(),
-    },
-    auditLog: {
-      create: jest.fn(),
-    },
-  },
-}));
+  };
+});
 
 describe('Signal Collection System', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('Signal Schema Validation', () => {
