@@ -36,7 +36,9 @@
     "deploy:phase2": "node scripts/deploy-phase2-to-supabase.js",
     "deploy:milestone3": "node scripts/deploy-milestone3-to-supabase.js",
     "deploy:milestone3:direct": "node scripts/deploy-milestone3-direct.js",
-    "deploy:production": "node scripts/deploy-production.js"
+    "deploy:production": "node scripts/deploy-production.js",
+    "deploy:seed:api": "curl -X POST https://sck-plattform.vercel.app/api/v1/deploy/seed",
+    "deploy:status": "curl https://sck-plattform.vercel.app/api/v1/deploy/status"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
