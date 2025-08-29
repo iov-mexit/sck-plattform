@@ -1,6 +1,14 @@
-// Polyfills / globals for tests
-import { afterAll, afterEach, beforeAll } from 'vitest';
+// Vitest globals are enabled via vitest.config.ts
+// Shim minimal Jest APIs used by legacy tests
+globalThis.jest = {
+  fn: (impl?: (...args: any[]) => any) => vi.fn(impl as any),
+  mock: (path: string, factory?: any) => vi.mock(path, factory),
+  spyOn: (...args: Parameters<typeof vi.spyOn>) => (vi.spyOn as any)(...args),
+} as any;
 
-// If any global setup is needed, add here.
+// Basic environment defaults expected by env-validation tests
+process.env.NEXT_PUBLIC_BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://secure-knaight.io';
+process.env.NEXT_PUBLIC_ENVIRONMENT = process.env.NEXT_PUBLIC_ENVIRONMENT || 'development';
+process.env.NODE_ENV = process.env.NODE_ENV || 'test';
 
 
