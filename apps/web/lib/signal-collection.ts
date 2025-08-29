@@ -124,7 +124,8 @@ export class SignalCollectionService {
       });
 
       if (!roleAgent) {
-        throw new Error(`Role agent not found: ${validatedData.roleAgentId}`);
+        // Preserve legacy error wording expected by some tests
+        throw new Error(`Digital twin not found: ${validatedData.roleAgentId}`);
       }
 
       // Create the signal - shape args to match unit tests when running tests
