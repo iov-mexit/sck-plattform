@@ -93,7 +93,7 @@ export default function AgentsPage() {
 
   const handleAgentSelect = (agentId: string) => {
     setSelectedAgent(agentId);
-    
+
     // Navigate to appropriate page based on agent
     if (agentId === 'compliance') {
       router.push('/policy-search');
@@ -132,7 +132,7 @@ export default function AgentsPage() {
             Choose Your AI Agent
           </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Each agent specializes in different aspects of compliance, security, and organizational management. 
+            Each agent specializes in different aspects of compliance, security, and organizational management.
             Select the agent that best matches your current needs.
           </p>
         </div>
@@ -142,11 +142,10 @@ export default function AgentsPage() {
           {agentCategories.map((agent) => (
             <div
               key={agent.id}
-              className={`border-2 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                selectedAgent === agent.id 
-                  ? 'border-black bg-gray-50' 
+              className={`border-2 rounded-lg p-6 cursor-pointer transition-all duration-200 hover:shadow-lg ${selectedAgent === agent.id
+                  ? 'border-black bg-gray-50'
                   : 'border-gray-200 hover:border-gray-300'
-              } ${agent.status === 'coming-soon' ? 'opacity-60' : ''}`}
+                } ${agent.status === 'coming-soon' ? 'opacity-60' : ''}`}
               onClick={() => agent.status === 'active' && handleAgentSelect(agent.id)}
             >
               {/* Agent Header */}
@@ -211,7 +210,7 @@ export default function AgentsPage() {
               <h4 className="font-medium text-black mb-2">Search Policies</h4>
               <p className="text-sm text-gray-600">Find regulatory requirements and compliance guidance</p>
             </button>
-            
+
             <button
               onClick={() => router.push('/mentoring')}
               className="text-left p-4 bg-white rounded-lg border border-gray-200 hover:border-black transition-colors"
@@ -219,7 +218,7 @@ export default function AgentsPage() {
               <h4 className="font-medium text-black mb-2">Get Mentoring</h4>
               <p className="text-sm text-gray-600">Role-specific guidance and best practices</p>
             </button>
-            
+
             <button
               className="text-left p-4 bg-white rounded-lg border border-gray-200 opacity-50 cursor-not-allowed"
             >

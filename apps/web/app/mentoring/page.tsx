@@ -39,13 +39,13 @@ export default function MentoringPage() {
               <Users className="h-12 w-12 text-green-600" />
             </div>
           </div>
-          
+
           <h1 className="text-3xl font-bold text-black mb-4">
             Mentoring Agent
           </h1>
-          
+
           <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-            Role-specific guidance, best practices, and skill development. 
+            Role-specific guidance, best practices, and skill development.
             Get personalized mentoring for your specific role and career goals.
           </p>
 
@@ -56,23 +56,23 @@ export default function MentoringPage() {
             <p className="text-gray-600 mb-6">
               The Mentoring Agent is currently under development. It will provide:
             </p>
-            
+
             <div className="grid md:grid-cols-2 gap-4 text-left">
               <div className="bg-white p-4 rounded-lg border">
                 <h3 className="font-medium text-black mb-2">Role-Based Learning</h3>
                 <p className="text-sm text-gray-600">Personalized learning paths for your specific role</p>
               </div>
-              
+
               <div className="bg-white p-4 rounded-lg border">
                 <h3 className="font-medium text-black mb-2">Best Practices</h3>
                 <p className="text-sm text-gray-600">Industry best practices and implementation guidance</p>
               </div>
-              
+
               <div className="bg-white p-4 rounded-lg border">
                 <h3 className="font-medium text-black mb-2">Skill Development</h3>
                 <p className="text-sm text-gray-600">Track and improve your professional skills</p>
               </div>
-              
+
               <div className="bg-white p-4 rounded-lg border">
                 <h3 className="font-medium text-black mb-2">Peer Learning</h3>
                 <p className="text-sm text-gray-600">Collaborate and learn from peers in similar roles</p>
