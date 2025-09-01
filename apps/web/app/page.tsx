@@ -1,31 +1,35 @@
 'use client';
 
 import { AuthProvider, useAuth } from '@/lib/auth/auth-context';
-import { MagicLinkLogin } from '@/components/auth/magic-link-login';
-// Temporarily removed react-toastify to fix build
-// import { ToastContainer } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
 import { useState, useEffect } from 'react';
-import { Shield, Zap, Users, Lock, CheckCircle } from 'lucide-react';
+import { Shield, ArrowUpRight, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 function HomeContent() {
   const { isAuthenticated, user, loading } = useAuth();
   const router = useRouter();
-  const [showSplash, setShowSplash] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
 
-  // Redirect authenticated users to dashboard once client is ready
+  // Redirect authenticated users to dashboard
   useEffect(() => {
-    console.log('🔍 Root Page - Auth State:', { isAuthenticated, user: !!user, loading, showSplash });
     if (isAuthenticated && user && !loading) {
       router.push('/dashboard');
     }
-  }, [isAuthenticated, user, loading, router, showSplash]);
+  }, [isAuthenticated, user, loading, router]);
 
-  // Always render landing page for unauthenticated users (no blocking spinner)
+  const handleWalletConnect = async () => {
+    setIsConnecting(true);
+    // Simulate wallet connection
+    setTimeout(() => {
+      setIsConnecting(false);
+      // For now, redirect to magic link as fallback
+      router.push('/auth/magic-link');
+    }, 2000);
+  };
+
   if (isAuthenticated && user) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center">
+      <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-center text-white">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
           <p>Welcome back! Taking you to your dashboard...</p>
@@ -34,121 +38,114 @@ function HomeContent() {
     );
   }
 
-  // Show main landing page for unauthenticated users
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white/80 backdrop-blur-sm border-b border-gray-200">
+      <header className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-                <Shield className="h-6 w-6 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center bg-black">
+                <Shield className="h-5 w-5 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">Secure Code KnAIght</h1>
-                <p className="text-sm text-gray-600">Enterprise Role Agent Platform</p>
-              </div>
+              <span className="text-xl font-bold text-black">SCK</span>
             </div>
-            <div className="flex items-center space-x-4">
-              <div className="hidden md:flex items-center space-x-6 text-sm text-gray-600">
-                <div className="flex items-center space-x-2">
-                  <Lock className="h-4 w-4" />
-                  <span>Enterprise Security</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Zap className="h-4 w-4" />
-                  <span>AI-Powered</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Users className="h-4 w-4" />
-                  <span>Team Collaboration</span>
-                </div>
-              </div>
-            </div>
+            <nav className="hidden md:flex items-center space-x-8 text-sm text-gray-600">
+              <a href="#" className="hover:text-black transition-colors">Home</a>
+              <a href="#" className="hover:text-black transition-colors">About</a>
+              <a href="#" className="hover:text-black transition-colors">Docs</a>
+              <a href="#" className="hover:text-black transition-colors">Blog</a>
+              <a href="#" className="hover:text-black transition-colors">Press</a>
+            </nav>
           </div>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center p-4">
-        <div className="w-full max-w-6xl">
-          {/* Hero Section */}
-          <div className="text-center mb-16">
-            <h2 className="text-5xl font-bold text-gray-900 mb-6">
-              Transform Your Team with
-              <span className="text-blue-600"> AI-Powered Role Agents</span>
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
-              Stop managing chaos. Start orchestrating success. Our enterprise platform turns your team roles into intelligent, trust-verified agents that deliver measurable results.
-            </p>
-
-            {/* Key Value Props */}
-            <div className="grid md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-blue-100 mb-4 mx-auto">
-                  <Shield className="h-6 w-6 text-blue-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Trust-Verified Roles</h3>
-                <p className="text-gray-600">
-                  Replace manual oversight with AI-driven trust scoring and blockchain-verified achievements.
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-purple-100 mb-4 mx-auto">
-                  <Users className="h-6 w-6 text-purple-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Zero-Friction Coordination</h3>
-                <p className="text-gray-600">
-                  Eliminate status meetings and manual tracking. Your roles self-organize and report automatically.
-                </p>
-              </div>
-
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-green-100 mb-4 mx-auto">
-                  <Zap className="h-6 w-6 text-green-600" />
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Measurable Performance</h3>
-                <p className="text-gray-600">
-                  Get real-time insights into role performance, trust levels, and team dynamics with zero overhead.
-                </p>
-              </div>
+      {/* Abstract Dotted Pattern */}
+      <div className="relative h-96 bg-white overflow-hidden">
+        <div className="absolute inset-0">
+          {/* Abstract dotted pattern - simplified version */}
+          <div className="absolute top-0 left-0 w-full h-full opacity-20">
+            <div className="grid grid-cols-20 gap-1">
+              {Array.from({ length: 400 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="w-1 h-1 bg-black rounded-full"
+                  style={{
+                    opacity: Math.random() * 0.8 + 0.2,
+                    transform: `translateY(${Math.sin(i * 0.1) * 20}px)`
+                  }}
+                />
+              ))}
             </div>
           </div>
+        </div>
+      </div>
 
-          {/* Authentication Section */}
-          <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-8 max-w-md mx-auto">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-bold text-gray-900 mb-2">Get Started</h3>
-              <p className="text-gray-600">
-                Enter your email to access the platform and discover how role agents can transform your team.
-              </p>
+      {/* Main Content */}
+      <main className="relative z-10 -mt-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left Side */}
+            <div>
+              <div className="mb-4">
+                <span className="text-sm text-gray-500">• Role Agents + Compliance</span>
+              </div>
+              <h1 className="text-5xl font-bold text-black leading-tight mb-6">
+                <span className="block">Agents enabling</span>
+                <span className="block">trust-verified</span>
+                <span className="block">compliance</span>
+              </h1>
             </div>
 
-            <MagicLinkLogin />
-
-            <div className="mt-6 text-center">
-              <p className="text-xs text-gray-500">
-                No passwords required. Secure, passwordless authentication via magic link.
+            {/* Right Side */}
+            <div>
+              <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+                SCK is the infrastructure powering autonomous compliance markets by enabling non-custodial role agents that execute sophisticated regulatory strategies with blockchain-verified trust.
               </p>
+
+              <div className="space-y-4">
+                <button
+                  onClick={handleWalletConnect}
+                  disabled={isConnecting}
+                  className="w-full bg-black text-white px-6 py-4 rounded-lg font-medium flex items-center justify-center space-x-2 hover:bg-gray-800 transition-colors disabled:opacity-50"
+                >
+                  {isConnecting ? (
+                    <>
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                      <span>Connecting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Wallet className="h-5 w-5" />
+                      <span>Connect Wallet</span>
+                      <ArrowUpRight className="h-4 w-4" />
+                    </>
+                  )}
+                </button>
+                
+                <div className="text-center">
+                  <a href="/auth/magic-link" className="text-sm text-gray-600 hover:text-black transition-colors">
+                    Or use email authentication
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </main>
 
       {/* Footer */}
-      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <footer className="bg-white border-t border-gray-100 mt-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex justify-between items-center">
             <div className="text-sm text-gray-600">
-              © 2024 Secure Code KnAIght. All rights reserved.
+              © 2024 SCK Platform. All rights reserved.
             </div>
-            <div className="flex items-center space-x-4 text-sm text-gray-600">
-              <span>Privacy Policy</span>
-              <span>Terms of Service</span>
-              <span>Support</span>
-              <a href="/SCK_PLATFORM_SITEMAP.md" target="_blank" className="text-blue-600 hover:underline">Sitemap</a>
+            <div className="flex items-center space-x-6 text-sm text-gray-600">
+              <a href="#" className="hover:text-black transition-colors">Privacy</a>
+              <a href="#" className="hover:text-black transition-colors">Terms</a>
+              <a href="#" className="hover:text-black transition-colors">Support</a>
             </div>
           </div>
         </div>
@@ -159,9 +156,8 @@ function HomeContent() {
 
 export default function HomePage() {
   return (
-    <>
+    <AuthProvider>
       <HomeContent />
-      {/* <ToastContainer /> */}
-    </>
+    </AuthProvider>
   );
 }
