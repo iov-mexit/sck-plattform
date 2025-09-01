@@ -7,7 +7,7 @@ import { HighConfidenceQA } from '../../../../../lib/policy/high-confidence-qa';
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { question, frameworks } = body;
+    const { question, frameworks, role } = body;
 
     if (!question) {
       return NextResponse.json(
@@ -16,10 +16,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🧠 High-Confidence QA Request:', { question, frameworks });
+    console.log('🧠 High-Confidence QA Request:', { question, frameworks, role });
 
     const qaSystem = new HighConfidenceQA();
-    const response = await qaSystem.answerQuestion({ question, frameworks });
+    const response = await qaSystem.answerQuestion({ question, frameworks, role });
 
     console.log(`✅ High-confidence response generated (confidence: ${response.confidence})`);
 

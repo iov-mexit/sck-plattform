@@ -293,7 +293,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       // Wait for the wallet connection to be established
       // The wallet connection state will be updated by the useEffect that syncs with wagmiAccount
-      
+
       // Additional API call to register wallet user if needed
       if (wagmiAccount?.address) {
         try {
