@@ -117,7 +117,7 @@ export default function PolicySearchPage() {
           <h1 className="text-3xl font-bold text-black mb-6">
             Search Regulatory Frameworks
           </h1>
-          
+
           {/* Filters */}
           <div className="grid md:grid-cols-2 gap-4 mb-6">
             <div>
@@ -136,7 +136,7 @@ export default function PolicySearchPage() {
                 ))}
               </select>
             </div>
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Framework
@@ -257,7 +257,7 @@ export default function PolicySearchPage() {
                 <p className="text-sm font-medium text-gray-900">ISO 27001 Access Control</p>
                 <p className="text-xs text-gray-600">Key requirements for access management</p>
               </button>
-              
+
               <button
                 onClick={() => {
                   setQuery("How should a Product Manager implement OWASP security controls?");
@@ -269,7 +269,7 @@ export default function PolicySearchPage() {
                 <p className="text-sm font-medium text-gray-900">OWASP for Product Managers</p>
                 <p className="text-xs text-gray-600">Implementation guidance for PMs</p>
               </button>
-              
+
               <button
                 onClick={() => {
                   setQuery("What are the GDPR requirements for data processing?");
@@ -280,7 +280,7 @@ export default function PolicySearchPage() {
                 <p className="text-sm font-medium text-gray-900">GDPR Data Processing</p>
                 <p className="text-xs text-gray-600">Data protection requirements</p>
               </button>
-              
+
               <button
                 onClick={() => {
                   setQuery("How to implement NIS2 incident reporting?");

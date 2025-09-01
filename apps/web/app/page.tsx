@@ -16,19 +16,19 @@ function HomeContent() {
   } = useAuth();
   const router = useRouter();
 
-  // Redirect authenticated users to policy search
+  // Redirect authenticated users to agents page
   useEffect(() => {
     if (isAuthenticated && user && !loading) {
-      router.push('/policy-search');
+      router.push('/agents');
     }
   }, [isAuthenticated, user, loading, router]);
 
   const handleWalletConnect = async () => {
     try {
       await connectWallet();
-      // If wallet connection is successful and user is authenticated, redirect to policy search
+      // If wallet connection is successful and user is authenticated, redirect to agents page
       if (walletConnection.isConnected && walletConnection.address) {
-        router.push('/policy-search');
+        router.push('/agents');
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);
