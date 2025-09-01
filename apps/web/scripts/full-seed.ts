@@ -108,6 +108,11 @@ async function seedDefaultOrganization() {
       isActive: true,
       onboardingComplete: true,
       complianceTags: ['SYSTEM', 'DEFAULT', 'BOOTSTRAP'],
+      metadata: {
+        system: true,
+        seedVersion: '1.0.0',
+        createdAt: new Date().toISOString()
+      },
       createdAt: new Date(),
       updatedAt: new Date()
     }
@@ -116,30 +121,25 @@ async function seedDefaultOrganization() {
   console.log(`✅ Default organization: ${defaultOrg.name} (${defaultOrg.domain})`);
 
   // Create default admin user
-  const existingAdmin = await prisma.organizationMember.findFirst({
+  const defaultAdmin = await prisma.organizationMember.upsert({
     where: {
+      organizationId_email: {
+        organizationId: defaultOrg.id,
+        email: 'admin@default.org'
+      }
+    },
+    update: {},
+    create: {
+      id: 'member-default-admin',
       organizationId: defaultOrg.id,
-      email: 'admin@default.org'
+      name: 'Default Admin',
+      email: 'admin@default.org',
+      role: 'ADMIN',
+      isActive: true
     }
   });
 
-  let defaultAdmin;
-  if (!existingAdmin) {
-    defaultAdmin = await prisma.organizationMember.create({
-      data: {
-        id: 'member-default-admin',
-        organizationId: defaultOrg.id,
-        name: 'Default Admin',
-        email: 'admin@default.org',
-        role: 'ADMIN',
-        isActive: true
-      }
-    });
-    console.log(`✅ Default admin user: ${defaultAdmin.name} (${defaultAdmin.email})`);
-  } else {
-    defaultAdmin = existingAdmin;
-    console.log(`✅ Default admin user already exists: ${defaultAdmin.name} (${defaultAdmin.email})`);
-  }
+  console.log(`✅ Default admin user: ${defaultAdmin.name} (${defaultAdmin.email})`);
 
   return defaultOrg;
 }
@@ -152,19 +152,22 @@ async function seedExtendedOrganizations() {
       name: 'Acme Security Corp',
       domain: 'acme-security.com',
       description: 'Leading cybersecurity consulting firm',
-      complianceTags: ['SOC2', 'ISO27001', 'GDPR', 'EU_AI_ACT']
+      complianceTags: ['SOC2', 'ISO27001', 'GDPR', 'EU_AI_ACT'],
+      metadata: { type: 'demo', industry: 'cybersecurity' }
     },
     {
       name: 'DevOps Labs Inc',
       domain: 'devopslabs.io',
       description: 'DevOps and infrastructure automation specialists',
-      complianceTags: ['ISO27001', 'NIST', 'OWASP']
+      complianceTags: ['ISO27001', 'NIST', 'OWASP'],
+      metadata: { type: 'demo', industry: 'devops' }
     },
     {
       name: 'AI Governance Partners',
       domain: 'aigovernance.partners',
       description: 'AI compliance and governance consulting',
-      complianceTags: ['EU_AI_ACT', 'GDPR', 'AI_ETHICS']
+      complianceTags: ['EU_AI_ACT', 'GDPR', 'AI_ETHICS'],
+      metadata: { type: 'demo', industry: 'ai_governance' }
     }
   ];
 
@@ -180,6 +183,7 @@ async function seedExtendedOrganizations() {
         isActive: true,
         onboardingComplete: true,
         complianceTags: orgData.complianceTags,
+        metadata: orgData.metadata,
         createdAt: new Date(),
         updatedAt: new Date()
       }
@@ -189,31 +193,29 @@ async function seedExtendedOrganizations() {
 
     // Create org admin for each extended organization
     const adminEmail = `admin@${orgData.domain}`;
-    const existingAdmin = await prisma.organizationMember.findFirst({
+    await prisma.organizationMember.upsert({
       where: {
+        organizationId_email: {
+          organizationId: org.id,
+          email: adminEmail
+        }
+      },
+      update: {},
+      create: {
+        id: `member-${org.id}-admin`,
         organizationId: org.id,
-        email: adminEmail
+        name: `${orgData.name} Admin`,
+        email: adminEmail,
+        role: 'ADMIN',
+        isActive: true
       }
     });
-
-    if (!existingAdmin) {
-      await prisma.organizationMember.create({
-        data: {
-          id: `member-${org.id}-admin`,
-          organizationId: org.id,
-          name: `${orgData.name} Admin`,
-          email: adminEmail,
-          role: 'ADMIN',
-          isActive: true
-        }
-      });
-    }
   }
 
   console.log(`✅ Created ${extendedOrgs.length} extended organizations with admins`);
 }
 
-async function seedRoleTemplates(organizationId) {
+async function seedRoleTemplates(organizationId: string) {
   console.log('👥 Seeding role templates...');
 
   const existingCount = await prisma.roleTemplate.count();
@@ -238,7 +240,7 @@ async function seedRoleTemplates(organizationId) {
   }
 }
 
-async function createBasicRoleTemplates(organizationId) {
+async function createBasicRoleTemplates(organizationId: string) {
   const basicTemplates = [
     {
       id: 'role-security-engineer',
@@ -303,7 +305,7 @@ async function createBasicRoleTemplates(organizationId) {
   console.log(`✅ Created ${basicTemplates.length} basic role templates`);
 }
 
-async function seedBasicTrustThresholds(organizationId) {
+async function seedBasicTrustThresholds(organizationId: string) {
   console.log('🎯 Seeding basic trust thresholds...');
 
   const existingCount = await prisma.roleTrustThreshold.count({
@@ -342,7 +344,7 @@ async function seedBasicTrustThresholds(organizationId) {
   console.log(`✅ Created ${basicThresholds.length} basic trust thresholds`);
 }
 
-async function seedLoAPolicies(organizationId) {
+async function seedLoAPolicies(organizationId: string) {
   console.log('📋 Seeding LoA policies...');
 
   const existingCount = await prisma.loaPolicy.count({
@@ -357,41 +359,41 @@ async function seedLoAPolicies(organizationId) {
   const defaultLoAPolicies = [
     {
       artifactType: 'RoleAgent',
-      level: 'L1',
+      level: 1,
       minReviewers: 1,
-      requiredFacets: ['security'],
+      requiredFacets: ['TECHNICAL'],
       externalRequired: false,
-      description: 'Basic role agent creation - single security review'
+      description: 'Basic role agent creation - single technical review'
     },
     {
       artifactType: 'RoleAgent',
-      level: 'L2',
+      level: 2,
       minReviewers: 2,
-      requiredFacets: ['security', 'compliance'],
+      requiredFacets: ['TECHNICAL', 'BUSINESS'],
       externalRequired: false,
-      description: 'Standard role agent - security and compliance review'
+      description: 'Standard role agent - technical and business review'
     },
     {
       artifactType: 'RoleAgent',
-      level: 'L3',
+      level: 3,
       minReviewers: 3,
-      requiredFacets: ['security', 'compliance', 'policy'],
+      requiredFacets: ['TECHNICAL', 'BUSINESS', 'SECURITY'],
       externalRequired: false,
       description: 'Advanced role agent - comprehensive review'
     },
     {
       artifactType: 'MCP',
-      level: 'L1',
+      level: 1,
       minReviewers: 2,
-      requiredFacets: ['security', 'policy'],
+      requiredFacets: ['TECHNICAL', 'SECURITY'],
       externalRequired: false,
-      description: 'Basic MCP policy - security and policy review'
+      description: 'Basic MCP policy - technical and security review'
     },
     {
       artifactType: 'MCP',
-      level: 'L2',
+      level: 2,
       minReviewers: 3,
-      requiredFacets: ['security', 'compliance', 'policy'],
+      requiredFacets: ['TECHNICAL', 'SECURITY', 'COMPLIANCE'],
       externalRequired: false,
       description: 'Standard MCP policy - comprehensive review'
     }
@@ -414,7 +416,7 @@ async function seedLoAPolicies(organizationId) {
 // PHASE 2: Governance & Compliance
 // =============================================================================
 
-async function seedComprehensiveTrustThresholds(organizationId) {
+async function seedComprehensiveTrustThresholds(organizationId: string) {
   console.log('🎯 Seeding comprehensive trust thresholds...');
 
   try {
@@ -430,7 +432,7 @@ async function seedComprehensiveTrustThresholds(organizationId) {
   }
 }
 
-async function seedMcpPolicies(organizationId) {
+async function seedMcpPolicies(organizationId: string) {
   console.log('🤖 Seeding MCP policies...');
 
   const existingCount = await prisma.mcpPolicy.count({
@@ -442,33 +444,40 @@ async function seedMcpPolicies(organizationId) {
     return;
   }
 
-  // Create a simple MCP policy with minimal required fields
-  try {
+  const mcpPolicies = [
+    {
+      name: 'AI Model Access Control',
+      description: 'Controls access to AI models based on role and trust level',
+      policyType: 'ACCESS_CONTROL',
+      regoCode: 'package ai.access\n\ndefault allow = false\n\nallow {\n  input.user.trust_level >= 3\n  input.resource.type == "ai_model"\n}',
+      isActive: true
+    },
+    {
+      name: 'Data Privacy Compliance',
+      description: 'Ensures AI systems comply with data privacy regulations',
+      policyType: 'COMPLIANCE',
+      regoCode: 'package ai.privacy\n\ndefault allow = false\n\nallow {\n  input.data.encrypted == true\n  input.data.consent_given == true\n}',
+      isActive: true
+    }
+  ];
+
+  for (const policyData of mcpPolicies) {
     await prisma.mcpPolicy.create({
       data: {
         organizationId,
-        name: 'Basic Access Control',
-        version: 1,
-        status: 'active',
-        regoModule: 'package access\n\ndefault allow = false\n\nallow {\n  input.user.trust_level >= 3\n}',
-        sha256: 'dummy-sha256-hash',
-        isDefault: false,
-        scope: { resources: ['basic'] },
-        createdBy: 'system-seed'
+        ...policyData
       }
     });
-
-    console.log('✅ Created 1 basic MCP policy');
-  } catch (error) {
-    console.log('⚠️ MCP policy creation failed, skipping:', error.message);
   }
+
+  console.log(`✅ Created ${mcpPolicies.length} MCP policies`);
 }
 
 // =============================================================================
 // PHASE 3: Demonstration & Knowledge
 // =============================================================================
 
-async function seedSampleRoleAgents(organizationId) {
+async function seedSampleRoleAgents(organizationId: string) {
   console.log('🤖 Seeding sample role agents...');
 
   const existingCount = await prisma.roleAgent.count({
@@ -696,7 +705,7 @@ async function seedRagKnowledgeBase() {
   console.log(`✅ Created ${sampleDocuments.length} RAG Knowledge Base documents`);
 }
 
-async function seedAiPolicies(organizationId) {
+async function seedAiPolicies(organizationId: string) {
   console.log('🤖 Seeding AI policies...');
 
   const existingCount = await prisma.mcpPolicy.count({

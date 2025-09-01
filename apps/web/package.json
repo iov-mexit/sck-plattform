@@ -36,7 +36,10 @@
     "deploy:seed:api": "curl -X POST https://sck-plattform.vercel.app/api/v1/deploy/seed",
     "deploy:status": "curl https://sck-plattform.vercel.app/api/v1/deploy/status",
     "seed:full": "node scripts/full-seed.js",
-    "seed:full:extended": "SEED_EXTENDED_ORGS=true SEED_DEMO_DATA=true SEED_AI_FEATURES=true node scripts/full-seed.js"
+    "seed:full:extended": "SEED_EXTENDED_ORGS=true SEED_DEMO_DATA=true SEED_AI_FEATURES=true node scripts/full-seed.js",
+    "seed:enterprise": "node scripts/enterprise-seed.js",
+    "seed:enterprise:simple": "node scripts/enterprise-simple-seed.js",
+    "seed:enterprise:150": "node scripts/enterprise-150-seed.js"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.10.0",
