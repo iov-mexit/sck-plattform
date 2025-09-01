@@ -114,6 +114,42 @@ export const ISO_27001_CHUNKS: EnhancedKnowledgeChunk[] = [
       difficulty: 'intermediate',
       targetRoles: ['security engineer', 'system administrator', 'product manager']
     }
+  },
+  {
+    id: 'iso27001-dev-desc',
+    text: 'As a Developer, ISO 27001 requires you to implement secure coding practices, access controls, data protection, and security monitoring in your applications to support the organization\'s Information Security Management System.',
+    chunkType: 'DESCRIPTION',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'ISO/IEC 27001:2022',
+      canonical: 'ISO 27001 Developer Overview',
+      framework: 'iso-27001-2022',
+      concepts: ['secure coding', 'access controls', 'data protection', 'security monitoring'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer', 'backend engineer', 'frontend engineer'],
+      jurisdiction: 'Global',
+      roleSpecificRelevance: [
+        'Implement secure coding practices and security controls in your applications.',
+        'Build access control and authentication mechanisms.',
+        'Ensure data protection and implement security monitoring.'
+      ]
+    }
+  },
+  {
+    id: 'iso27001-dev-examples',
+    text: 'Use OWASP guidelines, implement proper authentication/authorization, encrypt sensitive data, and add security logging. Example: JWT tokens, role-based access control, AES encryption, security event logging.',
+    chunkType: 'EXAMPLE_USECASE',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'ISO/IEC 27001:2022',
+      framework: 'iso-27001-2022',
+      concepts: ['OWASP guidelines', 'authentication', 'authorization', 'encryption', 'security logging'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer'],
+      jurisdiction: 'Global'
+    }
   }
 ];
 
@@ -131,6 +167,42 @@ export const NIS2_CHUNKS: EnhancedKnowledgeChunk[] = [
       concepts: ['incident reporting', 'risk management', 'supply chain', 'timelines'],
       difficulty: 'intermediate',
       targetRoles: ['security manager', 'compliance officer', 'product manager']
+    }
+  },
+  {
+    id: 'nis2-dev-desc',
+    text: 'As a Developer, NIS2 requires you to implement security controls from design, build incident detection and reporting systems, ensure supply chain security, and create comprehensive logging for compliance.',
+    chunkType: 'DESCRIPTION',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'NIS2 Directive (EU)',
+      canonical: 'NIS2 Developer Overview',
+      framework: 'nis2-2023',
+      concepts: ['security controls', 'incident detection', 'supply chain security', 'compliance logging'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer', 'security engineer', 'devops engineer'],
+      jurisdiction: 'EU',
+      roleSpecificRelevance: [
+        'Implement security controls and monitoring from the design phase.',
+        'Build automated incident detection and reporting systems.',
+        'Ensure third-party dependencies are secure and validated.'
+      ]
+    }
+  },
+  {
+    id: 'nis2-dev-examples',
+    text: 'Implement security scanning in CI/CD, automated incident detection with alerting, dependency vulnerability scanning, and comprehensive audit logging. Example: SAST/DAST tools, SIEM integration, npm audit, audit logs.',
+    chunkType: 'EXAMPLE_USECASE',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'NIS2 Directive (EU)',
+      framework: 'nis2-2023',
+      concepts: ['security scanning', 'incident detection', 'vulnerability scanning', 'audit logging'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer'],
+      jurisdiction: 'EU'
     }
   }
 ];
@@ -150,6 +222,42 @@ export const DORA_CHUNKS: EnhancedKnowledgeChunk[] = [
       difficulty: 'intermediate',
       targetRoles: ['compliance officer', 'legal counsel', 'product manager']
     }
+  },
+  {
+    id: 'dora-dev-desc',
+    text: 'As a Developer, DORA requires you to build resilient systems with redundancy, implement comprehensive monitoring and logging, create incident response capabilities, and ensure third-party integrations are secure.',
+    chunkType: 'DESCRIPTION',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'DORA Regulation (EU)',
+      canonical: 'DORA Developer Overview',
+      framework: 'dora-2024',
+      concepts: ['resilience', 'monitoring', 'logging', 'incident response', 'third-party security'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer', 'backend engineer', 'devops engineer'],
+      jurisdiction: 'EU',
+      roleSpecificRelevance: [
+        'Implement redundancy and failover mechanisms in critical systems.',
+        'Build comprehensive monitoring, logging, and alerting systems.',
+        'Create incident response automation and third-party security validation.'
+      ]
+    }
+  },
+  {
+    id: 'dora-dev-examples',
+    text: 'Implement circuit breakers, health checks, automated failover, comprehensive logging with structured data, and third-party API security validation. Example: Kubernetes health checks, ELK stack logging, API gateway security.',
+    chunkType: 'EXAMPLE_USECASE',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'DORA Regulation (EU)',
+      framework: 'dora-2024',
+      concepts: ['circuit breakers', 'health checks', 'failover', 'logging', 'API security'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer'],
+      jurisdiction: 'EU'
+    }
   }
 ];
 
@@ -167,6 +275,42 @@ export const CRA_CHUNKS: EnhancedKnowledgeChunk[] = [
       concepts: ['secure-by-design', 'vulnerability management', 'patch mechanisms', 'responsible disclosure'],
       difficulty: 'intermediate',
       targetRoles: ['security engineer', 'product manager', 'developer']
+    }
+  },
+  {
+    id: 'cra-dev-desc',
+    text: 'As a Developer, CRA requires you to implement secure-by-design principles in your code: use secure coding practices, implement automatic update mechanisms, handle vulnerabilities responsibly, and document security measures.',
+    chunkType: 'DESCRIPTION',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'EUR-Lex CRA Regulation',
+      canonical: 'CRA Developer Overview',
+      framework: 'cra-2024',
+      concepts: ['secure coding', 'update mechanisms', 'vulnerability handling', 'documentation'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer', 'backend engineer', 'frontend engineer'],
+      jurisdiction: 'EU',
+      roleSpecificRelevance: [
+        'Implement secure coding practices and automated security testing in CI/CD pipelines.',
+        'Build automatic update mechanisms and patch delivery systems.',
+        'Create vulnerability disclosure procedures and security documentation.'
+      ]
+    }
+  },
+  {
+    id: 'cra-dev-examples',
+    text: 'Use dependency scanning tools, implement automated security testing, create update APIs, and maintain security documentation. Example: npm audit in CI/CD, automated patch deployment, security.txt file.',
+    chunkType: 'EXAMPLE_USECASE',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'EUR-Lex CRA Regulation',
+      framework: 'cra-2024',
+      concepts: ['dependency scanning', 'automated testing', 'update APIs', 'security documentation'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer'],
+      jurisdiction: 'EU'
     }
   }
 ];
@@ -268,6 +412,28 @@ export const PRODUCT_MANAGER_ROLE_CHUNKS: EnhancedKnowledgeChunk[] = [
         'Incorporate secure-by-design principles into feature design and dependencies.',
         'Define and surface vulnerability handling workflows in product documentation.',
         'Ensure update/patch mechanisms are available and communicated.'
+      ]
+    }
+  },
+  {
+    id: 'cra-developer-desc',
+    text: 'As a Developer, CRA requires you to implement secure-by-design coding practices, build automatic update mechanisms, and ensure vulnerability handling is built into your codebase from the start.',
+    chunkType: 'DESCRIPTION',
+    metadata: {
+      language: 'en',
+      confidence: 0.95,
+      source: 'EUR-Lex CRA Regulation',
+      canonical: 'CRA Developer Overview',
+      framework: 'cra-2024',
+      concepts: ['secure-coding', 'automatic-updates', 'vulnerability-handling', 'secure-by-design'],
+      difficulty: 'intermediate',
+      targetRoles: ['developer', 'backend engineer', 'frontend engineer', 'devops engineer'],
+      jurisdiction: 'EU',
+      roleSpecificRelevance: [
+        'Implement secure coding practices and input validation in all user-facing code.',
+        'Build automatic update/patch delivery mechanisms into your applications.',
+        'Include vulnerability scanning and reporting in your CI/CD pipelines.',
+        'Document security practices and create secure coding guidelines for your team.'
       ]
     }
   },

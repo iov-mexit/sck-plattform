@@ -37,41 +37,41 @@ export default function PolicySearchPage() {
     { id: 'ai engineer (mid-level)', name: 'AI Engineer (Mid-Level)' },
     { id: 'ai engineer (senior)', name: 'AI Engineer (Senior)' },
     { id: 'ai governance specialist', name: 'AI Governance Specialist' },
-    
+
     // Backend Engineering
     { id: 'backend engineer (junior)', name: 'Backend Engineer (Junior)' },
     { id: 'backend engineer (mid-level)', name: 'Backend Engineer (Mid-Level)' },
     { id: 'backend engineer (senior)', name: 'Backend Engineer (Senior)' },
-    
+
     // Frontend Engineering
     { id: 'frontend engineer (junior)', name: 'Frontend Engineer (Junior)' },
     { id: 'frontend engineer (mid-level)', name: 'Frontend Engineer (Mid-Level)' },
     { id: 'frontend engineer (senior)', name: 'Frontend Engineer (Senior)' },
-    
+
     // Data Engineering
     { id: 'data engineer (junior)', name: 'Data Engineer (Junior)' },
     { id: 'data engineer (mid-level)', name: 'Data Engineer (Mid-Level)' },
     { id: 'data engineer (senior)', name: 'Data Engineer (Senior)' },
-    
+
     // DevOps Engineering
     { id: 'devops engineer (junior)', name: 'DevOps Engineer (Junior)' },
     { id: 'devops engineer (mid-level)', name: 'DevOps Engineer (Mid-Level)' },
     { id: 'devops engineer (senior)', name: 'DevOps Engineer (Senior)' },
-    
+
     // Security Engineering
     { id: 'security engineer (junior)', name: 'Security Engineer (Junior)' },
     { id: 'security engineer (mid-level)', name: 'Security Engineer (Mid-Level)' },
     { id: 'security engineer (senior)', name: 'Security Engineer (Senior)' },
-    
+
     // Compliance & Governance
     { id: 'compliance specialist (junior)', name: 'Compliance Specialist (Junior)' },
     { id: 'compliance specialist (mid-level)', name: 'Compliance Specialist (Mid-Level)' },
     { id: 'compliance specialist (senior)', name: 'Compliance Specialist (Senior)' },
-    
+
     // Business & Management
     { id: 'product manager', name: 'Product Manager' },
     { id: 'threat intelligence analyst', name: 'Threat Intelligence Analyst' },
-    
+
     // Legacy roles for compatibility
     { id: 'developer', name: 'Developer' },
     { id: 'security engineer', name: 'Security Engineer' },

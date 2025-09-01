@@ -30,7 +30,7 @@ export class HighConfidenceQA {
 
       // Use the enhanced knowledge manager for role-specific responses
       const response = await this.generateRoleSpecificAnswer(request);
-      
+
       return {
         success: true,
         answer: response.answer,
@@ -55,11 +55,11 @@ export class HighConfidenceQA {
     citations: string[];
   }> {
     const { question, frameworks, role } = request;
-    
+
     // Use role-specific search if role is provided
     if (role) {
       const roleResults = await this.knowledgeManager.searchRoleSpecific(question, role, frameworks?.[0]);
-      
+
       if (roleResults.semanticResults.length > 0) {
         const bestMatch = roleResults.semanticResults[0];
         const citations = roleResults.semanticResults
@@ -77,7 +77,7 @@ export class HighConfidenceQA {
 
     // Fallback to general semantic search
     const results = await this.knowledgeManager.searchBySimilarity(question, 0.2);
-    
+
     if (results.length > 0) {
       const bestMatch = results[0];
       const citations = results
