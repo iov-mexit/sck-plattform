@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // If user doesn't exist, create a new user
     if (!user) {
       console.log('👤 Creating new user for wallet address:', address);
-      
+
       user = await prisma.user.create({
         data: {
           walletAddress: address,
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     // Update user's last login
     await prisma.user.update({
       where: { id: user.id },
-      data: { 
+      data: {
         lastLoginAt: new Date(),
         walletChainId: chainId || null
       }
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Wallet connection error:', error);
-    
+
     return NextResponse.json(
       {
         error: 'Wallet connection failed',

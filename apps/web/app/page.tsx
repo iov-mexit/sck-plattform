@@ -6,29 +6,29 @@ import { Shield, ArrowUpRight, Wallet } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 function HomeContent() {
-  const { 
-    isAuthenticated, 
-    user, 
-    loading, 
-    walletConnection, 
-    connectWallet, 
-    disconnectWallet 
+  const {
+    isAuthenticated,
+    user,
+    loading,
+    walletConnection,
+    connectWallet,
+    disconnectWallet
   } = useAuth();
   const router = useRouter();
 
-  // Redirect authenticated users to dashboard
+  // Redirect authenticated users to policy search
   useEffect(() => {
     if (isAuthenticated && user && !loading) {
-      router.push('/dashboard');
+      router.push('/policy-search');
     }
   }, [isAuthenticated, user, loading, router]);
 
   const handleWalletConnect = async () => {
     try {
       await connectWallet();
-      // If wallet connection is successful and user is authenticated, redirect to dashboard
+      // If wallet connection is successful and user is authenticated, redirect to policy search
       if (walletConnection.isConnected && walletConnection.address) {
-        router.push('/dashboard');
+        router.push('/policy-search');
       }
     } catch (error) {
       console.error('Wallet connection failed:', error);

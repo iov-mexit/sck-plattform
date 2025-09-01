@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     // Update user's last logout
     await prisma.user.update({
       where: { id: user.id },
-      data: { 
+      data: {
         lastLogoutAt: new Date(),
         walletChainId: null
       }
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('❌ Wallet disconnection error:', error);
-    
+
     return NextResponse.json(
       {
         error: 'Wallet disconnection failed',
