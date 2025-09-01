@@ -291,8 +291,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       await wagmiConnect.connect({ connector });
 
+      // Wait for the wallet connection to be established
       // The wallet connection state will be updated by the useEffect that syncs with wagmiAccount
-      // No need to manually update it here
+      
+      // Additional API call to register wallet user if needed
+      if (wagmiAccount?.address) {
+        try {
+          const response = await fetch('/api/v1/auth/wallet/connect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              address: wagmiAccount.address,
+              chainId: wagmiAccount.chainId,
+              signature: '', // Will be implemented later
+              message: 'Wallet connection'
+            })
+          });
+
+          if (response.ok) {
+            console.log('✅ Wallet user registered successfully');
+          }
+        } catch (apiError) {
+          console.warn('Wallet API registration failed:', apiError);
+          // Don't fail the connection if API call fails
+        }
+      }
 
       showToast({
         message: 'Wallet connected successfully!',
@@ -353,15 +376,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   // Combined authentication state
-  // For MVP: Only consider Magic Link authentication, not wallet connection
-  const isAuthenticated = magicAuth.isLoggedIn;
+  // Consider both Magic Link and wallet connection as valid authentication
+  const isAuthenticated = magicAuth.isLoggedIn || walletConnection.isConnected;
 
   // Create user object from wallet connection if not logged in via Magic
   const user = magicAuth.user || (walletConnection.isConnected && walletConnection.address ? {
     id: walletConnection.address,
     email: `${walletConnection.address.slice(0, 6)}...${walletConnection.address.slice(-4)}@wallet.local`,
     walletAddress: walletConnection.address,
-    organization: undefined, // Will be set during onboarding
+    organization: {
+      id: 'org-wallet-default',
+      name: `Wallet Organization ${walletConnection.address.slice(0, 6)}...${walletConnection.address.slice(-4)}`,
+      domain: `wallet-${walletConnection.address.slice(2, 8)}.local`,
+      isActive: true,
+      onboardingComplete: true,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    },
     createdAt: new Date(),
     updatedAt: new Date(),
   } : null);

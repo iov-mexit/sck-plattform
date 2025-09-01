@@ -26,10 +26,7 @@ function HomeContent() {
   const handleWalletConnect = async () => {
     try {
       await connectWallet();
-      // If wallet connection is successful and user is authenticated, redirect to agents page
-      if (walletConnection.isConnected && walletConnection.address) {
-        router.push('/agents');
-      }
+      // The useEffect will handle routing when authentication state changes
     } catch (error) {
       console.error('Wallet connection failed:', error);
       // Fallback to magic link if wallet connection fails
