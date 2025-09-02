@@ -1,8 +1,8 @@
 // LLM Policy Generation API Endpoint
-// Tests the new LLM-powered system vs old template approach
+// Temporarily disabled - using QA system instead
 
 import { NextRequest, NextResponse } from 'next/server';
-import { LLMPolicyGenerator, LLMPolicyRequest } from '../../../../../lib/policy/llm-policy-generator';
+// import { LLMPolicyGenerator, LLMPolicyRequest } from '../../../../../lib/policy/llm-policy-generator';
 import { UnifiedPolicySystem } from '../../../../../lib/policy/unified-policy-system';
 
 export async function POST(request: NextRequest) {
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log('🚀 LLM Policy Generation Request:', {
+    console.log('🚀 Policy Generation Request:', {
       regulatoryFramework,
       roleTitle,
       roleCategory,
@@ -35,66 +35,22 @@ export async function POST(request: NextRequest) {
       useUnified
     });
 
-    if (useUnified) {
-      // Use the unified system (recommended)
-      const unifiedSystem = new UnifiedPolicySystem();
-
-      // Create a mock role template for testing
-      const mockRoleTemplate = {
-        id: 'test-role',
-        title: roleTitle,
-        category: roleCategory,
-        responsibilities: [`Implement ${specificRequirement} controls`],
-        securityContributions: ['Security implementation', 'Compliance monitoring'],
-        riskProfile: 'MEDIUM'
-      };
-
-      const result = await unifiedSystem.generateUnifiedPolicy({
-        roleTemplate: mockRoleTemplate,
-        regulatoryFramework,
-        specificRequirement,
-        confidenceThreshold,
-        context
-      });
-
-      return NextResponse.json({
-        success: true,
-        message: 'LLM-powered unified policy generated successfully!',
-        result,
-        system: 'unified-llm'
-      });
-
-    } else {
-      // Use direct LLM generator
-      const llmGenerator = new LLMPolicyGenerator();
-
-      const llmRequest: LLMPolicyRequest = {
-        regulatoryFramework,
-        roleTitle,
-        roleCategory,
-        specificRequirement,
-        confidenceThreshold,
-        context
-      };
-
-      const result = await llmGenerator.generateLLMPolicy(llmRequest);
-
-      return NextResponse.json({
-        success: true,
-        message: 'LLM-powered policy generated successfully!',
-        result,
-        system: 'direct-llm'
-      });
-    }
+    // Return a response directing users to the QA system
+    return NextResponse.json({
+      success: true,
+      message: 'Policy generation temporarily disabled. Please use the High-Confidence QA system instead.',
+      redirect: '/api/v1/qa/high-confidence',
+      system: 'qa-system-redirect'
+    });
 
   } catch (error) {
-    console.error('❌ LLM Policy Generation Error:', error);
+    console.error('❌ Policy Generation Error:', error);
 
     return NextResponse.json(
       {
         error: 'Policy generation failed',
         details: error instanceof Error ? error.message : 'Unknown error',
-        system: 'llm-powered'
+        system: 'qa-system-redirect'
       },
       { status: 500 }
     );

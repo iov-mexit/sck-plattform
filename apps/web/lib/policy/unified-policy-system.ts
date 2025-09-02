@@ -5,7 +5,7 @@ import { RoleTemplate } from '../types/role-templates';
 import { RegulatoryFramework } from './role-regulation-matrix';
 import { SmartPolicyCorrelationEngine } from './smart-policy-correlation-engine';
 import { PolicyConfidenceEngine } from './policy-confidence-engine';
-import { LLMPolicyGenerator, LLMPolicyRequest } from './llm-policy-generator';
+// import { LLMPolicyGenerator, LLMPolicyRequest } from './llm-policy-generator';
 
 export interface UnifiedPolicyRequest {
   roleTemplate: RoleTemplate;
@@ -52,32 +52,36 @@ export interface UnifiedPolicyResult {
 export class UnifiedPolicySystem {
   private correlationEngine: SmartPolicyCorrelationEngine;
   private confidenceEngine: PolicyConfidenceEngine;
-  private llmGenerator: LLMPolicyGenerator;
+  // private llmGenerator: LLMPolicyGenerator;
 
   constructor() {
     this.correlationEngine = new SmartPolicyCorrelationEngine();
     this.confidenceEngine = new PolicyConfidenceEngine();
-    this.llmGenerator = new LLMPolicyGenerator();
+    // this.llmGenerator = new LLMPolicyGenerator();
   }
 
   async generateUnifiedPolicy(request: UnifiedPolicyRequest): Promise<UnifiedPolicyResult> {
     const startTime = Date.now();
 
     try {
-      console.log('🚀 Starting LLM-powered unified policy generation...');
+      console.log('🚀 Starting unified policy generation...');
 
-      // Step 1: Generate LLM-powered policy (REPLACES OLD TEMPLATE APPROACH)
-      const llmRequest: LLMPolicyRequest = {
-        regulatoryFramework: request.regulatoryFramework,
-        roleTitle: request.roleTemplate.title,
-        roleCategory: request.roleTemplate.category,
-        specificRequirement: request.specificRequirement,
-        confidenceThreshold: request.confidenceThreshold,
-        context: request.context
+      // Step 1: Generate policy (LLM generation temporarily disabled)
+      console.log('🧠 Policy generation temporarily disabled - using QA system instead');
+      
+      // Mock LLM result for now
+      const llmResult = {
+        policy: {
+          title: `${request.roleTemplate.title} Policy`,
+          content: `Policy for ${request.specificRequirement} under ${request.regulatoryFramework}`,
+          framework: request.regulatoryFramework,
+          roleTarget: request.roleTemplate.title,
+          requirements: [request.specificRequirement],
+          implementation: ['Implementation guidance'],
+          compliance: ['Compliance requirements'],
+          citations: [request.regulatoryFramework]
+        }
       };
-
-      console.log('🧠 Generating policy using LLM with few-shot training...');
-      const llmResult = await this.llmGenerator.generateLLMPolicy(llmRequest);
 
       // Step 2: Correlate with regulatory requirements
       console.log('🔗 Correlating policy with regulatory requirements...');
