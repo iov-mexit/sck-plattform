@@ -1,0 +1,66 @@
+[
+  {
+    "name": "NIS2 incident reporting (CISO)",
+    "query": "What does NIS2 require for incident reporting?",
+    "role": "ciso",
+    "framework": "nis2-2023",
+    "expected_keywords": [
+      "notification",
+      "timeline",
+      "authority"
+    ],
+    "min_hits": 1,
+    "confidence_threshold": 0.75
+  },
+  {
+    "name": "ISO27001 cryptography (Product Manager)",
+    "query": "As a product manager, what do I need to know about cryptographic failures?",
+    "role": "product manager",
+    "framework": "iso-27001-2022",
+    "expected_keywords": [
+      "encryption",
+      "acceptance"
+    ],
+    "min_hits": 1,
+    "confidence_threshold": 0.75
+  },
+  {
+    "name": "OWASP A02 dev guidance (Developer)",
+    "query": "How should developers handle cryptographic failures?",
+    "role": "developer",
+    "framework": "owasp-top10-2021",
+    "expected_keywords": [
+      "tls",
+      "kms",
+      "keys"
+    ],
+    "min_hits": 1,
+    "confidence_threshold": 0.75
+  },
+  {
+    "name": "DORA incident reporting (Compliance)",
+    "query": "What are DORA obligations for incident reporting?",
+    "role": "compliance officer",
+    "framework": "dora-2024",
+    "expected_keywords": [
+      "reporting",
+      "supervisor",
+      "timeline"
+    ],
+    "min_hits": 1,
+    "confidence_threshold": 0.75
+  },
+  {
+    "name": "CRA vulnerability disclosure (CISO)",
+    "query": "Under the CRA, what should CISOs require for vulnerability handling and disclosure?",
+    "role": "ciso",
+    "framework": "cra-2024",
+    "expected_keywords": [
+      "vulnerability",
+      "disclosure",
+      "patch"
+    ],
+    "min_hits": 1,
+    "confidence_threshold": 0.75
+  }
+]

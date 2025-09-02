@@ -29,7 +29,7 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
   private enhancedChunks: Map<string, EnhancedKnowledgeChunk> = new Map();
   private chunkEmbeddings: Map<string, number[]> = new Map();
   private conceptIndex: Map<string, string[]> = new Map(); // concept -> chunkIds
-  private initializationComplete: Promise<void>;
+  public initializationComplete: Promise<void>;
 
   constructor() {
     super();
@@ -44,6 +44,7 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     console.log('🚀 Initializing Enhanced Knowledge Manager with embeddings...');
 
     // Load all regulatory chunks
+    console.log('🔍 About to load external chunks...');
     for (const chunk of ALL_REGULATORY_CHUNKS) {
       this.enhancedChunks.set(chunk.id, chunk);
 
@@ -57,32 +58,78 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
       }
     }
 
-    // Load external role-specific chunks from JSON files if available
+    // Load external role-specific chunks from JSONL files if available
+    console.log('🔍 Starting external chunk loading...');
     try {
       const externalDir = path.resolve(process.cwd(), 'apps/web/rag-ingestion/cleaned-data/role_chunks');
+      console.log(`🔍 Current working directory: ${process.cwd()}`);
+      console.log(`🔍 External directory: ${externalDir}`);
+      console.log(`🔍 External directory: ${externalDir}`);
+      console.log(`🔍 External directory exists: ${fs.existsSync(externalDir)}`);
       if (fs.existsSync(externalDir)) {
-        const files = fs.readdirSync(externalDir).filter(f => f.endsWith('.json'));
-        for (const file of files) {
+        // First try to load the embedded JSONL file (preferred)
+        const embeddedFile = path.join(externalDir, 'regulatory_knowledge.embedded.jsonl');
+        console.log(`🔍 Looking for embedded file: ${embeddedFile}`);
+        console.log(`🔍 File exists: ${fs.existsSync(embeddedFile)}`);
+        if (fs.existsSync(embeddedFile)) {
           try {
-            const full = path.join(externalDir, file);
-            const raw = fs.readFileSync(full, 'utf-8');
-            const items: EnhancedKnowledgeChunk[] = JSON.parse(raw);
-            for (const item of items) {
-              // Avoid ID collisions
-              if (!this.enhancedChunks.has(item.id)) {
-                this.enhancedChunks.set(item.id, item);
-                if (item.metadata.concepts) {
-                  for (const concept of item.metadata.concepts) {
-                    const existing = this.conceptIndex.get(concept) || [];
-                    existing.push(item.id);
-                    this.conceptIndex.set(concept, existing);
+            const raw = fs.readFileSync(embeddedFile, 'utf-8');
+            const lines = raw.trim().split('\n').filter(line => line.trim());
+            console.log(`🔍 Found ${lines.length} lines in JSONL file`);
+            let loadedCount = 0;
+
+            for (const line of lines) {
+              try {
+                const item: EnhancedKnowledgeChunk = JSON.parse(line);
+                // Avoid ID collisions
+                if (!this.enhancedChunks.has(item.id)) {
+                  this.enhancedChunks.set(item.id, item);
+                  // If the item has an embedding, store it
+                  if (item.embedding && Array.isArray(item.embedding)) {
+                    this.chunkEmbeddings.set(item.id, item.embedding);
+                  }
+                  if (item.metadata.concepts) {
+                    for (const concept of item.metadata.concepts) {
+                      const existing = this.conceptIndex.get(concept) || [];
+                      existing.push(item.id);
+                      this.conceptIndex.set(concept, existing);
+                    }
+                  }
+                  loadedCount++;
+                }
+              } catch (parseErr) {
+                console.error(`❌ Failed parsing JSONL line:`, parseErr);
+              }
+            }
+            console.log(`✅ Loaded ${loadedCount} embedded chunks from regulatory_knowledge.embedded.jsonl`);
+          } catch (err) {
+            console.error(`❌ Failed loading embedded chunks:`, err);
+          }
+        } else {
+          // Fallback to JSON files
+          const files = fs.readdirSync(externalDir).filter(f => f.endsWith('.json'));
+          for (const file of files) {
+            try {
+              const full = path.join(externalDir, file);
+              const raw = fs.readFileSync(full, 'utf-8');
+              const items: EnhancedKnowledgeChunk[] = JSON.parse(raw);
+              for (const item of items) {
+                // Avoid ID collisions
+                if (!this.enhancedChunks.has(item.id)) {
+                  this.enhancedChunks.set(item.id, item);
+                  if (item.metadata.concepts) {
+                    for (const concept of item.metadata.concepts) {
+                      const existing = this.conceptIndex.get(concept) || [];
+                      existing.push(item.id);
+                      this.conceptIndex.set(concept, existing);
+                    }
                   }
                 }
               }
+              console.log(`✅ Loaded ${items.length} external chunks from ${file}`);
+            } catch (err) {
+              console.error(`❌ Failed loading external chunks from ${file}:`, err);
             }
-            console.log(`✅ Loaded ${items.length} external chunks from ${file}`);
-          } catch (err) {
-            console.error(`❌ Failed loading external chunks from ${file}:`, err);
           }
         }
       }
@@ -90,7 +137,7 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
       console.error('❌ External chunk loading failed:', err);
     }
 
-    // Generate embeddings for all chunks
+    // Generate embeddings for chunks that don't already have them
     await this.generateEmbeddingsForAllChunks();
 
     console.log(`✅ Enhanced Knowledge Manager initialized: ${this.enhancedChunks.size} chunks, ${this.chunkEmbeddings.size} embeddings`);

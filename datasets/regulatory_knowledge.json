@@ -1,0 +1,148 @@
+{
+  "knowledgeChunks": [
+    {
+      "id": "owasp-web-a02-2021",
+      "requirementName": "Cryptographic Failures",
+      "coreDescription": "Sensitive data exposure due to weak/missing encryption or poor key management.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Implement TLS 1.3 for all APIs, use KMS for key storage, and rotate keys every 90 days. Configure secure cipher suites and disable deprecated algorithms like MD5/SHA1.",
+          "policyGuidance": "Avoid deprecated algorithms; never hardcode keys; use vetted crypto primitives."
+        },
+        "ProductManager": {
+          "phrasing": "Ensure product features enforce encryption acceptance criteria for sensitive data. Customers expect security by default - include encryption requirements in feature specifications and vendor selection.",
+          "policyGuidance": "Include encryption requirements in feature acceptance and vendor selection."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Cryptography requirements appear in ISO 27001 Annex A.10 and product security regulations. Maintain evidence of encryption controls and key management for audit documentation.",
+          "policyGuidance": "Collect evidence of encryption controls and key management for audits."
+        },
+        "CISO": {
+          "phrasing": "Cryptographic weaknesses create systemic risk—govern policies and verify compliance. Define enterprise crypto policy, rotate keys, and track compliance KPIs for board reporting.",
+          "policyGuidance": "Define enterprise crypto policy, rotate keys, and track compliance KPIs."
+        }
+      },
+      "crossReferences": ["ISO27001-A.10", "CRA-2024", "dora-2024"]
+    },
+    {
+      "id": "owasp-api-a01-2023",
+      "requirementName": "Broken Object Level Authorization (BOLA)",
+      "coreDescription": "APIs fail to verify whether a user is authorized to access specific objects, enabling mass data leaks.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Verify object ownership/permissions on every access and enforce policy in server logic. Implement central authorization middleware and object-level checks with proper session tokens.",
+          "policyGuidance": "Implement central authorization middleware and object-level checks."
+        },
+        "ProductManager": {
+          "phrasing": "Design APIs so that object access is always bounded by user permissions, especially multi-tenant cases. Require authorization design review before API launch and include access control in acceptance criteria.",
+          "policyGuidance": "Require authorization design review before API launch."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Object leaks can trigger data breach reporting obligations; map sensitive endpoints for audits. Document controls for high-risk endpoints and include them in compliance mapping.",
+          "policyGuidance": "Document controls for high-risk endpoints and include them in audits."
+        },
+        "CISO": {
+          "phrasing": "BOLA is a top API risk that can cause large-scale exposure; require central governance. Mandate standardized RBAC/ABAC and monitoring for anomalous object access with board oversight.",
+          "policyGuidance": "Mandate standardized RBAC/ABAC and monitoring for anomalous object access."
+        }
+      },
+      "crossReferences": ["ISO27001-A.9", "GDPR", "owasp-web-a01-2021"]
+    },
+    {
+      "id": "nis2-incident-reporting",
+      "requirementName": "NIS2 Incident Reporting Requirements",
+      "coreDescription": "Operators of essential services must report significant incidents to competent authorities within 24 hours.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Implement logging and monitoring systems that can detect and report incidents within the 24-hour notification timeline. Build automated incident detection and reporting capabilities.",
+          "policyGuidance": "Add instrumentation for incident forensics and test incident playbooks."
+        },
+        "ProductManager": {
+          "phrasing": "Ensure product supports incident analysis and customer communication needs within regulatory notification timelines. Define user communications and rollback criteria as part of incident planning.",
+          "policyGuidance": "Define user communications and rollback criteria as part of incident planning."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Incident evidence and timelines are required for regulatory reporting to competent authorities. Retain incident logs and documentation for reporting and audit proof within notification requirements.",
+          "policyGuidance": "Retain incident logs and documentation for reporting and audit proof."
+        },
+        "CISO": {
+          "phrasing": "Incident response capability determines regulatory exposure and reputational impact. Maintain tested IR playbooks, tabletop exercises, and report KPIs to leadership with authority oversight.",
+          "policyGuidance": "Maintain tested IR playbooks, tabletop exercises, and report KPIs to leadership."
+        }
+      },
+      "crossReferences": ["NIS2-2023", "DORA-2024", "CRA-2024"]
+    },
+    {
+      "id": "iso27001-access-control",
+      "requirementName": "Access Control (Annex A.9)",
+      "coreDescription": "Control access to information and systems to authorized users, processes, and devices.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Implement role-based access control, privileged account management, session handling, and regular access reviews. Use MFA, session tokens, and secure authentication mechanisms.",
+          "policyGuidance": "Add instrumentation for incident forensics and test incident playbooks."
+        },
+        "ProductManager": {
+          "phrasing": "Ensure product features enforce proper access boundaries and include encryption acceptance criteria. Customers expect security by default - include access control requirements in feature specifications.",
+          "policyGuidance": "Define user communications and rollback criteria as part of incident planning."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Access control maps to ISO 27001 A.9 and data-protection obligations; evidence must be retained. Document controls for high-risk endpoints and include them in compliance mapping.",
+          "policyGuidance": "Retain incident logs and documentation for reporting and audit proof."
+        },
+        "CISO": {
+          "phrasing": "Access control is a high-impact enterprise risk with regulatory and reputational exposure. Mandate entitlement reviews, SOD policies, and centralized policy enforcement with board oversight.",
+          "policyGuidance": "Maintain tested IR playbooks, tabletop exercises, and report KPIs to leadership."
+        }
+      },
+      "crossReferences": ["ISO27001-A.9", "NIS2-2023", "owasp-api-a01-2023"]
+    },
+    {
+      "id": "dora-incident-reporting",
+      "requirementName": "DORA Incident Reporting and Notification",
+      "coreDescription": "Financial entities must report major ICT-related incidents to supervisors within strict timelines.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Implement logging and monitoring systems that can detect and report incidents within supervisor notification timelines. Build automated incident detection and reporting capabilities for regulatory compliance.",
+          "policyGuidance": "Add instrumentation for incident forensics and test incident playbooks."
+        },
+        "ProductManager": {
+          "phrasing": "Ensure product supports incident analysis and customer communication needs within regulatory reporting timelines. Define user communications and rollback criteria as part of incident planning for supervisor requirements.",
+          "policyGuidance": "Define user communications and rollback criteria as part of incident planning."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Incident evidence and timelines are required for regulatory reporting to supervisors. Retain incident logs and documentation for reporting and audit proof within notification requirements.",
+          "policyGuidance": "Retain incident logs and documentation for reporting and audit proof."
+        },
+        "CISO": {
+          "phrasing": "Incident response capability determines regulatory exposure and reputational impact. Maintain tested IR playbooks, tabletop exercises, and report KPIs to leadership with supervisor oversight.",
+          "policyGuidance": "Maintain tested IR playbooks, tabletop exercises, and report KPIs to leadership."
+        }
+      },
+      "crossReferences": ["DORA-2024", "NIS2-2023", "CRA-2024"]
+    },
+    {
+      "id": "cra-vulnerability-disclosure",
+      "requirementName": "CRA Vulnerability Disclosure and Patching",
+      "coreDescription": "Products must have vulnerability disclosure policies and secure update mechanisms.",
+      "roles": {
+        "Developer": {
+          "phrasing": "Implement secure update channels, sign artifacts, and enforce runtime checks. Build vulnerability disclosure processes and patch mechanisms with proper testing.",
+          "policyGuidance": "Implement secure CI/CD and validate updates before rollout."
+        },
+        "ProductManager": {
+          "phrasing": "Include secure-by-design requirements in product specs and lifecycle documents. Require secure update and disclosure processes in product roadmaps with customer communication plans.",
+          "policyGuidance": "Require secure update and disclosure processes in product roadmaps."
+        },
+        "ComplianceOfficer": {
+          "phrasing": "Collect product design evidence and secure update logs for conformity assessments. Retain documentation needed for CRA conformity and market surveillance with disclosure tracking.",
+          "policyGuidance": "Retain documentation needed for CRA conformity and market surveillance."
+        },
+        "CISO": {
+          "phrasing": "Product security must be assured prior to market; enforce org-wide product-security gates. Define product-security acceptance criteria and oversee compliance with vulnerability disclosure policies.",
+          "policyGuidance": "Define product-security acceptance criteria and oversee compliance."
+        }
+      },
+      "crossReferences": ["ISO27001-A.12", "ISO42001-2023"]
+    }
+  ]
+}
