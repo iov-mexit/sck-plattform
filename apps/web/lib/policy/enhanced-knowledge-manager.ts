@@ -27,10 +27,12 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
   private enhancedChunks: Map<string, EnhancedKnowledgeChunk> = new Map();
   private chunkEmbeddings: Map<string, number[]> = new Map();
   private conceptIndex: Map<string, string[]> = new Map(); // concept -> chunkIds
+  private initializationComplete: Promise<void>;
 
   constructor() {
     super();
-    this.initializeEnhancedChunks();
+    // Kick off async initialization and retain a promise we can await before searches
+    this.initializationComplete = this.initializeEnhancedChunks();
   }
 
   /**
@@ -93,6 +95,8 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     const startTime = Date.now();
 
     try {
+      // Ensure embeddings and indexes are ready before searching
+      await this.initializationComplete;
       const queryEmbedding = await generateEmbedding(query);
       const results: SemanticSearchResult[] = [];
 
@@ -135,6 +139,9 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
    */
   async searchIntelligent(query: string, userRole?: string): Promise<MultiModalSearchResult> {
     const startTime = Date.now();
+
+    // Ensure initialization before any composite search
+    await this.initializationComplete;
 
     // 1. Semantic search
     const semanticResults = await this.searchBySimilarity(query, 0.6);
@@ -374,15 +381,17 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     sampleResponses?: any;
     summary: string;
   }> {
+    // Ensure initialization before accessing chunk collections
+    await this.initializationComplete;
     const roleChunks = this.getChunksByRole(role);
     const frameworkChunks = framework ? this.getChunksByFramework(framework) : roleChunks;
-    
+
     // Filter for role-specific content
-    const roleSpecificChunks = roleChunks.filter(chunk => 
+    const roleSpecificChunks = roleChunks.filter(chunk =>
       chunk.metadata.targetRoles?.includes(role.toLowerCase()) ||
       chunk.metadata.roleSpecificRelevance
     );
-    
+
     // Get sample responses if available
     let sampleResponses;
     if (role.toLowerCase() === 'product manager') {
@@ -401,9 +410,9 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
         }
       };
     }
-    
+
     const summary = `Found ${roleSpecificChunks.length} role-specific guidance chunks for ${role}${framework ? ` in ${framework}` : ''}`;
-    
+
     return {
       role,
       framework,
@@ -420,18 +429,18 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     sampleResponse?: string;
     confidence: number;
   }> {
-    // Get semantic results
-    const semanticResults = await this.searchBySimilarity(query, 0.2);
-    
+    // Get semantic results with lower threshold for role-specific queries
+    const semanticResults = await this.searchBySimilarity(query, 0.1);
+
     // Get role-specific guidance
     const roleGuidance = await this.getRoleSpecificGuidance(role, framework);
-    
+
     // Filter results by role
-    const roleFilteredResults = semanticResults.filter(result => 
+    const roleFilteredResults = semanticResults.filter(result =>
       result.chunk.metadata.targetRoles?.includes(role.toLowerCase()) ||
       result.chunk.metadata.roleSpecificRelevance
     );
-    
+
     // Generate sample response if available
     let sampleResponse;
     if (roleGuidance.sampleResponses) {
@@ -441,10 +450,10 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
         sampleResponse = response.concise;
       }
     }
-    
-    const confidence = roleFilteredResults.length > 0 ? 
+
+    const confidence = roleFilteredResults.length > 0 ?
       Math.min(0.95, 0.7 + (roleFilteredResults.length * 0.05)) : 0.5;
-    
+
     return {
       semanticResults: roleFilteredResults,
       roleGuidance,
