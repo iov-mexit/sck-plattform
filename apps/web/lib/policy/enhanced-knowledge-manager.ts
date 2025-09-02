@@ -61,14 +61,19 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     // Load external role-specific chunks from JSONL files if available
     console.log('🔍 Starting external chunk loading...');
     try {
-      const externalDir = path.resolve(process.cwd(), 'apps/web/rag-ingestion/cleaned-data/role_chunks');
+      // Resolve external directory robustly against varying CWDs
+      const candidateDirs = [
+        path.resolve(process.cwd(), 'rag-ingestion/cleaned-data/role_chunks'),
+        path.resolve(process.cwd(), 'apps/web/rag-ingestion/cleaned-data/role_chunks'),
+        path.resolve(process.cwd(), '../rag-ingestion/cleaned-data/role_chunks'),
+      ];
+      const resolvedExternalDir = candidateDirs.find(d => fs.existsSync(d));
       console.log(`🔍 Current working directory: ${process.cwd()}`);
-      console.log(`🔍 External directory: ${externalDir}`);
-      console.log(`🔍 External directory: ${externalDir}`);
-      console.log(`🔍 External directory exists: ${fs.existsSync(externalDir)}`);
-      if (fs.existsSync(externalDir)) {
+      console.log(`🔍 Candidate external dirs: ${candidateDirs.join(' | ')}`);
+      console.log(`🔍 Chosen external dir: ${resolvedExternalDir || 'NOT FOUND'}`);
+      if (resolvedExternalDir && fs.existsSync(resolvedExternalDir)) {
         // First try to load the embedded JSONL file (preferred)
-        const embeddedFile = path.join(externalDir, 'regulatory_knowledge.embedded.jsonl');
+        const embeddedFile = path.join(resolvedExternalDir, 'regulatory_knowledge.embedded.jsonl');
         console.log(`🔍 Looking for embedded file: ${embeddedFile}`);
         console.log(`🔍 File exists: ${fs.existsSync(embeddedFile)}`);
         if (fs.existsSync(embeddedFile)) {
@@ -80,20 +85,55 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
 
             for (const line of lines) {
               try {
-                const item: EnhancedKnowledgeChunk = JSON.parse(line);
-                // Avoid ID collisions
-                if (!this.enhancedChunks.has(item.id)) {
-                  this.enhancedChunks.set(item.id, item);
-                  // If the item has an embedding, store it
-                  if (item.embedding && Array.isArray(item.embedding)) {
-                    this.chunkEmbeddings.set(item.id, item.embedding);
+                const raw: any = JSON.parse(line);
+                const id: string = raw.id || raw.requirementId || `ext-${Math.random().toString(36).slice(2)}`;
+
+                // Derive framework from id heuristics
+                const lowerId = (id || '').toLowerCase();
+                let framework = raw.framework || raw.metadata?.framework;
+                if (!framework) {
+                  if (lowerId.includes('nis2')) framework = 'nis2-2023';
+                  else if (lowerId.includes('dora')) framework = 'dora-2024';
+                  else if (lowerId.includes('cra')) framework = 'cra-2024';
+                  else if (lowerId.includes('iso27001') || lowerId.includes('iso-27001')) framework = 'iso-27001-2022';
+                  else if (lowerId.includes('owasp-api')) framework = 'owasp-api-2023';
+                  else if (lowerId.includes('owasp-web') || lowerId.includes('owasp-top10')) framework = 'owasp-top10-2021';
+                  else if (lowerId.includes('ai-act') || lowerId.includes('iso42001')) framework = 'eu-ai-act-2024';
+                  else framework = 'unknown';
+                }
+
+                // Build text from core + role phrasing for richer retrieval
+                const roles = raw.roles || {};
+                const roleTexts: string[] = [];
+                for (const roleKey of ['Developer', 'ProductManager', 'ComplianceOfficer', 'CISO']) {
+                  const r = roles[roleKey];
+                  if (r?.phrasing) roleTexts.push(`${roleKey}: ${r.phrasing}`);
+                  if (r?.policyGuidance) roleTexts.push(`${roleKey} Policy: ${r.policyGuidance}`);
+                }
+                const coreParts = [raw.coreDescription, ...roleTexts].filter(Boolean);
+                const text = coreParts.join('\n');
+
+                const safeChunk: any = {
+                  id,
+                  text,
+                  metadata: {
+                    framework,
+                    concepts: Array.isArray(raw.metadata?.concepts) ? raw.metadata.concepts : []
                   }
-                  if (item.metadata.concepts) {
-                    for (const concept of item.metadata.concepts) {
-                      const existing = this.conceptIndex.get(concept) || [];
-                      existing.push(item.id);
-                      this.conceptIndex.set(concept, existing);
-                    }
+                };
+
+                // Avoid ID collisions
+                if (!this.enhancedChunks.has(id)) {
+                  this.enhancedChunks.set(id, safeChunk);
+                  // If the raw line has an embedding array, store it
+                  if (Array.isArray(raw.embedding)) {
+                    this.chunkEmbeddings.set(id, raw.embedding);
+                  }
+                  const concepts: string[] = safeChunk.metadata?.concepts || [];
+                  for (const concept of concepts) {
+                    const existing = this.conceptIndex.get(concept) || [];
+                    existing.push(id);
+                    this.conceptIndex.set(concept, existing);
                   }
                   loadedCount++;
                 }
@@ -107,10 +147,10 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
           }
         } else {
           // Fallback to JSON files
-          const files = fs.readdirSync(externalDir).filter(f => f.endsWith('.json'));
+          const files = fs.readdirSync(resolvedExternalDir).filter(f => f.endsWith('.json'));
           for (const file of files) {
             try {
-              const full = path.join(externalDir, file);
+              const full = path.join(resolvedExternalDir, file);
               const raw = fs.readFileSync(full, 'utf-8');
               const items: EnhancedKnowledgeChunk[] = JSON.parse(raw);
               for (const item of items) {
