@@ -1,0 +1,1674 @@
+[
+  {
+    "id": "nis2-2023-product manager-1756801970118-0",
+    "text": "<!DOCTYPE html> <html lang=\"en\" dir=\"ltr\" class=\"h-100\"> <head> <meta charset=\"utf-8\" /> <meta name=\"MobileOptimized\" content=\"width\" /> <meta name=\"HandheldFriendly\" content=\"true\" /> <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /> <style>div#sliding-popup, div#sliding-popup .eu-cookie-withdraw-banner, .eu-cookie-withdraw-tab {background: #0779bf} div#sliding-popup.eu-cookie-withdraw-wrapper { background: transparent; } #sliding-popup h1, #sliding-popup h2, #sliding-popup h3, #sliding-popup p, #sliding-popup label, #sliding-popup div, .eu-cookie-compliance-more-button, .eu-cookie-compliance-secondary-button, .eu-cookie-withdraw-tab { color: #ffffff;} .eu-cookie-withdraw-tab { border-color: #ffffff;}</style> <link rel=\"icon\" href=\"/themes/custom/enisaweb/favicon.ic",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.118Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-1",
+    "text": "o\" type=\"image/png\" /> <link rel=\"canonical\" href=\"https://www.enisa.europa.eu/publications/nis2-technical-implementation-guidance\" /> <link rel=\"shortlink\" href=\"https://www.enisa.europa.eu/node/19130\" /> <script>window.a2a_config=window.a2a_config||{};a2a_config.callbacks=[];a2a_config.overlays=[];a2a_config.templates={};</script> <meta content=\"ENISA: Every day we experience the Information Society. Interconnected networks touch our everyday lives, at home and at work. It is therefore vital that computers, mobile phones, banking, and the Internet function, to support Europe’s digital economy. That is why ENISA is working with Cybersecurity for the EU and the Member States.\" name=\"DC.description\"> <meta name=\"description\" content=\"ENISA is the EU agency dedicated to enhancing cybersecuri",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-2",
+    "text": "ty in Europe. They offer guidance, tools, and resources to safeguard citizens and businesses from cyber threats.\"> <meta name=\"keywords\" content=\"Cybersecurity, EU, ENISA, computer security, Cyber Threats, EU Cyber Crisis, Incident Management, Market and Standards, Product Security, Security certification, Risk Management, Skills and competences, State of cybersecurity in the EU, Vulnerability Disclosure, Artificial Intelligence, Next Gen Technologies, Awareness, Cyber Hygiene, Digital Identity, Data Protection, Education and career path\"> <title>NIS2 Technical Implementation Guidance | ENISA</title> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/core/components/progress.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/core/componen",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-3",
+    "text": "ts/ajax-progress.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/align.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/fieldgroup.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/container-inline.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/clearfix.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/details.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/hidden.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/s",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-4",
+    "text": "ystem/components/item-list.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/js.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/nowrap.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/position-container.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/reset-appearance.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/resize.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/system-status-counter.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-5",
+    "text": "themes/stable9/css/system/components/system-status-report-counters.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/system-status-report-general-info.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/system/components/tablesort.module.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/themes/base/core.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/themes/base/tabs.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"//cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/views/views.module.css?sz6ici\" /> <link re",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-6",
+    "text": "l=\"stylesheet\" media=\"all\" href=\"/modules/contrib/eu_cookie_compliance/css/eu_cookie_compliance.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/addtoany/css/addtoany.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/themes/base/theme.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/blocktabs/css/blocktabs.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/ckeditor_accordion/css/accordion.frontend.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/social_media_links/css/social_media_links.theme.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/modules/contrib/we_megamenu/assets/includes/bootstrap/css/bootstrap.min.css?sz6ici\" /> <link r",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-7",
+    "text": "el=\"stylesheet\" media=\"all\" href=\"/modules/contrib/we_megamenu/assets/css/we_megamenu_backend.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/core/themes/stable9/css/core/assets/vendor/normalize-css/normalize.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/progress.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/action-links.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/breadcrumb.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/container-inline.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/details.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\"",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-8",
+    "text": " href=\"/themes/custom/enisaweb/css/components/exposed-filters.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/field.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/form.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/icons.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/inline-form.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/item-list.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/links.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/menu.css?sz6ici\" /> <link re",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-9",
+    "text": "l=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/more-link.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/pager.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/tabledrag.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/tableselect.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/tablesort.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/textarea.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/ui-dialog.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/compone",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-10",
+    "text": "nts/messages.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/components/node.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/style.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/enisafonts.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/enisaweb.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/nis2_style.css?sz6ici\" /> <link rel=\"stylesheet\" media=\"all\" href=\"/themes/custom/enisaweb/css/cookies.css?sz6ici\" /> </head> <body class=\"path-node page-node-type-publications d-flex flex-column h-100\"> <div class=\"dialog-off-canvas-main-canvas d-flex flex-column h-100\" data-off-canvas-main-canvas> <header> <p class=\"sr-on",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-11",
+    "text": "ly\"><a href=\"#main-content\" accesskey=\"M\">Go to the main content</a></p> <div class=\"navbar navbar-expand-lg navbar-dark text-light bg-primary header\"> <div class=\"container logo-menu-wrapper d-flex\"> <div class=\"region region-nav-branding\"> <div id=\"block-enisaweb-branding\" class=\"block block-system block-system-branding-block\"> <div class=\"navbar-brand d-flex align-items-center\"> <a href=\"/\" title=\"Home\" rel=\"home\" class=\"site-logo d-block\"> <img src=\"/themes/custom/enisaweb/enisa-logo.png\" alt=\"Home\" fetchpriority=\"high\" /> </a> <div> </div> </div> </div> </div> <nav class=\"collapse navbar-collapse justify-content-end main-menu\" id=\"navbarSupportedContent\" role=\"navigation\" aria-label=\"Main menu and Search box\"> <div class=\"region region-nav-main\"> <div id=\"block-enisaweb-mainnavigation",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-12",
+    "text": "-2\" class=\"block block-we-megamenu block-we-megamenu-blockmain\"> <div class=\"region-we-mega-menu\"> <a href=\"javascript:\" class=\"navbar-toggle collapsed\" aria-label=\"Open/close menu\" aria-controls=\"mainMenuResposive\" name=\"menu-button\" role=\"button\"> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> <span class=\"icon-bar\"></span> </a> <nav class=\"main navbar navbar-default navbar-we-mega-menu mobile-collapse hover-action\" data-menu-name=\"main\" data-block-theme=\"enisaweb\" data-style=\"Default\" data-animation=\"None\" data-delay=\"\" data-duration=\"\" data-autoarrow=\"\" data-alwayshowsubmenu=\"\" data-action=\"hover\" data-mobile-collapse=\"0\" aria-label=\"ENISA main menu\" id=\"mainMenuResposive\"> <div class=\"container-fluid\"> <ul class=\"we-mega-menu-ul nav nav-tabs\"> <li class=\"we-mega-menu-li",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-13",
+    "text": " justify dropdown-menu\" title=\"\" data-level=\"0\" data-element-type=\"\" data-id=\"320e2c86-310b-4f7b-a4a9-188df34c3e43\" data-submenu=\"1\" data-hide-sub-when-collapse=\"\" data-group=\"0\" data-caption=\"\" data-alignsub=\"justify\" data-target=\"\" data-icon=\"\" > <span class=\"we-megamenu-nolink\"> Topics</span> <div class=\"we-mega-menu-submenu\" data-element-type=\"we-mega-menu-submenu\" data-submenu-width=\"\" data-class=\"\" style=\"width: px\"> <div class=\"we-mega-menu-submenu-inner\"> <div class=\"we-mega-menu-row\" data-element-type=\"we-mega-menu-row\" data-custom-row=\"1\"> <div class=\"we-mega-menu-col span3\" data-element-type=\"we-mega-menu-col\" data-width=\"3\" data-block=\"enisaweb_topics\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-14",
+    "text": "enisaweb-topics\" class=\"block block-block-content block-block-contentec3f1f7d-35d4-4776-a03c-7f97a2fcfc8f\"> <p class=\"title\"><a href=\"/topics\" target=\"_self\" title=\"Access to All Topics page\">Topics</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Learn more about the topics</p><p><a class=\"button\" href=\"/topics\" data-entity-type=\"node\" data-entity-uuid=\"5f4db810-e19d-49a4-baaa-86ec782eb91e\" data-entity-substitution=\"canonical\" title=\"All topics page\">Access</a></p></div> </div> </div></div> </div> <div class=\"we-mega-menu-col span3\" data-element-type=\"we-mega-menu-col\" data-width=\"3\" data-block=\"enisaweb_views_block__topics_tax_block_1\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-15",
+    "text": "=\"type-of-block\"><div class=\"block-inner\"><div class=\"views-element-container block block-views block-views-blocktopics-tax-block-1\" id=\"block-enisaweb-views-block-topics-tax-block-1\"> <p class=\"title\"><a href=\"/audience/national-eu-authorities\" target=\"_self\" title=\"Access to For National / EU authorities page\">For National / EU authorities</a></p> <div data-block=\"nav_main\"><div class=\"view view-topics-tax view-id-topics_tax view-display-id-block_1 js-view-dom-id-881d7fab13a7be23300d574abfeafe939cb3ed2a4f6f7c0098cc74614ffa24c2\"> <div class=\"view-content\"> <div class=\"item-list\"> <ul> <li><a href=\"/topics/cyber-threats\" hreflang=\"en\">Cyber Threats</a></li> <li><a href=\"/topics/eu-incident-response-and-cyber-crisis-management\" hreflang=\"en\">EU incident response and cyber crisis management<",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-16",
+    "text": "/a></li> <li><a href=\"/topics/market\" hreflang=\"en\">Market</a></li> <li><a href=\"/topics/product-security-and-certification\" hreflang=\"en\">Product Security and Certification</a></li> <li><a href=\"/topics/risk-management\" hreflang=\"en\">Risk Management</a></li> <li><a href=\"/topics/skills-and-competences\" hreflang=\"en\">Skills and competences</a></li> <li><a href=\"/topics/state-of-cybersecurity-in-the-eu\" hreflang=\"en\">State of cybersecurity in the EU</a></li> <li><a href=\"/topics/vulnerability-disclosure\" hreflang=\"en\">Vulnerability Disclosure</a></li> </ul> </div> </div> </div> </div> </div></div></div> </div> <div class=\"we-mega-menu-col span3\" data-element-type=\"we-mega-menu-col\" data-width=\"3\" data-block=\"enisaweb_views_block__topics_tax_block_2\" data-blocktitle=\"0\" data-hidewhencollapse",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-17",
+    "text": "=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div class=\"views-element-container title block block-views block-views-blocktopics-tax-block-2\" id=\"block-enisaweb-views-block-topics-tax-block-2\"> <p class=\"title\"><a href=\"/audience/private-sector\" target=\"_self\" title=\"Access to Private Sector page\">Private Sector</a></p> <div data-block=\"nav_main\"><div class=\"view view-topics-tax view-id-topics_tax view-display-id-block_2 js-view-dom-id-415d6b1fff72af354ec51aafaf709d5b4b73ef37b87a7b6bd5b7c39267746121\"> <div class=\"view-content\"> <div class=\"item-list\"> <ul> <li><a href=\"/topics/artificial-intelligence-and-next-gen-technologies\" hreflang=\"en\">Artificial Intelligence and Next Gen Technologies</a></li> <li><a href=\"/topics/awareness-and-cyber-hygiene\" hreflang=\"en\">Aw",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-18",
+    "text": "areness and Cyber Hygiene</a></li> <li><a href=\"/topics/certification-and-standards\" hreflang=\"en\">Certification and Standards</a></li> <li><a href=\"/topics/cyber-threats\" hreflang=\"en\">Cyber Threats</a></li> <li><a href=\"/topics/cybersecurity-of-critical-sectors\" hreflang=\"en\">Cybersecurity of Critical Sectors</a></li> <li><a href=\"/topics/digital-identity-and-data-protection\" hreflang=\"en\">Digital Identity and Data Protection</a></li> <li><a href=\"/topics/incident-management\" hreflang=\"en\">Incident management</a></li> <li><a href=\"/topics/risk-management\" hreflang=\"en\">Risk Management</a></li> <li><a href=\"/topics/skills-and-competences-for-companies\" hreflang=\"en\">Skills and competences (for companies)</a></li> <li><a href=\"/topics/vulnerability-disclosure\" hreflang=\"en\">Vulnerability D",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-19",
+    "text": "isclosure</a></li> </ul> </div> </div> </div> </div> </div></div></div> </div> <div class=\"we-mega-menu-col span3\" data-element-type=\"we-mega-menu-col\" data-width=\"3\" data-block=\"enisaweb_views_block__topics_tax_block_3\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div class=\"views-element-container title block block-views block-views-blocktopics-tax-block-3\" id=\"block-enisaweb-views-block-topics-tax-block-3\"> <p class=\"title\"><a href=\"/audience/citizens\" target=\"_self\" title=\"Access to Citizens page\">Citizens</a></p> <div data-block=\"nav_main\"><div class=\"view view-topics-tax view-id-topics_tax view-display-id-block_3 js-view-dom-id-a778bfb4c9462d66c9f8029377b22d961d9a24f0e199dc6111f9d5764cde12c7\"> <div class=\"view-conten",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-20",
+    "text": "t\"> <div class=\"item-list\"> <ul> <li><a href=\"/topics/cyber-hygiene\" hreflang=\"en\">Cyber Hygiene</a></li> <li><a href=\"/topics/cyber-incident-awareness\" hreflang=\"en\">Cyber Incident Awareness</a></li> <li><a href=\"/topics/education-and-career-path\" hreflang=\"en\">Education and career path</a></li> </ul> </div> </div> </div> </div> </div></div></div> </div> </div> </div> </div> </li><li class=\"we-mega-menu-li\" title=\"Access to all publications\" data-level=\"0\" data-element-type=\"\" data-id=\"2d24a690-803d-44ad-8d7e-8cf0eb7d0e40\" data-submenu=\"0\" data-hide-sub-when-collapse=\"\" data-group=\"0\" data-caption=\"\" data-alignsub=\"\" data-target=\"_self\" data-icon=\"\" > <a class=\"we-mega-menu-li\" title=\"\" href=\"/publications\" target=\"_self\"> Publications </a> </li><li class=\"we-mega-menu-li dropdown-menu\" t",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-21",
+    "text": "itle=\"\" data-level=\"0\" data-element-type=\"\" data-id=\"54b069d8-f99f-45e7-9d50-9345e82ad14f\" data-submenu=\"1\" data-hide-sub-when-collapse=\"\" data-group=\"0\" data-caption=\"\" data-alignsub=\"\" data-target=\"\" data-icon=\"\" > <span class=\"we-megamenu-nolink\"> Newsroom &amp; Events</span> <div class=\"we-mega-menu-submenu\" data-element-type=\"we-mega-menu-submenu\" data-submenu-width=\"\" data-class=\"\" style=\"width: px\"> <div class=\"we-mega-menu-submenu-inner\"> <div class=\"we-mega-menu-row\" data-element-type=\"we-mega-menu-row\" data-custom-row=\"1\"> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_news\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-news\" clas",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-22",
+    "text": "s=\"block block-block-content block-block-content00f65cb0-e1b0-41a1-8a0d-00ce6ced0f0e\"> <p class=\"title\"><a href=\"/news\" target=\"_self\" title=\"Access to All News\">News</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Cybersecurity in focus: News &amp; updates from ENISA</p><p><a class=\"button\" href=\"/news\" data-entity-type=\"node\" data-entity-uuid=\"088dd847-33ff-4c8e-b094-f0d38a66bbdd\" data-entity-substitution=\"canonical\" title=\"All News page\">Access</a></p></div> </div> </div></div> </div> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_events\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-23",
+    "text": "inner\"><div id=\"block-enisaweb-events\" class=\"block block-block-content block-block-contentb3c06780-f342-437d-9828-54fe86eb9786\"> <p class=\"title\"><a href=\"/events\" target=\"_self\" title=\"Access to All Events\">Events</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Cybersecurity in practice: Events &amp; Workshops by ENISA</p><p><a class=\"button\" href=\"/events\" data-entity-type=\"node\" data-entity-uuid=\"34f66c6d-0f07-4977-85e3-e8578a59d59c\" data-entity-substitution=\"canonical\" title=\"All Events page\">Access</a></p></div> </div> </div></div> </div> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_pressoffice\" data-blocktitle=\"0\" data-hidewhencollapse=",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-24",
+    "text": "\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-pressoffice\" class=\"block block-system block-system-menu-blockpress-office\"> <p class=\"title\"><a href=\"/press-office\" target=\"_self\" title=\"Access to Press office page\">Press office</a></p> <ul data-block=\"nav_main\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/press-office/corporate-identity\" class=\"nav-link\" data-drupal-link-system-path=\"node/11030\">Corporate identity</a> </li> <li class=\"nav-item\"> <a href=\"/press-office/cybersecurity-material\" class=\"nav-link\" data-drupal-link-system-path=\"node/11031\">Cybersecurity material</a> </li> <li class=\"nav-item\"> <a href=\"/form/seek-an-expert\" class=\"nav-link\" data-drupal-link-system-path=\"webform/seek_an_expert\">Seek an expert or Request a ",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-25",
+    "text": "speaker</a> </li> </ul> </div></div></div> </div> </div> </div> </div> </li><li class=\"we-mega-menu-li dropdown-menu\" title=\"\" data-level=\"0\" data-element-type=\"\" data-id=\"eaba29ce-6446-4da3-930a-c3d97495f00b\" data-submenu=\"1\" data-hide-sub-when-collapse=\"\" data-group=\"0\" data-caption=\"\" data-alignsub=\"\" data-target=\"\" data-icon=\"\" > <span class=\"we-megamenu-nolink\"> About</span> <div class=\"we-mega-menu-submenu\" data-element-type=\"we-mega-menu-submenu\" data-submenu-width=\"\" data-class=\"\" style=\"width: px\"> <div class=\"we-mega-menu-submenu-inner\"> <div class=\"we-mega-menu-row\" data-element-type=\"we-mega-menu-row\" data-custom-row=\"1\"> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_whatwedosubmenubutton_2\" data-blocktitle=\"0\" data",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-26",
+    "text": "-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-whatwedosubmenubutton-2\" class=\"block block-block-content block-block-contente0a96203-1eca-4991-9533-33064cace452\"> <p class=\"title\"><a href=\"/about-enisa/what-we-do\" target=\"_self\" title=\"Access to What we do page\">What we do</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Achieving a high common level of cybersecurity across Europe</p><p><a class=\"button\" href=\"/about-enisa/what-we-do\" data-entity-type=\"node\" data-entity-uuid=\"0619d110-d4dc-4f6b-aa0d-9a56252da07d\" data-entity-substitution=\"canonical\" title=\"What we do page\">Access</a></p></div> </div></div></div> </div> <div class=\"we-mega-menu",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-27",
+    "text": "-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_whatwedosubmenu_2\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-whatwedosubmenu-2\" class=\"block block-block-content block-block-content99599d89-56f7-43f1-907b-72614045018d\"> <p class=\"title\"><a href=\"/about-enisa/who-we-are\" target=\"_self\" title=\"Access to Who we are page\">Who we are</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Towards a Trusted and Cyber Secure Europe&nbsp;</p><p><a class=\"button\" href=\"/about-enisa/who-we-are\" data-entity-type=\"node\" data-entity-uuid=\"3c46c210-298c-472c-b871-b167dfe2642c\" data-entity-substitutio",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-28",
+    "text": "n=\"canonical\" title=\"Who we are page\">Access</a></p></div> </div></div></div> </div> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_transparency\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-transparency\" class=\"block block-system block-system-menu-blocktransparency\"> <p class=\"title\"><a href=\"/about-enisa/How-we-work\" target=\"_self\" title=\"Access to How we work page\">How we work</a></p> <ul data-block=\"nav_main\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/about-enisa/accounting-finance/accounting-finance\" class=\"nav-link\" data-drupal-link-system-path=\"node/17339\">Accounting and Finance</a> </li> <li class=\"nav-item\"> <a href=\"",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-29",
+    "text": "/about-enisa/procedures-and-policies\" class=\"nav-link dropdown-toggle\" data-drupal-link-system-path=\"node/17360\">Policies and Procedures</a> </li> <li class=\"nav-item\"> <a href=\"/about-enisa/data-protection/data-protection\" class=\"nav-link dropdown-toggle\" data-drupal-link-system-path=\"node/17346\">Data Protection</a> </li> <li class=\"nav-item\"> <a href=\"/about-enisa/transparency\" class=\"nav-link dropdown-toggle\" data-drupal-link-system-path=\"node/17404\">Transparency</a> </li> <li class=\"nav-item\"> <a href=\"/enisa-a-climate-neutral-agency\" class=\"nav-link\" data-drupal-link-system-path=\"node/18893\">ENISA, a climate neutral agency </a> </li> </ul> </div> </div></div> </div> </div> <div class=\"we-mega-menu-row\" data-element-type=\"we-mega-menu-row\" data-custom-row=\"1\"> <div class=\"we-mega-menu-",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-30",
+    "text": "col span12 transversal-menu\" data-element-type=\"we-mega-menu-col\" data-width=\"12\" data-block=\"enisaweb_transversaloptionsofaboutmenu\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"transversal-menu\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-transversaloptionsofaboutmenu\" class=\"block block-system block-system-menu-blocktransversal-options-about-menu\"> <ul data-block=\"nav_main\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/topics/state-of-cybersecurity-in-the-eu/cybersecurity-policies/policy-observatory\" class=\"nav-link\" data-drupal-link-system-path=\"node/17484\">Policy observatory</a> </li> </ul> </div> </div></div> </div> </div> </div> </div> </li><li class=\"we-mega-menu-li dropdown-menu\" title=\"\" data-level=\"0\" data-element-type=\"\" da",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-31",
+    "text": "ta-id=\"44fbec5d-1aaf-4cb3-b06b-a79b571ad50c\" data-submenu=\"1\" data-hide-sub-when-collapse=\"\" data-group=\"0\" data-caption=\"\" data-alignsub=\"\" data-target=\"\" data-icon=\"\" > <span class=\"we-megamenu-nolink\"> Working with us</span> <div class=\"we-mega-menu-submenu\" data-element-type=\"we-mega-menu-submenu\" data-submenu-width=\"\" data-class=\"\" style=\"width: px\"> <div class=\"we-mega-menu-submenu-inner\"> <div class=\"we-mega-menu-row\" data-element-type=\"we-mega-menu-row\" data-custom-row=\"1\"> <div class=\"we-mega-menu-col span4\" data-element-type=\"we-mega-menu-col\" data-width=\"4\" data-block=\"enisaweb_workwithenisa\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-class=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-workwithenisa\" class=\"block block-block-content block",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-32",
+    "text": "-block-content86d5ce2f-abc2-4160-afda-442fe2c68258\"> <p class=\"title\"><a href=\"/working-with-us/working-for-enisa\" target=\"_self\" title=\"Access to Working for ENISA page\">Working for ENISA</a></p> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>Explore the benefits of working for ENISA</p><p><a class=\"button\" href=\"/working-with-us/working-for-enisa\" data-entity-type=\"node\" data-entity-uuid=\"f10da531-46ad-49f6-84cb-0770c69d839e\" data-entity-substitution=\"canonical\" title=\"Work with ENISA page\">Access</a></p></div> </div> </div></div> </div> <div class=\"we-mega-menu-col span8\" data-element-type=\"we-mega-menu-col\" data-width=\"8\" data-block=\"enisaweb_workingwithus\" data-blocktitle=\"0\" data-hidewhencollapse=\"\" data-cl",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-33",
+    "text": "ass=\"\"> <div class=\"type-of-block\"><div class=\"block-inner\"><div id=\"block-enisaweb-workingwithus\" class=\"title block block-system block-system-menu-blockworking-with-us\"> <p class=\"title\"><a href=\"/work-with-us\" target=\"_self\" title=\"Access to Working with us page\">Working with us</a></p> <ul data-block=\"nav_main\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/careers\" class=\"nav-link\" data-drupal-link-system-path=\"node/12487\">Careers</a> </li> <li class=\"nav-item\"> <a href=\"/working-with-us/procurement\" class=\"nav-link\" data-drupal-link-system-path=\"node/17421\">Procurement</a> </li> <li class=\"nav-item\"> <a href=\"/working-with-us/ad-hoc-working-groups-calls\" class=\"nav-link\" data-drupal-link-system-path=\"node/17422\">Ad hoc working groups</a> </li> </ul> </div></div></div> </div>",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-34",
+    "text": " </div> </div> </div> </li> </ul> </div> </nav> </div> </div> </div> <p class=\"btn-search\"> <a href=\"javascript:\" title=\"Show the search field\">Search</a> </p> <div class=\"search-form-wrapper\" aria-label=\"Search field\"> <div class=\"region region-nav-additional\"> <div id=\"block-enisaweb-search\" class=\"block block-block-content block-block-content8aa16f51-855f-41da-a3e7-a38e954a15b6\"> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><div class=\"search-block-form contextual-region block block-search container-inline\" data-drupal-selector=\"search-block-form\" id=\"block-enisaweb-search-form\" role=\"search\"><div class=\"contextual\" data-contextual-id=\"block:block=enisaweb_search:langcode=en\" data-contextual-token=\"S6pjfYIf4E7l",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-35",
+    "text": "YSnOGjvBizH9RyjrxyfFPxclLSTGUQE\" data-drupal-ajax-container data-once=\"contextual-render\"><p><button class=\"trigger focusable visually-hidden\" type=\"button\" aria-pressed=\"false\">Open configuration options</button></p><ul class=\"contextual-links\" hidden><li><a href=\"/web/admin/structure/block/manage/enisaweb_search?destination=/web/node\">Configure block</a></li><li><a href=\"/web/admin/structure/block/manage/enisaweb_search/delete?destination=/web/node\">Remove block</a></li></ul></div><form data-block=\"nav_additional\" action=\"/search\" method=\"get\" id=\"search-block-form\" accept-charset=\"UTF-8\"><div class=\"js-form-item form-item js-form-type-search form-type-search js-form-item-keys form-item-keys form-no-label\"><label class=\"visually-hidden\" for=\"edit-keys\">Search</label> <input class=\"form-s",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-36",
+    "text": "earch form-control\" title=\"Enter the terms you wish to search for.\" data-drupal-selector=\"edit-keys\" type=\"search\" id=\"edit-keys\" name=\"keys\" value size=\"15\" maxlength=\"128\"></div><div class=\"form-actions js-form-wrapper form-wrapper\" data-drupal-selector=\"edit-actions\" id=\"edit-actions-search\"><button class=\"button js-form-submit form-submit btn-enisa btn-primary\" data-drupal-selector=\"edit-submit\" type=\"submit\" id=\"edit-submit\" value=\"Search\">Search</button></div></form></div></div> </div> </div> <p class=\"btn-close-search\"><a href=\"javascript:\" title=\"Hide the search field\">Close</a></p> </div> </nav> </div> </div> </header> <main role=\"main\" class=\"container-full image-banner\"> <section class=\"title-breadcrumbs container\"> <div id=\"block-enisaweb-page-title\" class=\"block block-core blo",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-37",
+    "text": "ck-page-title-block\"> <h1><span class=\"field field--name-title field--type-string field--label-hidden\">NIS2 Technical Implementation Guidance</span> </h1> </div> <div class=\"region region-breadcrumb\"> <div id=\"block-enisaweb-breadcrumbs\" class=\"block block-system block-system-breadcrumb-block\"> <nav aria-label=\"breadcrumb\"> <p id=\"system-breadcrumb\" class=\"visually-hidden\">Breadcrumb</p> <ol class=\"breadcrumb\"> <li class=\"breadcrumb-item\"> <a href=\"/\" aria-label=\"Access to \">Home</a> </li> <li class=\"breadcrumb-item\"> <a href=\"/publications\" aria-label=\"Access to \">Publications</a> </li> <li class=\"breadcrumb-item\"> NIS2 Technical Implementation Guidance </li> </ol> </nav> </div> </div> </section> <div class=\"main container\"> <a id=\"main-content\" tabindex=\"-1\"></a> <div class=\"container\"> ",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-38",
+    "text": "<div class=\"row g-0 publications-node-section\"> <div id=\"block-enisaweb-content\" class=\"block block-system block-system-main-block\"> <article data-history-node-id=\"19130\" class=\"node publication-content-wrapper node--type-publications node--view-mode-full\"> <p class=\"btn-back\"><a href=\"https://www.enisa.europa.eu/publications\">Back to all publications</a></p> <div class=\"row\" class=\"node__content\"> <div class=\"publication-image col-xs-12 col-md-6 col-lg-3\"> <a href=\"/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf\" target=\"_blank\" > <img src=\"/sites/default/files/2025-06/Screenshot%202025-06-26%20114127.png\" alt=\"Cover of the publication titled “NIS 2 Implementation Guidance,” featuring hand icons related to cybe",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-39",
+    "text": "rsecurity and the NIS 2 logo in the centre, with “June 2025” noted at the bottom.\" > </a> <p class=\"btn-download-file\"><a href=\"/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf\" target=\"_blank\" >Download</a></p> </div> <div class=\"publication-content col-xs-12 col-md-12 col-lg-6\"> <p class=\"publish-date\"><span class=\"label-detail\">Publication date:</span><span class=\"date\">June 26, 2025</span></p> <div class=\"clearfix text-formatted field field--name-field-description field--type-text-long field--label-hidden field__item\"><p><span data-teams=\"true\">This report provides technical guidance to support the implementation of the NIS2 Directive for several types of entities in the NIS2 digital infrastructure, ICT servi",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-40",
+    "text": "ce management and digital providers sectors. The cybersecurity requirements for these entities are defined at EU level by Commission Implementing Regulation (EU) 2024/2690 of 17 October 2024. ENISA’s guidance offers practical advice, examples of evidence, and mappings of security requirements to help companies implement the regulation.</span></p></div> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p><strong>Additional materials</strong></p><p><a href=\"https://www.enisa.europa.eu/sites/default/files/2025-07/ENISA_Technical_Implementation_Guidance_Mapping_table_version_1.1.xlsx\">ENISA_Technical_Implementation_Guidance_Mapping_table_version_1.1</a></p></div> <div class=\"shareLinks\"> <div id=\"block-enisaweb-addtoanysh",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-41",
+    "text": "arebuttons\" class=\"block block-addtoany block-addtoany-block\"> <span class=\"a2a_kit a2a_kit_size_24 addtoany_list\" data-a2a-url=\"https://www.enisa.europa.eu/publications/nis2-technical-implementation-guidance\" data-a2a-title=\"NIS2 Technical Implementation Guidance\"><span>Share this page</span><a class=\"a2a_button_facebook\"></a><a class=\"a2a_button_twitter\"></a><a class=\"a2a_button_linkedin\"></a></span> </div> </div> </div> <div class=\"publication-metadata col-xs-12 col-md-6 col-lg-3\"> <h2 class=\"publication-detail\">Publication details</h2> <ul class=\"publication-metadata-detail\"> <li><span class=\"label-detail\">Content written for</span> <span class=\"text\"> <a href=\"https://www.enisa.europa.eu/audience/private-sector\">Private Sector</a> </span> </li> <li><span class=\"label-detail\">Publicati",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-42",
+    "text": "on type</span><span class=\"text\">ENISA Reports</span></li> <li class=\"related-topics\"> <span class=\"label-detail\">Topics</span> <ul> <li> <a href=\"/topics/cybersecurity-of-critical-sectors\"> Cybersecurity of Critical Sectors </a> </li> </ul> </li> <li class=\"lang\"> <span class=\"label-detail\">Language</span> <span class=\"text\"><a href=\"/sites/default/files/2025-06/ENISA_Technical_implementation_guidance_on_cybersecurity_risk_management_measures_version_1.0.pdf\" target=\"_blank\" >EN</a></span> </li> </ul> </div> </div> </article> </div> <div class=\"related-content-section\"> <div class=\"container\"> <div id=\"block-enisaweb-blocktabsrelatedcontent\" class=\"block block-blocktabs block-blocktabs-blockrelated-content\"> <h2>Related content</h2> <div id=\"blocktabs-related_content\" class=\"blocktabs cli",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-43",
+    "text": "ck default\" > <ul> <li><a href=\"#blocktabs-related_content-1\">Publications</a></li> <li><a href=\"#blocktabs-related_content-2\">Events</a></li> <li><a href=\"#blocktabs-related_content-3\">News</a></li> </ul> <div id=\"blocktabs-related_content-1\"><div class=\"views-element-container\"><div class=\"publications-list grid2x view view-related-content view-id-related_content view-display-id-block_1 js-view-dom-id-4ffb74dc32b676be2baf90237b02b7a63cfa7ff5c1feee6f61faeaa43010ea51\"> <div class=\"view-content\"> <div class=\"publications-item\"><div class=\"publication-image\"><a href='/publications/cybersecurity-roles-and-skills-for-nis2-essential-and-important-entities' title='Access to Cybersecurity roles and skills for NIS2 Essential and Important Entities'> <img loading=\"lazy\" src=\"/sites/default/files/st",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-44",
+    "text": "yles/thumbail_publications_list_98_147/public/2025-06/Screenshot%202025-06-25%20192713.png?itok=1K0yW3YL\" width=\"98\" height=\"147\" alt=\"Cover page of an ENISA report titled &#039;Cybersecurity Roles and Skills for NIS2 Essential and Important Entities&#039;, featuring a person typing on a laptop with floating digital icons representing cybersecurity roles. The report is dated June 2025 and maps NIS2 obligations to the ECSF.\" class=\"img-fluid image-style-thumbail-publications-list-98-147\" /> </a></div> <div class=\"publication-content\"> <h3><a href='/publications/cybersecurity-roles-and-skills-for-nis2-essential-and-important-entities' title='Access to the content '>Cybersecurity roles and skills for NIS2 Essential and Important Entities</a></h3> <p class=\"metadata\"> <span class=\"date\"><time ",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-45",
+    "text": "datetime=\"2025-06-26T12:00:32+02:00\" title=\"Thursday, June 26, 2025 - 12:00\" class=\"datetime\">June 26, 2025</time> </span> </p> <div class=\"content\"><p>&nbsp;ENISA in line with articles 6 and 10 of the Cybersecurity Act , prepared this guidance document on the skills and roles for the cybersecurity professionals needed to meet these legal requirements effectively.</p></div> <div class=\"related-topics\"> </div> </div></div> <div class=\"publications-item\"><div class=\"publication-image\"><a href='/publications/handbook-for-cyber-stress-tests' title='Access to Handbook for Cyber Stress Tests'> <img loading=\"lazy\" src=\"/sites/default/files/styles/thumbail_publications_list_98_147/public/2025-05/Screenshot%202025-05-15%20122329.png?itok=VNIOxEd_\" width=\"98\" height=\"147\" alt=\"Publication cover for ",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-46",
+    "text": "Handbook for Cyber Stress Tests - Skyline image with different metrics visual\" class=\"img-fluid image-style-thumbail-publications-list-98-147\" /> </a></div> <div class=\"publication-content\"> <h3><a href='/publications/handbook-for-cyber-stress-tests' title='Access to the content '>Handbook for Cyber Stress Tests</a></h3> <p class=\"metadata\"> <span class=\"date\"><time datetime=\"2025-05-15T12:02:09+02:00\" title=\"Thursday, May 15, 2025 - 12:02\" class=\"datetime\">May 15, 2025</time> </span> </p> <div class=\"content\"><p><span lang=\"EN-GB\">ENISA developed this handbook as guidance for national or sectorial authorities overseeing cybersecurity and resilience of critical sectors, at the national level, regional or EU level under NIS 2 Directi</span></p></div> <div class=\"related-topics\"> </div> </di",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-47",
+    "text": "v></div> <div class=\"publications-item\"><div class=\"publication-image\"><a href='/publications/low-earth-orbit-leo-satcom-cybersecurity-assessment' title='Access to Low Earth Orbit (LEO) SATCOM Cybersecurity Assessment'> <img loading=\"lazy\" src=\"/sites/default/files/styles/thumbail_publications_list_98_147/public/images/low-earth-orbit-leo-satcom-cybersecurity-assessment.png?itok=eC9mQ12q\" width=\"98\" height=\"147\" class=\"img-fluid image-style-thumbail-publications-list-98-147\" /> </a></div> <div class=\"publication-content\"> <h3><a href='/publications/low-earth-orbit-leo-satcom-cybersecurity-assessment' title='Access to the content '>Low Earth Orbit (LEO) SATCOM Cybersecurity Assessment</a></h3> <p class=\"metadata\"> <span class=\"date\"><time datetime=\"2024-02-15T01:00:00+01:00\" title=\"Thursday",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-48",
+    "text": ", February 15, 2024 - 01:00\" class=\"datetime\">February 15, 2024</time> </span> </p> <div class=\"content\">This report explores the cybersecurity of Low Earth Orbit (LEO) constellations providing telecommunications services (LEO satcom). Examining various threats and risks-technical, financial, or commercial the landscape of potential attacks is vast.</div> <div class=\"related-topics\"> </div> </div></div> <div class=\"publications-item\"><div class=\"publication-image\"><a href='/publications/undersea-cables' title='Access to Undersea cables'> <img loading=\"lazy\" src=\"/sites/default/files/styles/thumbail_publications_list_98_147/public/images/undersea-cables.png?itok=5SfWBIsc\" width=\"98\" height=\"147\" class=\"img-fluid image-style-thumbail-publications-list-98-147\" /> </a></div> <div class=\"public",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-49",
+    "text": "ation-content\"> <h3><a href='/publications/undersea-cables' title='Access to the content '>Undersea cables</a></h3> <p class=\"metadata\"> <span class=\"date\"><time datetime=\"2023-08-31T02:00:00+02:00\" title=\"Thursday, August 31, 2023 - 02:00\" class=\"datetime\">August 31, 2023</time> </span> </p> <div class=\"content\"><p>This report aims to follow up with detailed technical guidelines for national authorities and to support them with the technical aspects of the supervision of undersea cables and their associated infrastructure, including landing stations and cable net</p></div> <div class=\"related-topics\"> </div> </div></div> </div> <div class=\"view-footer\"> <p><a href=\"/publications?f[0]=topics%3A528#contentList\" class=\"btn-all\">BROWSE ALL PUBLICATIONS</a></p> </div> </div> </div> </div> <div",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-50",
+    "text": " id=\"blocktabs-related_content-2\"><div class=\"views-element-container\"><div class=\"events-for view view-related-content view-id-related_content view-display-id-block_2 js-view-dom-id-673428421b2c998110686c480434163269a7fb5ff6a5839c215631af2c1f9e76\"> <div class=\"view-content\"> <div class=\"item-events-for\"><div class=\"card-event\"> <h3 class=\"event-title\"><a href=\"/events/enisa-telecom-and-digital-infrastructure-security-forum-2025\" hreflang=\"en\">ENISA Telecom and Digital Infrastructure Security Forum 2025</a></h3> <p class=\"event-date\"> <span class=\"year\">2025</span> <span class=\"month\">Mar 20</span> </p> </div></div> <div class=\"item-events-for\"><div class=\"card-event\"> <h3 class=\"event-title\"><a href=\"/events/telecom-security-forum-2022\" hreflang=\"en\">ENISA Telecom Security Forum 2022</a><",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-51",
+    "text": "/h3> <p class=\"event-date\"> <span class=\"year\">2022</span> <span class=\"month\">Jun 29</span> </p> </div></div> <div class=\"item-events-for\"><div class=\"card-event\"> <h3 class=\"event-title\"><a href=\"/events/8th-edsoee-isacencsenisa-cybersecurity-forum\" hreflang=\"en\">8th E.DSO/EE-ISAC/ENCS/ENISA Cybersecurity Forum</a></h3> <p class=\"event-date\"> <span class=\"year\">2025</span> <span class=\"month\">Oct 30</span> </p> </div></div> <div class=\"item-events-for\"><div class=\"card-event\"> <h3 class=\"event-title\"><a href=\"/events/7th-e-dso-ee-isac-encs-enisa-cybersecurity-forum\" hreflang=\"en\">7th E.DSO/EE-ISAC/ENCS/ENISA Cybersecurity Forum</a></h3> <p class=\"event-date\"> <span class=\"year\">2024</span> <span class=\"month\">Oct 1</span> </p> </div></div> </div> <div class=\"view-footer\"> <p><a href=\"/ev",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-52",
+    "text": "ents?f[0]=topics%3A528#contentList\" class=\"btn-all\">BROWSE ALL EVENTS</a></p> </div> </div> </div> </div> <div id=\"blocktabs-related_content-3\"><div class=\"views-element-container\"><div class=\"enisa-cards-wrapper tabs col2x view view-related-content view-id-related_content view-display-id-block_3 js-view-dom-id-a556eaeb54e98414eb8b63e3d7d4dbd6d0a41f05d8c2e7978cfcb8f00ccaaa0c\"> <div class=\"view-content\"> <div class=\"enisa-card\"><h3><a href=\"/news/supporting-nis2-implementation-through-actionable-guidance\" hreflang=\"en\">Supporting NIS2 implementation through actionable guidance</a></h3> <p class=\"metadata\"> <span>Press Release</span> <span class=\"date\"><time datetime=\"2025-06-26T12:00:47+02:00\" title=\"Thursday, June 26, 2025 - 12:00\" class=\"datetime\">June 26, 2025</time> </span> </p> <div cl",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-53",
+    "text": "ass=\"related-topics\"> </div> <div class=\"content\"> <p>The EU Agency for Cybersecurity (ENISA) publishes a technical guideline for the security measures of the NIS2 Implementing Regulation to assist digital infrastructures and managed service providers.</p> </div></div> <div class=\"enisa-card\"><h3><a href=\"/news/putting-eu-resilience-to-the-test-enisa-handbook-on-cyber-stress-testing\" hreflang=\"en\">Putting EU resilience to the test: ENISA handbook on cyber stress testing</a></h3> <p class=\"metadata\"> <span>News Item</span> <span class=\"date\"><time datetime=\"2025-05-15T12:02:00+02:00\" title=\"Thursday, May 15, 2025 - 12:02\" class=\"datetime\">May 15, 2025</time> </span> </p> <div class=\"related-topics\"> </div> <div class=\"content\"> <p>The <a href=\"https://enisa.europa.eu/publications/handbook-f",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-54",
+    "text": "or-cyber-stress-tests\">Handbook for Cyber Stress Testing</a> aims to support national authorities in assessing the cybersecurity and resilience of critical sector entities.</p> </div></div> <div class=\"enisa-card\"><h3><a href=\"/news/from-cyber-to-outer-space-a-guide-to-securing-commercial-satellite-operations\" hreflang=\"en\">From Cyber to Outer Space: A Guide to Securing Commercial Satellite Operations</a></h3> <p class=\"metadata\"> <span>Press Release</span> <span class=\"date\"><time datetime=\"2025-03-26T09:01:55+01:00\" title=\"Wednesday, March 26, 2025 - 09:01\" class=\"datetime\">March 26, 2025</time> </span> </p> <div class=\"related-topics\"> </div> <div class=\"content\"> <p>The European Union Agency for Cybersecurity (ENISA) explores the cybersecurity threat landscape of space to strengthen th",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-55",
+    "text": "e resilience of commercial satellites.</p> </div></div> <div class=\"enisa-card\"><h3><a href=\"/news/proposed-enisa-role-to-safeguard-cybersecurity-of-health-sector\" hreflang=\"en\">Proposed ENISA role to safeguard cybersecurity of health sector </a></h3> <p class=\"metadata\"> <span>News Item</span> <span class=\"date\"><time datetime=\"2025-01-21T16:24:14+01:00\" title=\"Tuesday, January 21, 2025 - 16:24\" class=\"datetime\">January 21, 2025</time> </span> </p> <div class=\"related-topics\"> </div> <div class=\"content\"> <p>The EU Agency for Cybersecurity, ENISA welcomes the EU Action Plan for the cybersecurity of hospitals and healthcare providers proposed on 15 January.</p> </div></div> </div> <div class=\"view-footer\"> <p><a href=\"/news?f[0]=topics%3A528#contentList\" class=\"btn-all\">BROWSE ALL NEWS</a>",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-56",
+    "text": "</p> </div> </div> </div> </div> </div> </div> </div> </div> </div> </div> </div> </main> <footer class=\"mt-auto enisa-footer\"> <div class=\"container\"> <div class=\"footer container\"> <div class=\"row\"> <div class=\"col-md-12 col-lg-3\"> <div id=\"block-enisaweb-enisalogos\" class=\"block block-block-content block-block-content2195446e-db39-496e-a33e-1eefa17fd80e\"> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><div class=\"enisa-logo\"><img src=\"/themes/custom/enisaweb/images/enisa-logo-white.svg\" alt=\"ENISA, European Union Agency for Cybersecurity\" width=\"220\" height=\"150\" fetchpriority=\"high\" class=\"align-left\" loading=\"lazy\"><p><em>A Trusted and Cyber Secure Europe</em></p></div><div class=\"agencies-network-logo\"><img sr",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-57",
+    "text": "c=\"/themes/custom/enisaweb/images/agencies-network.png\" alt=\"Agencies network logo\" width=\"39\" height=\"36\" fetchpriority=\"high\" class=\"align-left\" loading=\"lazy\"><p><a href=\"https://agencies-network.europa.eu/index_en\" target=\"_blank\">EU Agencies Network</a></p></div></div> </div> <div id=\"block-enisaweb-socialmedialinks\" class=\"block-social-media-links block block-social-media-links-block\"> <p>Follow us on</p> <ul class=\"social-media-links--platforms platforms vertical\"> <li> <a class=\"social-media-link-icon--youtube\" href=\"https://www.youtube.com/user/ENISAvideos\" target=\"_blank\" > <span class='fab fa-youtube fa-2x'></span> <span class=\"platform-name\">Youtube</span> </a> </li> <li> <a class=\"social-media-link-icon--twitter\" href=\"https://x.com/enisa_eu\" target=\"_blank\" > <span class='fab",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-58",
+    "text": " fa-x-twitter fa-2x'></span> <span class=\"platform-name\">X</span> </a> </li> <li> <a class=\"social-media-link-icon--linkedin\" href=\"https://www.linkedin.com/company/european-union-agency-for-cybersecurity-enisa/\" target=\"_blank\" > <span class='fab fa-linkedin fa-2x'></span> <span class=\"platform-name\">LinkedIn</span> </a> </li> <li> <a class=\"social-media-link-icon--facebook\" href=\"https://www.facebook.com/ENISAEUAGENCY\" target=\"_blank\" > <span class='fab fa-facebook fa-2x'></span> <span class=\"platform-name\">Facebook</span> </a> </li> </ul> </div> </div> <div class=\"col-xs-12 col-md-6 col-lg-3 border-left\"> <nav aria-labelledby=\"block-enisaweb-contactus-menu\" id=\"block-enisaweb-contactus\" class=\"block block-menu navigation menu--contact-us\"> <p id=\"block-enisaweb-contactus-menu\">Contact u",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-59",
+    "text": "s</p> <ul data-block=\"footer\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/about-enisa/contact/contact\" class=\"nav-link\" data-drupal-link-system-path=\"node/17344\">Contacts</a> </li> <li class=\"nav-item\"> <a href=\"/form/contact-form\" class=\"nav-link\" data-drupal-link-system-path=\"webform/contact_form\">General queries</a> </li> <li class=\"nav-item\"> <a href=\"/working-with-us/procurement\" class=\"nav-link\" data-drupal-link-system-path=\"node/17421\">Public Procurement</a> </li> <li class=\"nav-item\"> <a href=\"/form/media-inquiries\" class=\"nav-link\" data-drupal-link-system-path=\"webform/media_inquiries\">Media inquiries</a> </li> </ul> </nav> </div> <div class=\"col-xs-12 col-md-6 col-lg-3 border-left\"> <div id=\"block-enisaweb-findoutaboutus\" class=\"block block-system block-system-menu-bl",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-60",
+    "text": "ockfind-out-about-us\"> <p>Find out about us</p> <ul data-block=\"footer\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/accessibility-statement\" class=\"nav-link\" data-drupal-link-system-path=\"node/18887\">Accessibility</a> </li> <li class=\"nav-item\"> <a href=\"/about-enisa/legal-notice\" class=\"nav-link\" data-drupal-link-system-path=\"node/17355\">Legal Notice</a> </li> <li class=\"nav-item\"> <a href=\"/about-enisa/data-protection/data-protection\" class=\"nav-link\" data-drupal-link-system-path=\"node/17346\">Data Protection</a> </li> <li class=\"nav-item\"> <a href=\"/about-enisa/cookies\" class=\"nav-link\" data-drupal-link-system-path=\"node/17345\">Cookies</a> </li> <li class=\"nav-item\"> <a href=\"/sitemap\" target=\"_blank\" class=\"nav-link\" data-drupal-link-system-path=\"sitemap\">Sitemap</a> </li> <",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-61",
+    "text": "/ul> </div> </div> <div class=\"col-xs-12 col-md-6 col-lg-3 border-left\"> <div id=\"block-enisaweb-pageofinterest\" class=\"block block-system block-system-menu-blockpage-of-interest\"> <p>Page of interest</p> <ul data-block=\"footer\" class=\"nav navbar-nav\"> <li class=\"nav-item\"> <a href=\"/publications\" class=\"nav-link\" data-drupal-link-system-path=\"publications\">Publications </a> </li> <li class=\"nav-item\"> <a href=\"/press-office\" class=\"nav-link\" data-drupal-link-system-path=\"node/11033\">Press Office</a> </li> <li class=\"nav-item\"> <a href=\"/digital-tools\" class=\"nav-link\" data-drupal-link-system-path=\"digital-tools\">Digital Tools</a> </li> <li class=\"nav-item\"> <a href=\"/work-with-us\" class=\"nav-link\" data-drupal-link-system-path=\"node/11443\">Working with us</a> </li> <li class=\"nav-item\"> <a",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-62",
+    "text": " href=\"/about-enisa/public-access-to-documents\" class=\"nav-link\" data-drupal-link-system-path=\"node/17363\">Public access to documents</a> </li> </ul> </div> </div> </div> </div> </div> <div class=\"line\"></div> <div class=\"copy container\"> <div class=\"row\"> <div class=\"col-xs-12 col-md-12 col-lg-6 alignleft\"> <div id=\"block-enisaweb-copyrightfooter\" class=\"block block-block-content block-block-content0f0b270e-cc5d-448c-a771-6cc7c0621340\"> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>©&nbsp;<script>document.write(/\\d{4}/.exec(Date())[0])</script> by the European Union Agency for Cybersecurity</p></div> </div> </div> <div class=\"col-xs-12 col-md-12 col-lg-6 alignright\"> <div id=\"block-enisaweb-enisadescriptionfoot",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-63",
+    "text": "er\" class=\"block block-block-content block-block-content2b4d8729-4032-4438-ba87-1a58fbc364db\"> <div class=\"clearfix text-formatted field field--name-body field--type-text-with-summary field--label-hidden field__item\"><p>ENISA is an agency of the European Union</p></div> </div> </div> </div> </div> <p><a href=\"#\" id=\"totop\" class=\"totop\"><span class=\"sr-only\">Go to top</span></a></p> </footer> </div> <script type=\"application/json\" data-drupal-selector=\"drupal-settings-json\">{\"path\":{\"baseUrl\":\"\\/\",\"pathPrefix\":\"\",\"currentPath\":\"node\\/19130\",\"currentPathIsAdmin\":false,\"isFront\":false,\"currentLanguage\":\"en\"},\"pluralDelimiter\":\"\\u0003\",\"suppressDeprecationErrors\":true,\"ajaxPageState\":{\"libraries\":\"eJxtkFFywyAMRC8E5qvn8ciwdolByiC5bnr64qaN22l-0OqBVhKUkgnxLdC3GOYmbG4qElejScNDubgiZZM2UozSUhYOD3Uv",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-64",
+    "text": "AyfXAQJLq1TyBxw4K-2YwkT6OxMxtUbXF39RX8igdt4uRSYqXu1WMi8nr1ClBXoSltRdtzGKrBk91GvJxBHhGRwTZtqKOZWYqYy1L0Rj77FqmPv83VKlYjgqhMFPH_5Hg72iwulNDfW-6FvGruHrHOhC739AlbQVuB3dZKEK3nr3Vocd_gD-IP7nQz8BuSSjPg\",\"theme\":\"enisaweb\",\"theme_token\":null},\"ajaxTrustedUrl\":[],\"eu_cookie_compliance\":{\"cookie_policy_version\":\"1.0.0\",\"popup_enabled\":true,\"popup_agreed_enabled\":false,\"popup_hide_agreed\":false,\"popup_clicking_confirmation\":false,\"popup_scrolling_confirmation\":false,\"popup_html_info\":\"\\u003Cdiv aria-labelledby=\\u0022popup-text\\u0022 class=\\u0022eu-cookie-compliance-banner eu-cookie-compliance-banner-info eu-cookie-compliance-banner--opt-in\\u0022 aria-label=\\u0022Cookies popup\\u0022\\u003E\\n \\u003Cdiv class=\\u0022popup-content info eu-cookie-compliance-content\\u0022\\u003E\\n \\u003Cdiv id=\\u0022popup-tex",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-65",
+    "text": "t\\u0022 class=\\u0022eu-cookie-compliance-message\\u0022 role=\\u0022document\\u0022\\u003E\\n \\u003Cp\\u003EThis site uses cookies. Visit our \\u003Ca href=\\u0022\\/about-enisa\\/cookies\\u0022 data-entity-type=\\u0022node\\u0022 data-entity-uuid=\\u002277d123e2-b6d7-4927-9f7a-3285c69c4811\\u0022 data-entity-substitution=\\u0022canonical\\u0022 title=\\u0022Cookies\\u0022\\u003Ecookies policy page\\u003C\\/a\\u003E or click the link in any footer for more information and to change your preferences.\\u003C\\/p\\u003E\\n \\u003C\\/div\\u003E\\n\\n \\n \\u003Cdiv id=\\u0022popup-buttons\\u0022 class=\\u0022eu-cookie-compliance-buttons\\u0022\\u003E\\n \\u003Cbutton type=\\u0022button\\u0022 class=\\u0022agree-button eu-cookie-compliance-secondary-button button button--small\\u0022\\u003EAccept all cookies\\u003C\\/button\\u003E\\n \\u003Cbut",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-66",
+    "text": "ton type=\\u0022button\\u0022 class=\\u0022decline-button eu-cookie-compliance-default-button button button--small button--primary\\u0022\\u003EAccept only essential cookies\\u003C\\/button\\u003E\\n \\u003C\\/div\\u003E\\n \\u003C\\/div\\u003E\\n\\u003C\\/div\\u003E\",\"use_mobile_message\":false,\"mobile_popup_html_info\":\"\\u003Cdiv aria-labelledby=\\u0022popup-text\\u0022 class=\\u0022eu-cookie-compliance-banner eu-cookie-compliance-banner-info eu-cookie-compliance-banner--opt-in\\u0022 aria-label=\\u0022Cookies popup\\u0022\\u003E\\n \\u003Cdiv class=\\u0022popup-content info eu-cookie-compliance-content\\u0022\\u003E\\n \\u003Cdiv id=\\u0022popup-text\\u0022 class=\\u0022eu-cookie-compliance-message\\u0022 role=\\u0022document\\u0022\\u003E\\n \\n \\u003C\\/div\\u003E\\n\\n \\n \\u003Cdiv id=\\u0022popup-buttons\\u0022 class=\\u0022eu-cookie",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-67",
+    "text": "-compliance-buttons\\u0022\\u003E\\n \\u003Cbutton type=\\u0022button\\u0022 class=\\u0022agree-button eu-cookie-compliance-secondary-button button button--small\\u0022\\u003EAccept all cookies\\u003C\\/button\\u003E\\n \\u003Cbutton type=\\u0022button\\u0022 class=\\u0022decline-button eu-cookie-compliance-default-button button button--small button--primary\\u0022\\u003EAccept only essential cookies\\u003C\\/button\\u003E\\n \\u003C\\/div\\u003E\\n \\u003C\\/div\\u003E\\n\\u003C\\/div\\u003E\",\"mobile_breakpoint\":768,\"popup_html_agreed\":false,\"popup_use_bare_css\":false,\"popup_height\":\"auto\",\"popup_width\":\"100%\",\"popup_delay\":1000,\"popup_link\":\"\\/about-enisa\\/cookies\",\"popup_link_new_window\":true,\"popup_position\":false,\"fixed_top_position\":true,\"popup_language\":\"en\",\"store_consent\":true,\"better_support_for_screen_readers\":t",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-68",
+    "text": "rue,\"cookie_name\":\"\",\"reload_page\":false,\"domain\":\"\",\"domain_all_sites\":false,\"popup_eu_only\":false,\"popup_eu_only_js\":false,\"cookie_lifetime\":100,\"cookie_session\":0,\"set_cookie_session_zero_on_disagree\":0,\"disagree_do_not_show_popup\":false,\"method\":\"opt_in\",\"automatic_cookies_removal\":true,\"allowed_cookies\":\"\",\"withdraw_markup\":\"\\u003Cbutton type=\\u0022button\\u0022 class=\\u0022eu-cookie-withdraw-tab\\u0022\\u003EPrivacy settings\\u003C\\/button\\u003E\\n\\u003Cdiv aria-labelledby=\\u0022popup-text\\u0022 class=\\u0022eu-cookie-withdraw-banner\\u0022 aria-label=\\u0022Cookies popup\\u0022\\u003E\\n \\u003Cdiv class=\\u0022popup-content info eu-cookie-compliance-content\\u0022\\u003E\\n \\u003Cdiv id=\\u0022popup-text\\u0022 class=\\u0022eu-cookie-compliance-message\\u0022 role=\\u0022document\\u0022\\u003E\\n \\u003Ch2",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-69",
+    "text": "\\u003EWe use cookies on this site to enhance your user experience\\u003C\\/h2\\u003E\\u003Cp\\u003EYou have given your consent for us to set cookies.\\u003C\\/p\\u003E\\n \\u003C\\/div\\u003E\\n \\u003Cdiv id=\\u0022popup-buttons\\u0022 class=\\u0022eu-cookie-compliance-buttons\\u0022\\u003E\\n \\u003Cbutton type=\\u0022button\\u0022 class=\\u0022eu-cookie-withdraw-button button button--small button--primary\\u0022\\u003EWithdraw consent\\u003C\\/button\\u003E\\n \\u003C\\/div\\u003E\\n \\u003C\\/div\\u003E\\n\\u003C\\/div\\u003E\",\"withdraw_enabled\":false,\"reload_options\":0,\"reload_routes_list\":\"\",\"withdraw_button_on_info_popup\":false,\"cookie_categories\":[],\"cookie_categories_details\":[],\"enable_save_preferences_button\":true,\"cookie_value_disagreed\":\"0\",\"cookie_value_agreed_show_thank_you\":\"1\",\"cookie_value_agreed\":\"2\",\"containin",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-70",
+    "text": "g_element\":\"body\",\"settings_tab_enabled\":false,\"olivero_primary_button_classes\":\" button button--small button--primary\",\"olivero_secondary_button_classes\":\" button button--small\",\"close_button_action\":\"close_banner\",\"open_by_default\":true,\"modules_allow_popup\":true,\"hide_the_banner\":false,\"geoip_match\":true,\"unverified_scripts\":[]},\"ckeditorAccordion\":{\"accordionStyle\":{\"collapseAll\":1,\"keepRowsOpen\":0,\"animateAccordionOpenAndClose\":1,\"openTabsWithHash\":0,\"allowHtmlInTitles\":1}},\"views\":{\"ajax_path\":\"\\/views\\/ajax\",\"ajaxViews\":{\"views_dom_id:4ffb74dc32b676be2baf90237b02b7a63cfa7ff5c1feee6f61faeaa43010ea51\":{\"view_name\":\"related_content\",\"view_display_id\":\"block_1\",\"view_args\":\"528\\/19130\",\"view_path\":\"\\/node\\/19130\",\"view_base_path\":null,\"view_dom_id\":\"4ffb74dc32b676be2baf90237b02b7a63cfa7",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-71",
+    "text": "ff5c1feee6f61faeaa43010ea51\",\"pager_element\":0}}},\"csp\":{\"nonce\":\"QRpO0AHUuIpobhSUYuxQVg\"},\"user\":{\"uid\":0,\"permissionsHash\":\"d13d3ebc056c5f586c5b580bdf86b22f1d79f495ec519548dec3dbada031e3e9\"}}</script> <script src=\"/core/assets/vendor/jquery/jquery.min.js?v=3.7.1\"></script> <script src=\"/core/assets/vendor/once/once.min.js?v=1.0.1\"></script> <script src=\"/core/misc/drupalSettingsLoader.js?v=10.5.0\"></script> <script src=\"/core/misc/drupal.js?v=10.5.0\"></script> <script src=\"/core/misc/drupal.init.js?v=10.5.0\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/version-min.js?v=1.13.2\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/keycode-min.js?v=1.13.2\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/saf",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-72",
+    "text": "e-active-element-min.js?v=1.13.2\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/unique-id-min.js?v=1.13.2\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/widget-min.js?v=1.13.2\"></script> <script src=\"/modules/contrib/jquery_ui/assets/vendor/jquery.ui/ui/widgets/tabs-min.js?v=1.13.2\"></script> <script src=\"/core/assets/vendor/tabbable/index.umd.min.js?v=6.2.0\"></script> <script src=\"https://static.addtoany.com/menu/page.js\" defer></script> <script src=\"/modules/contrib/addtoany/js/addtoany.js?v=10.5.0\"></script> <script src=\"/modules/contrib/blocktabs/js/blocktabs.js?v=10.5.0\"></script> <script src=\"/modules/contrib/ckeditor_accordion/js/accordion.frontend.min.js?sz6ici\"></script> <script src=\"/themes/custom/enisaweb/js/enisaweb.",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-73",
+    "text": "js?sz6ici\"></script> <script src=\"/themes/custom/enisaweb/js/nis2-directive.js?sz6ici\"></script> <script src=\"/modules/contrib/eu_cookie_compliance/js/eu_cookie_compliance.min.js?v=10.5.0\"></script> <script src=\"/core/misc/jquery.form.js?v=4.3.0\"></script> <script src=\"/core/misc/progress.js?v=10.5.0\"></script> <script src=\"/core/assets/vendor/loadjs/loadjs.min.js?v=4.3.0\"></script> <script src=\"/core/misc/debounce.js?v=10.5.0\"></script> <script src=\"/core/misc/announce.js?v=10.5.0\"></script> <script src=\"/core/misc/message.js?v=10.5.0\"></script> <script src=\"/core/misc/ajax.js?v=10.5.0\"></script> <script src=\"/core/modules/views/js/base.js?v=10.5.0\"></script> <script src=\"/core/modules/views/js/ajax_view.js?v=10.5.0\"></script> <script src=\"/modules/contrib/we_megamenu/assets/js/we_mobile_",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-74",
+    "text": "menu.js?v=1\"></script> <script src=\"/modules/contrib/we_megamenu/assets/js/we_megamenu_frontend.js?v=1\"></script> <script async=\"\" src=\"/themes/custom/enisaweb/js/application.js\"></script> <!-- Matomo --> <script data-diazo=\"analytics\"> var _paq = window._paq = window._paq || []; /* tracker methods like \"setCustomDimension\" should be called before \"trackPageView\" */ // _paq.push([function(){if (this.isUserOptedOut()) {this.disableCookies()}}]); _paq.push([function(){if (this.isUserOptedOut() || window.getCookie(\"accept_analytics\") !== \"1\") {this.disableCookies()}}]); _paq.push(['trackPageView']); _paq.push(['enableLinkTracking']); (function() { var u=\"//analytics.enisa.europa.eu/\"; _paq.push(['setTrackerUrl', u+'matomo.php']); _paq.push(['setSiteId', '1']); var d=document, g=d.createElemen",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  },
+  {
+    "id": "nis2-2023-product manager-1756801970119-75",
+    "text": "t('script'), s=d.getElementsByTagName('script')[0]; g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s); })(); </script> <!-- End Matomo Code --> </body> </html>",
+    "chunkType": "LAW_TEXT_SNIPPET",
+    "metadata": {
+      "language": "en",
+      "confidence": 0.9,
+      "source": "ENISA NIS2 Guidance",
+      "framework": "nis2-2023",
+      "concepts": [
+        "reporting timelines",
+        "supply chain"
+      ],
+      "difficulty": "intermediate",
+      "targetRoles": [
+        "product manager"
+      ],
+      "jurisdiction": "EU",
+      "lastUpdated": "2025-09-02T08:32:50.119Z",
+      "roleSpecificRelevance": []
+    }
+  }
+]

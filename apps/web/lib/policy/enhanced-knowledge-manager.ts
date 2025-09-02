@@ -5,6 +5,8 @@ import { KnowledgeManager } from './knowledge-manager';
 import { RegulatoryRequirement, FrameworkMetadata, CrossReference } from './regulatory-core';
 import { EnhancedKnowledgeChunk, ALL_REGULATORY_CHUNKS, FRAMEWORK_METADATA } from './enhanced-knowledge-chunks';
 import { generateEmbedding, cosineSimilarity } from '../rag/embedding';
+import fs from 'fs';
+import path from 'path';
 
 export interface SemanticSearchResult {
   chunk: EnhancedKnowledgeChunk;
@@ -53,6 +55,39 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
           this.conceptIndex.set(concept, existing);
         }
       }
+    }
+
+    // Load external role-specific chunks from JSON files if available
+    try {
+      const externalDir = path.resolve(process.cwd(), 'apps/web/rag-ingestion/cleaned-data/role_chunks');
+      if (fs.existsSync(externalDir)) {
+        const files = fs.readdirSync(externalDir).filter(f => f.endsWith('.json'));
+        for (const file of files) {
+          try {
+            const full = path.join(externalDir, file);
+            const raw = fs.readFileSync(full, 'utf-8');
+            const items: EnhancedKnowledgeChunk[] = JSON.parse(raw);
+            for (const item of items) {
+              // Avoid ID collisions
+              if (!this.enhancedChunks.has(item.id)) {
+                this.enhancedChunks.set(item.id, item);
+                if (item.metadata.concepts) {
+                  for (const concept of item.metadata.concepts) {
+                    const existing = this.conceptIndex.get(concept) || [];
+                    existing.push(item.id);
+                    this.conceptIndex.set(concept, existing);
+                  }
+                }
+              }
+            }
+            console.log(`✅ Loaded ${items.length} external chunks from ${file}`);
+          } catch (err) {
+            console.error(`❌ Failed loading external chunks from ${file}:`, err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('❌ External chunk loading failed:', err);
     }
 
     // Generate embeddings for all chunks
@@ -424,7 +459,8 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
 
   // Enhanced role-based search with context
   async searchRoleSpecific(query: string, role: string, framework?: string): Promise<{
-    semanticResults: SemanticSearchResult[];
+    semanticResults: SemanticSearchResult[]; // role-filtered
+    unfilteredSemanticResults: SemanticSearchResult[]; // full set for framework fallback
     roleGuidance: any;
     sampleResponse?: string;
     confidence: number;
@@ -436,10 +472,23 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     const roleGuidance = await this.getRoleSpecificGuidance(role, framework);
 
     // Filter results by role
-    const roleFilteredResults = semanticResults.filter(result =>
-      result.chunk.metadata.targetRoles?.includes(role.toLowerCase()) ||
-      result.chunk.metadata.roleSpecificRelevance
-    );
+    const roleFilteredResults = semanticResults.filter(result => {
+      const targetRoles = result.chunk.metadata.targetRoles;
+      const hasRoleHints = Array.isArray(result.chunk.metadata.roleSpecificRelevance) && result.chunk.metadata.roleSpecificRelevance.length > 0;
+
+      // If explicit targetRoles are provided, require a role match
+      if (Array.isArray(targetRoles) && targetRoles.length > 0) {
+        return targetRoles.some(r => r.toLowerCase().includes(role.toLowerCase()) || role.toLowerCase().includes(r.toLowerCase()));
+      }
+
+      // If no explicit roles but there are role hints, allow as generally role-relevant
+      if (hasRoleHints) {
+        return true;
+      }
+
+      // Otherwise, allow (generic content)
+      return true;
+    });
 
     // Generate sample response if available
     let sampleResponse;
@@ -456,6 +505,7 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
 
     return {
       semanticResults: roleFilteredResults,
+      unfilteredSemanticResults: semanticResults,
       roleGuidance,
       sampleResponse,
       confidence
