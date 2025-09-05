@@ -9,12 +9,12 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Users, 
-  Search, 
-  Plus, 
-  Target, 
-  TrendingUp, 
+import {
+  Users,
+  Search,
+  Plus,
+  Target,
+  TrendingUp,
   AlertTriangle,
   CheckCircle,
   Clock,
@@ -55,7 +55,7 @@ interface ProjectPhase {
 
 const SDLC_PHASES = [
   'Ideation',
-  'Planning', 
+  'Planning',
   'Design',
   'Implementation',
   'Testing',
@@ -83,7 +83,7 @@ export default function TeamCompositionPage() {
   const [phases, setPhases] = useState<ProjectPhase[]>([]);
   const [loading, setLoading] = useState(true);
   const [suggesting, setSuggesting] = useState(false);
-  
+
   // Form state
   const [selectedPhase, setSelectedPhase] = useState('');
   const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
@@ -277,7 +277,7 @@ export default function TeamCompositionPage() {
                       <Plus className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">Common skills:</p>
                     <div className="flex flex-wrap gap-2">
@@ -320,8 +320,8 @@ export default function TeamCompositionPage() {
             </div>
 
             <div className="mt-6">
-              <Button 
-                onClick={suggestTeam} 
+              <Button
+                onClick={suggestTeam}
                 disabled={suggesting || !selectedPhase || requiredSkills.length === 0}
                 className="w-full"
               >
@@ -417,7 +417,7 @@ export default function TeamCompositionPage() {
                             ))}
                           </div>
                         </div>
-                        
+
                         <div>
                           <p className="text-sm font-medium text-gray-700">Trust Level:</p>
                           <Badge variant="outline">
@@ -487,7 +487,7 @@ export default function TeamCompositionPage() {
                         <p className="text-sm text-gray-600">Project: {phase.projectId}</p>
                         {phase.startDate && (
                           <p className="text-sm text-gray-500">
-                            {new Date(phase.startDate).toLocaleDateString()} - 
+                            {new Date(phase.startDate).toLocaleDateString()} -
                             {phase.endDate ? new Date(phase.endDate).toLocaleDateString() : 'Ongoing'}
                           </p>
                         )}

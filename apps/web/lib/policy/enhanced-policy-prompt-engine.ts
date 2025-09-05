@@ -93,7 +93,7 @@ Non-compliance may result in security vulnerabilities and potential OWASP Top 10
         }
       ],
       validationKeywords: [
-        'OWASP', 'Top 10', 'ASVS', 'injection', 'XSS', 'input validation', 
+        'OWASP', 'Top 10', 'ASVS', 'injection', 'XSS', 'input validation',
         'secure coding', 'vulnerability prevention', 'security controls'
       ],
       outputFormat: "OWASP-focused policy with specific controls and references"
@@ -191,7 +191,7 @@ Non-compliance may result in NIS2 Article 33 penalties and regulatory enforcemen
         }
       ],
       validationKeywords: [
-        'NIS2', 'incident response', 'cybersecurity', 'risk management', 
+        'NIS2', 'incident response', 'cybersecurity', 'risk management',
         'supply chain security', 'business continuity', 'incident reporting'
       ],
       outputFormat: "NIS2-focused policy with specific directive references and cybersecurity controls"
@@ -300,20 +300,20 @@ Non-compliance may result in EU AI Act Article 71 penalties up to €30 million 
   // Generate framework-specific policy with optimized prompts
   async generateFrameworkSpecificPolicy(request: PolicyGenerationRequest): Promise<EnhancedPolicyResponse> {
     const frameworkPrompt = this.frameworkPrompts.get(request.regulatoryFramework);
-    
+
     if (!frameworkPrompt) {
       throw new Error(`Unsupported regulatory framework: ${request.regulatoryFramework}`);
     }
 
     // Build the complete prompt with few-shot examples
     const completePrompt = this.buildCompletePrompt(request, frameworkPrompt);
-    
+
     // Generate policy content (this would integrate with your LLM client)
     const policyContent = await this.generatePolicyWithPrompt(completePrompt, request);
-    
+
     // Validate and assess the generated policy
     const validationResults = this.validateFrameworkAlignment(policyContent, frameworkPrompt, request);
-    
+
     return {
       policyContent,
       frameworkAlignment: validationResults.frameworkAlignment,
@@ -366,9 +366,9 @@ Generate the policy now:`;
   private async generatePolicyWithPrompt(completePrompt: string, request: PolicyGenerationRequest): Promise<string> {
     // This would integrate with your existing LLM client
     // For now, return a framework-specific template
-    
+
     const frameworkPrompt = this.frameworkPrompts.get(request.regulatoryFramework)!;
-    
+
     // Generate framework-specific content based on the prompt
     return this.generateFrameworkSpecificTemplate(request, frameworkPrompt);
   }
@@ -378,10 +378,10 @@ Generate the policy now:`;
     const roleTitle = request.roleProfile.roleTitle;
     const category = request.roleProfile.category;
     const framework = request.regulatoryFramework;
-    
+
     // Framework-specific content generation
     let frameworkSpecificContent = '';
-    
+
     switch (framework) {
       case 'OWASP':
         frameworkSpecificContent = `
@@ -397,7 +397,7 @@ Generate the policy now:`;
 - Secure development lifecycle integration
 - Regular OWASP compliance assessments`;
         break;
-        
+
       case 'GDPR':
         frameworkSpecificContent = `
 ## GDPR Requirements
@@ -412,7 +412,7 @@ Generate the policy now:`;
 - Purpose limitation enforcement (Article 5(1)(b))
 - Technical and organizational security measures (Article 32)`;
         break;
-        
+
       case 'NIS2':
         frameworkSpecificContent = `
 ## NIS2 Requirements
@@ -427,7 +427,7 @@ Generate the policy now:`;
 - Business continuity and disaster recovery
 - Regular NIS2 compliance assessments`;
         break;
-        
+
       case 'NIST_CSF':
         frameworkSpecificContent = `
 ## NIST CSF Requirements
@@ -442,7 +442,7 @@ Generate the policy now:`;
 - Security control monitoring
 - Framework compliance validation`;
         break;
-        
+
       case 'EU_AI_ACT':
         frameworkSpecificContent = `
 ## EU AI Act Requirements
@@ -492,28 +492,28 @@ Non-compliance may result in ${framework} violations and potential regulatory pe
     recommendations: string[];
   } {
     const content = policyContent.toLowerCase();
-    
+
     // Check for framework-specific keywords
     const frameworkKeywords = frameworkPrompt.validationKeywords;
-    const foundKeywords = frameworkKeywords.filter(keyword => 
+    const foundKeywords = frameworkKeywords.filter(keyword =>
       content.includes(keyword.toLowerCase())
     );
     const frameworkAlignment = foundKeywords.length / frameworkKeywords.length;
-    
+
     // Check for role-specific content
     const roleTitle = request.roleProfile.roleTitle.toLowerCase();
     const category = request.roleProfile.category.toLowerCase();
     const hasRoleContent = content.includes(roleTitle) && content.includes(category);
     const roleSpecificity = hasRoleContent ? 1.0 : 0.5;
-    
+
     // Check for regulatory accuracy
     const hasFrameworkName = content.includes(request.regulatoryFramework.toLowerCase());
     const hasSpecificControls = content.includes('controls') || content.includes('requirements');
     const regulatoryAccuracy = (hasFrameworkName ? 0.5 : 0) + (hasSpecificControls ? 0.5 : 0);
-    
+
     // Calculate overall confidence
     const confidence = (frameworkAlignment + roleSpecificity + regulatoryAccuracy) / 3;
-    
+
     // Validation checks
     const validationChecks = {
       hasFrameworkKeywords: frameworkAlignment > 0.7,
@@ -521,26 +521,26 @@ Non-compliance may result in ${framework} violations and potential regulatory pe
       followsOutputFormat: true, // Basic check
       meetsConfidenceThreshold: confidence >= request.confidenceThreshold
     };
-    
+
     // Generate recommendations
     const recommendations: string[] = [];
-    
+
     if (frameworkAlignment < 0.8) {
       recommendations.push(`Increase ${frameworkPrompt.framework}-specific terminology and references`);
     }
-    
+
     if (roleSpecificity < 0.9) {
       recommendations.push('Enhance role-specific content and responsibilities');
     }
-    
+
     if (regulatoryAccuracy < 0.8) {
       recommendations.push('Include more specific regulatory requirements and controls');
     }
-    
+
     if (confidence < request.confidenceThreshold) {
       recommendations.push(`Overall confidence (${confidence.toFixed(2)}) below threshold (${request.confidenceThreshold})`);
     }
-    
+
     return {
       frameworkAlignment,
       roleSpecificity,

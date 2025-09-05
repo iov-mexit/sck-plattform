@@ -68,7 +68,7 @@ export class UnifiedPolicySystem {
 
       // Step 1: Generate policy (LLM generation temporarily disabled)
       console.log('🧠 Policy generation temporarily disabled - using QA system instead');
-      
+
       // Mock LLM result for now
       const llmResult = {
         policy: {

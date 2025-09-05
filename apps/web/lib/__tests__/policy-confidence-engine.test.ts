@@ -186,7 +186,7 @@ describe('PolicyConfidenceEngine', () => {
       const recommendationText = assessment.recommendations.join(' ').toLowerCase();
 
       // Should address various aspects - check for any of these keywords
-      const hasQualityAspects =±±±++*reshold') ||
+      const hasQualityAspects = recommendationText.includes('threshold') ||
         recommendationText.includes('coverage') ||
         recommendationText.includes('risk') ||
         recommendationText.includes('review') ||
