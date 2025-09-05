@@ -419,7 +419,7 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     });
 
     const averageConfidence = chunks.length > 0 
-      ? chunks.reduce((sum, chunk) => sum + chunk.metadata.confidence, 0) / chunks.length 
+      ? chunks.reduce((sum, chunk) => sum + (chunk.metadata.confidence || 0.95), 0) / chunks.length 
       : 0;
 
     return {
