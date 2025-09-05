@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { signalCollection } from '@/lib/signal-collection';
 
+export const dynamic = 'force-dynamic';
+
 interface Signal {
   id: string;
   type: string;
