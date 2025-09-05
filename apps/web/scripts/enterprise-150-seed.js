@@ -44,6 +44,12 @@ async function enterprise150Seed() {
 
     await createTrustThresholdsAndPolicies(enterpriseOrg.id, roleTemplates);
 
+    // Phase 6: Create Sample Team Compositions
+    console.log('\n📋 PHASE 6: Sample Team Compositions');
+    console.log('=====================================');
+
+    await createSampleTeamCompositions(enterpriseOrg.id, roleAgents);
+
     console.log('\n🎉 Enterprise seeding completed successfully!');
     await generateEnterpriseReport();
 
@@ -1120,6 +1126,80 @@ function shuffleArray(array) {
 // Reporting
 // =============================================================================
 
+async function createSampleTeamCompositions(organizationId, roleAgents) {
+  console.log('🎯 Creating sample team compositions...');
+
+  const sampleCompositions = [
+    {
+      projectPhase: 'Threat Modeling',
+      requirements: {
+        skills: ['Threat Modeling', 'Risk Assessment', 'Security Architecture', 'OWASP'],
+        trustMinLevel: 4,
+        teamSize: 4
+      }
+    },
+    {
+      projectPhase: 'Implementation',
+      requirements: {
+        skills: ['TypeScript', 'React', 'Node.js', 'AWS', 'DevOps'],
+        trustMinLevel: 3,
+        teamSize: 6
+      }
+    },
+    {
+      projectPhase: 'Security Review',
+      requirements: {
+        skills: ['Penetration Testing', 'Vulnerability Assessment', 'ISO27001', 'SOC2'],
+        trustMinLevel: 4,
+        teamSize: 3
+      }
+    },
+    {
+      projectPhase: 'Compliance Audit',
+      requirements: {
+        skills: ['GDPR', 'NIST', 'Compliance', 'Risk Assessment'],
+        trustMinLevel: 4,
+        teamSize: 2
+      }
+    }
+  ];
+
+  for (const composition of sampleCompositions) {
+    // Select random agents that match the requirements
+    const availableAgents = roleAgents.filter(agent => 
+      agent.trustScore && agent.trustScore >= (composition.requirements.trustMinLevel * 100)
+    );
+    
+    const shuffledAgents = shuffleArray(availableAgents);
+    const selectedTeam = shuffledAgents.slice(0, composition.requirements.teamSize);
+
+    const suggestedTeam = selectedTeam.map(agent => ({
+      id: agent.id,
+      name: agent.name,
+      role: agent.roleTemplate?.title || 'Unknown Role',
+      trustScore: agent.trustScore || 0,
+      skillMatchScore: Math.random() * 0.4 + 0.6, // 60-100% match
+      skills: [agent.roleTemplate?.focus || 'General'],
+      certifications: Math.floor(Math.random() * 5) + 1,
+      signals: Math.floor(Math.random() * 10) + 5
+    }));
+
+    await prisma.teamComposition.create({
+      data: {
+        organizationId,
+        projectPhase: composition.projectPhase,
+        requirements: composition.requirements,
+        suggestedTeam,
+        gaps: Math.random() > 0.7 ? { missingSkills: ['Advanced AI/ML'] } : null
+      }
+    });
+
+    console.log(`✅ Created team composition for ${composition.projectPhase}`);
+  }
+
+  console.log(`🎯 Created ${sampleCompositions.length} sample team compositions`);
+}
+
 async function generateEnterpriseReport() {
   console.log('\n📊 Enterprise 150+ Seeding Report');
   console.log('==================================');
@@ -1131,6 +1211,7 @@ async function generateEnterpriseReport() {
     const certs = await prisma.certification.count();
     const thresholds = await prisma.roleTrustThreshold.count();
     const policies = await prisma.loaPolicy.count();
+    const compositions = await prisma.teamComposition.count();
 
     console.log(`🏢 Organizations: ${orgs}`);
     console.log(`👤 Role Templates: ${templates}`);
@@ -1138,8 +1219,9 @@ async function generateEnterpriseReport() {
     console.log(`🎓 Certifications: ${certs}`);
     console.log(`🎯 Trust Thresholds: ${thresholds}`);
     console.log(`📋 LoA Policies: ${policies}`);
+    console.log(`👥 Team Compositions: ${compositions}`);
 
-    const total = orgs + templates + agents + certs + thresholds + policies;
+    const total = orgs + templates + agents + certs + thresholds + policies + compositions;
     console.log(`\n📈 Total seeded entities: ${total}`);
     console.log('✅ Enterprise 150+ platform is ready for comprehensive testing!');
 

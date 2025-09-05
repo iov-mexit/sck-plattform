@@ -171,6 +171,8 @@ model Organization {
   policyCompositions  PolicyComposition[]
   trustTokens         TrustToken[]
   aiDecisions         AiDecision[]
+  teamCompositions    TeamComposition[]
+  projectPhases       ProjectPhase[]
 
   @@index([isActive], map: "idx_organizations_active")
   @@index([domain], map: "idx_organizations_domain")
@@ -846,4 +848,41 @@ model PolicyDraft {
   
   @@index([status])
   @@index([createdAt])
+}
+
+// --- Team Composition Engine ---
+model TeamComposition {
+  id             String       @id @default(cuid())
+  projectPhase   String       // e.g. "Design", "Implementation", "Audit"
+  requirements   Json         // required skills { "skills": ["TypeScript", "ISO27001"], "trustMin": 3 }
+  suggestedTeam  Json         // array of role_agent IDs
+  gaps           Json?        // identified skill gaps
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([projectPhase])
+  @@index([createdAt])
+  @@map("team_compositions")
+}
+
+model ProjectPhase {
+  id             String       @id @default(cuid())
+  projectId      String
+  phaseName      String
+  startDate      DateTime?
+  endDate        DateTime?
+  requiredSkills Json
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@index([organizationId])
+  @@index([projectId])
+  @@index([phaseName])
+  @@index([startDate])
+  @@map("project_phases")
 }
