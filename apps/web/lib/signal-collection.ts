@@ -160,7 +160,7 @@ export class SignalCollectionService {
 
   // Get signals for a role agent
   async getSignalsByRoleAgent(roleAgentId: string, options?: {
-    type?: 'certification' | 'activity';
+    type?: 'certification' | 'activity' | 'achievement' | 'security_incident' | 'training' | 'audit' | 'compliance' | 'collaboration';
     limit?: number;
     offset?: number;
   }): Promise<unknown[]> {

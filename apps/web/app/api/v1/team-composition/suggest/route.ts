@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
     const { organizationId, projectPhase, requiredSkills, trustMinLevel = 3, teamSize = 5 } = body;
 
     if (!organizationId || !projectPhase || !requiredSkills) {
-      return NextResponse.json({ 
-        error: 'Organization ID, project phase, and required skills are required' 
+      return NextResponse.json({
+        error: 'Organization ID, project phase, and required skills are required'
       }, { status: 400 });
     }
 
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     // Extract skills from role templates, certifications, and signals
     const agentsWithSkills = roleAgents.map(agent => {
       const skills = new Set<string>();
-      
+
       // Add role template skills
       if (agent.roleTemplate.focus) {
         skills.add(agent.roleTemplate.focus.toLowerCase());
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       if (agent.roleTemplate.category) {
         skills.add(agent.roleTemplate.category.toLowerCase());
       }
-      
+
       // Add certification skills
       agent.certifications.forEach(cert => {
         if (cert.verified) {
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
           skills.add(cert.issuer.toLowerCase());
         }
       });
-      
+
       // Add signal-based skills
       agent.signals.forEach(signal => {
         if (signal.verified && signal.value && signal.value > 0.7) {
@@ -73,20 +73,20 @@ export async function POST(request: NextRequest) {
 
     // Calculate skill matching scores
     const requiredSkillsLower = requiredSkills.map((skill: string) => skill.toLowerCase());
-    
+
     agentsWithSkills.forEach(agent => {
       let matchCount = 0;
       let totalScore = 0;
-      
-      requiredSkillsLower.forEach(requiredSkill => {
-        agent.skills.forEach(agentSkill => {
+
+      requiredSkillsLower.forEach((requiredSkill: string) => {
+        agent.skills.forEach((agentSkill: string) => {
           if (agentSkill.includes(requiredSkill) || requiredSkill.includes(agentSkill)) {
             matchCount++;
             totalScore += 1;
           }
         });
       });
-      
+
       agent.skillMatchCount = matchCount;
       agent.skillMatchScore = totalScore / requiredSkills.length;
     });
@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     // Select top agents for the team
     const suggestedTeam = sortedAgents.slice(0, teamSize);
-    
+
     // Identify skill gaps
     const coveredSkills = new Set<string>();
     suggestedTeam.forEach(agent => {
@@ -113,9 +113,9 @@ export async function POST(request: NextRequest) {
         coveredSkills.add(skill);
       });
     });
-    
-    const gaps = requiredSkillsLower.filter(skill => 
-      !Array.from(coveredSkills).some(coveredSkill => 
+
+    const gaps = requiredSkillsLower.filter((skill: string) =>
+      !Array.from(coveredSkills).some((coveredSkill: string) =>
         coveredSkill.includes(skill) || skill.includes(coveredSkill)
       )
     );
@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
           skillMatchScore: agent.skillMatchScore,
           skills: agent.skills
         })),
-        gaps: gaps.length > 0 ? { missingSkills: gaps } : null
+        gaps: gaps.length > 0 ? { missingSkills: gaps } : undefined
       },
       include: {
         organization: {
@@ -147,7 +147,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       composition,
       suggestedTeam: suggestedTeam.map(agent => ({
         id: agent.id,

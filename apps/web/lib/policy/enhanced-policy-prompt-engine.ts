@@ -41,7 +41,7 @@ export interface EnhancedPolicyResponse {
 }
 
 export class EnhancedPolicyPromptEngine {
-  private frameworkPrompts: Map<RegulatoryFramework, FrameworkSpecificPrompt>;
+  private frameworkPrompts: Map<RegulatoryFramework, FrameworkSpecificPrompt> = new Map();
   private defaultConfidenceThreshold: number = 0.85;
 
   constructor() {

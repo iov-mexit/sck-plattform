@@ -301,7 +301,7 @@ This policy establishes requirements for ${roleProfile.roleTitle} (${roleProfile
 Applies to all ${roleProfile.roleTitle} personnel and related systems.
 
 ## Requirements
-${requirement.specificPolicies.map(policy => `- ${policy}`).join('\n')}
+${requirement.specificPolicies.map((policy: string) => `- ${policy}`).join('\n')}
 
 ## Responsibilities
 - ${roleProfile.roleTitle} personnel must implement all specified security controls

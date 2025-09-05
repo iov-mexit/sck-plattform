@@ -398,8 +398,8 @@ export class EnhancedKnowledgeManager extends KnowledgeManager {
     difficultyDistribution: Record<string, number>;
   } {
     const chunks = Array.from(this.enhancedChunks.values());
-    const frameworks = [...new Set(chunks.map(c => c.metadata.framework).filter(Boolean))];
-    const jurisdictions = [...new Set(chunks.map(c => c.metadata.jurisdiction).filter(Boolean))];
+    const frameworks = [...new Set(chunks.map(c => c.metadata.framework).filter((f): f is string => Boolean(f)))];
+    const jurisdictions = [...new Set(chunks.map(c => c.metadata.jurisdiction).filter((j): j is string => Boolean(j)))];
     const chunkTypes = [...new Set(chunks.map(c => c.chunkType))];
 
     // Role distribution

@@ -43,8 +43,8 @@ export async function POST(request: NextRequest) {
     const { organizationId, projectPhase, requirements, suggestedTeam, gaps } = body;
 
     if (!organizationId || !projectPhase || !requirements) {
-      return NextResponse.json({ 
-        error: 'Organization ID, project phase, and requirements are required' 
+      return NextResponse.json({
+        error: 'Organization ID, project phase, and requirements are required'
       }, { status: 400 });
     }
 

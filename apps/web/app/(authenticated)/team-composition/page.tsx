@@ -350,7 +350,7 @@ export default function TeamCompositionPage() {
                 <p className="text-gray-600 mb-4">
                   Create your first team composition by suggesting a team for a project phase.
                 </p>
-                <Button onClick={() => document.querySelector('[value="suggest"]')?.click()}>
+                <Button onClick={() => (document.querySelector('[value="suggest"]') as HTMLElement)?.click()}>
                   Suggest Team Composition
                 </Button>
               </Card>

@@ -75,14 +75,14 @@ async function fullSeed() {
     await generateSeedingReport();
 
   } catch (error) {
-    console.error('❌ Comprehensive seeding failed:', error.message);
+    console.error('❌ Comprehensive seeding failed:', error instanceof Error ? error.message : String(error));
     console.log('🔄 Attempting fallback seeding...');
 
     try {
       await fallbackSeeding();
       console.log('✅ Fallback seeding completed');
     } catch (fallbackError) {
-      console.error('❌ Fallback seeding also failed:', fallbackError.message);
+      console.error('❌ Fallback seeding also failed:', fallbackError instanceof Error ? fallbackError.message : String(fallbackError));
       process.exit(1);
     }
   } finally {
@@ -234,7 +234,7 @@ async function seedRoleTemplates(organizationId: string) {
     });
     console.log('✅ Comprehensive role templates seeded successfully');
   } catch (seedError) {
-    console.error('❌ Comprehensive seed failed:', seedError.message);
+    console.error('❌ Comprehensive seed failed:', seedError instanceof Error ? seedError.message : String(seedError));
     console.log('🔄 Creating basic role templates as fallback...');
     await createBasicRoleTemplates(organizationId);
   }
@@ -427,7 +427,7 @@ async function seedComprehensiveTrustThresholds(organizationId: string) {
     });
     console.log('✅ Comprehensive trust thresholds seeded successfully');
   } catch (seedError) {
-    console.error('❌ Comprehensive trust thresholds failed:', seedError.message);
+    console.error('❌ Comprehensive trust thresholds failed:', seedError instanceof Error ? seedError.message : String(seedError));
     console.log('🔄 Skipping comprehensive thresholds - basic ones already created');
   }
 }
@@ -789,7 +789,7 @@ async function fallbackSeeding() {
     console.log('✅ Fallback seeding completed with minimal data');
 
   } catch (error) {
-    console.error('❌ Fallback seeding failed:', error.message);
+    console.error('❌ Fallback seeding failed:', error instanceof Error ? error.message : String(error));
     throw error;
   }
 }
@@ -827,7 +827,7 @@ async function generateSeedingReport() {
     }
 
   } catch (error) {
-    console.log('⚠️ Could not generate seeding report:', error.message);
+    console.log('⚠️ Could not generate seeding report:', error instanceof Error ? error.message : String(error));
   }
 }
 

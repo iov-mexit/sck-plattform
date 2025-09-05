@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import readline from 'readline';
-import { generateEmbedding } from '../../lib/rag/embedding.ts';
+import { generateEmbedding } from '../../lib/rag/embedding';
 
 async function processJsonl(inputPath: string, outputPath: string) {
   const absIn = path.resolve(process.cwd(), inputPath);
