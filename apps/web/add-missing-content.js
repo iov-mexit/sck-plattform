@@ -46,7 +46,7 @@ const missingEntries = [
     },
     "embedding": Array(384).fill(0).map(() => Math.random() * 2 - 1)
   },
-  
+
   // OWASP A01 Broken Access Control
   {
     "id": "owasp-web-a01-2021",
@@ -82,7 +82,7 @@ const missingEntries = [
     },
     "embedding": Array(384).fill(0).map(() => Math.random() * 2 - 1)
   },
-  
+
   // OWASP A03 Injection
   {
     "id": "owasp-web-a03-2021",

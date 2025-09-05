@@ -9,7 +9,7 @@ const lines = existingContent.trim().split('\n').filter(line => line.trim());
 // Parse existing entries and add chunkType
 const updatedEntries = lines.map(line => {
   const entry = JSON.parse(line);
-  
+
   // Add chunkType based on content
   if (!entry.chunkType) {
     if (entry.id.includes('developer') || entry.id.includes('dev')) {
@@ -22,17 +22,17 @@ const updatedEntries = lines.map(line => {
       entry.chunkType = 'REQUIREMENT';
     }
   }
-  
+
   // Ensure metadata exists
   if (!entry.metadata) {
     entry.metadata = {};
   }
-  
+
   // Add confidence if missing
   if (!entry.metadata.confidence) {
     entry.metadata.confidence = 0.95;
   }
-  
+
   // Add framework if missing
   if (!entry.metadata.framework) {
     if (entry.id.includes('owasp')) {
@@ -49,7 +49,7 @@ const updatedEntries = lines.map(line => {
       entry.metadata.framework = 'cra-2024';
     }
   }
-  
+
   // Add jurisdiction if missing
   if (!entry.metadata.jurisdiction) {
     if (entry.id.includes('eu') || entry.id.includes('ai-act') || entry.id.includes('nis2') || entry.id.includes('dora') || entry.id.includes('cra')) {
@@ -58,12 +58,12 @@ const updatedEntries = lines.map(line => {
       entry.metadata.jurisdiction = 'global';
     }
   }
-  
+
   // Add difficulty if missing
   if (!entry.metadata.difficulty) {
     entry.metadata.difficulty = 'intermediate';
   }
-  
+
   return entry;
 });
 
