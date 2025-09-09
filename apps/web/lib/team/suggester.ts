@@ -31,22 +31,20 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
     // Get all active role agents with their templates and certifications
     const agents = await prisma.roleAgent.findMany({
       where: {
-        isActive: true,
+        status: 'active',
         organizationId: 'default-org' // TODO: Get from auth context
       },
       include: {
         roleTemplate: {
           select: {
             title: true,
-            category: true,
-            skills: true
+            category: true
           }
         },
         certifications: {
           select: {
             name: true,
-            issuer: true,
-            trustScore: true
+            issuer: true
           }
         }
       }
@@ -54,9 +52,10 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
 
     // Calculate skill match scores for each agent
     const scoredAgents = agents.map(agent => {
-      const agentSkills = [
-        ...(agent.roleTemplate?.skills || []),
-        ...(agent.certifications?.map(c => c.name) || [])
+      const agentSkills: string[] = [
+        ...(agent.roleTemplate?.title ? [agent.roleTemplate.title] : []),
+        ...(agent.roleTemplate?.category ? [agent.roleTemplate.category] : []),
+        ...((agent as any).certifications?.map((c: any) => c.name) || [])
       ];
 
       const skillMatches = requirements.skills.filter(skill =>
@@ -66,7 +65,7 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
       );
 
       const skillMatchScore = skillMatches.length / requirements.skills.length;
-      const trustOk = agent.trustScore >= (requirements.trustMin || 0);
+      const trustOk = (agent.trustScore ?? 0) >= (requirements.trustMin || 0);
 
       return {
         id: agent.id,
@@ -74,8 +73,8 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
         title: agent.roleTemplate?.title || 'Unknown Role',
         category: agent.roleTemplate?.category || 'General',
         skills: agentSkills,
-        certifications: agent.certifications || [],
-        trustScore: agent.trustScore,
+        certifications: (agent as any).certifications || [],
+        trustScore: agent.trustScore ?? 0,
         skillMatchScore,
         availability: 'available' as const, // TODO: Implement real availability checking
         meetsTrustRequirement: trustOk,

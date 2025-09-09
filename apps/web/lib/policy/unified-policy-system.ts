@@ -114,7 +114,7 @@ export class UnifiedPolicySystem {
       {
         roleTemplateId: 'security-engineer-l3',
         roleTitle: 'L3 Security Engineer',
-        category: 'Architecture',
+        category: 'Architecture' as 'Architecture',
         regulatoryImpact: {
           GDPR: {
             id: 'gdpr-security',
@@ -557,14 +557,12 @@ export class UnifiedPolicySystem {
     // Handle both old and new request formats
     if (request.roleTemplateId) {
       // Convert old format to new format
-      const roleTemplate = {
+      const roleTemplate: RoleTemplate = {
         id: request.roleTemplateId,
         title: this.generateRoleTitle(request.roleTemplateId),
-        description: `Role template for ${request.roleTemplateId}`,
+        // description omitted – not part of RoleTemplate type
+        focus: 'Security & Compliance',
         category: 'Architecture',
-        skills: [],
-        certifications: [],
-        trustThreshold: 3,
         responsibilities: [
           'Security implementation',
           'Compliance monitoring',
@@ -572,10 +570,11 @@ export class UnifiedPolicySystem {
           'Policy enforcement'
         ],
         securityContributions: [
-          { title: 'Access Control', description: 'Manage access controls' },
-          { title: 'Data Protection', description: 'Protect sensitive data' },
-          { title: 'Incident Response', description: 'Handle security incidents' }
-        ]
+          { title: 'Access Control', bullets: ['Manage access controls'] },
+          { title: 'Data Protection', bullets: ['Protect sensitive data'] },
+          { title: 'Incident Response', bullets: ['Handle security incidents'] }
+        ],
+        selectable: true
       };
 
       const unifiedRequest: UnifiedPolicyRequest = {

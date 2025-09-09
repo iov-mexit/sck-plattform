@@ -13,7 +13,7 @@ export async function GET(req: Request) {
     // Build where clause
     const where: any = {
       organizationId,
-      isActive: true
+      status: 'active'
     };
 
     if (minTrust > 0) {
@@ -27,15 +27,13 @@ export async function GET(req: Request) {
         roleTemplate: {
           select: {
             title: true,
-            category: true,
-            skills: true
+            category: true
           }
         },
         certifications: {
           select: {
             name: true,
-            issuer: true,
-            trustScore: true
+            issuer: true
           }
         }
       },
@@ -44,13 +42,14 @@ export async function GET(req: Request) {
 
     // Filter by skills if provided
     const filteredResources = skills.length > 0
-      ? resources.filter(agent => {
-        const agentSkills = [
-          ...(agent.roleTemplate?.skills || []),
-          ...(agent.certifications?.map(c => c.name) || [])
+      ? resources.filter((agent: any) => {
+        const agentSkills: string[] = [
+          ...(agent.roleTemplate?.title ? [agent.roleTemplate.title] : []),
+          ...(agent.roleTemplate?.category ? [agent.roleTemplate.category] : []),
+          ...((agent.certifications || []).map((c: any) => c.name))
         ];
-        return skills.some(skill =>
-          agentSkills.some(agentSkill =>
+        return skills.some((skill: string) =>
+          agentSkills.some((agentSkill: string) =>
             agentSkill.toLowerCase().includes(skill.toLowerCase())
           )
         );
@@ -59,15 +58,15 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       success: true,
-      resources: filteredResources.map(agent => ({
+      resources: filteredResources.map((agent: any) => ({
         id: agent.id,
         name: agent.name,
         title: agent.roleTemplate?.title || 'Unknown Role',
         category: agent.roleTemplate?.category || 'General',
-        skills: agent.roleTemplate?.skills || [],
+        skills: [],
         certifications: agent.certifications || [],
-        trustScore: agent.trustScore,
-        isActive: agent.isActive,
+        trustScore: agent.trustScore ?? 0,
+        status: agent.status,
         createdAt: agent.createdAt
       })),
       total: filteredResources.length,

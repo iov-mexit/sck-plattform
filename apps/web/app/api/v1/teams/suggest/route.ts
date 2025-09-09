@@ -32,9 +32,9 @@ export async function POST(req: Request) {
     const record = await prisma.teamComposition.create({
       data: {
         projectPhase: phase.phaseName,
-        requirements: phase.requiredSkills,
-        suggestedTeam: team.suggestions,
-        gaps: team.gaps,
+        requirements: phase.requiredSkills as any,
+        suggestedTeam: team.suggestions as any,
+        gaps: team.gaps as any,
         organizationId: "default-org" // TODO: Get from auth context
       },
     });
