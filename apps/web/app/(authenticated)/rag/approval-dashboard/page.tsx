@@ -67,8 +67,8 @@ export default function ApprovalDashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-8">
-        <div className="max-w-6xl mx-auto">
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="text-center">Loading policies...</div>
         </div>
       </div>
@@ -76,10 +76,21 @@ export default function ApprovalDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white shadow-lg rounded-2xl p-6">
-          <h1 className="text-2xl font-bold mb-6">📋 Policy Approval Dashboard</h1>
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white border border-gray-100 rounded-lg p-8">
+          <div className="text-center mb-12">
+            <div className="mb-4">
+              <span className="text-sm text-gray-500">• Policy Management</span>
+            </div>
+            <h1 className="text-5xl font-bold text-black leading-tight mb-6">
+              <span className="block">Policy Approval</span>
+              <span className="block">Dashboard</span>
+            </h1>
+            <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed">
+              Review and manage policy drafts across all regulatory frameworks
+            </p>
+          </div>
 
           {/* Filter Tabs */}
           <div className="flex space-x-2 mb-6">

@@ -11,7 +11,9 @@ import {
   Bell,
   Menu,
   ChevronDown,
-  Users
+  Users,
+  Search,
+  FileCheck
 } from 'lucide-react';
 import { ConnectWallet } from '@/components/ConnectWallet';
 
@@ -20,6 +22,8 @@ const simplifiedNavigation = [
   { name: 'Role Agents', href: '/role-agents', icon: Users },
   { name: 'Services', href: '/services', icon: Grid3X3 },
   { name: 'Team Composition', href: '/team-composition', icon: Users },
+  { name: 'RAG Search', href: '/rag/search', icon: Search },
+  { name: 'Policy Approval', href: '/rag/approval-dashboard', icon: FileCheck },
   { name: 'LoA Management', href: '/loa-management', icon: Shield },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
