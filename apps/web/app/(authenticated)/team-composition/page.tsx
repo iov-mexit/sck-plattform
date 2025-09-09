@@ -1,510 +1,525 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  Users,
-  Search,
-  Plus,
-  Target,
-  TrendingUp,
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Users, 
+  Sparkles, 
+  Shield, 
+  Target, 
+  CheckCircle, 
   AlertTriangle,
-  CheckCircle,
-  Clock,
-  Star
-} from 'lucide-react';
+  Star,
+  Zap,
+  TrendingUp,
+  Clock
+} from "lucide-react";
 
-interface TeamComposition {
+interface TeamMember {
   id: string;
-  projectPhase: string;
-  requirements: {
-    skills: string[];
-    trustMinLevel: number;
-    teamSize: number;
-  };
-  suggestedTeam: Array<{
-    id: string;
-    name: string;
-    role: string;
-    trustScore: number;
-    skillMatchScore: number;
-    skills: string[];
-    certifications: number;
-    signals: number;
-  }>;
-  gaps: { missingSkills: string[] } | null;
-  createdAt: string;
+  name: string;
+  title: string;
+  category: string;
+  skills: string[];
+  certifications: any[];
+  trustScore: number;
+  skillMatchScore: number;
+  availability: 'available' | 'busy' | 'unknown';
 }
 
-interface ProjectPhase {
-  id: string;
-  projectId: string;
-  phaseName: string;
-  startDate: string | null;
-  endDate: string | null;
-  requiredSkills: string[];
-  createdAt: string;
+interface TeamSuggestion {
+  suggestions: TeamMember[];
+  gaps: string[];
+  confidence: number;
+  rationale: string;
 }
 
-const SDLC_PHASES = [
-  'Ideation',
-  'Planning',
-  'Design',
-  'Implementation',
-  'Testing',
-  'Deployment',
-  'Maintenance',
-  'Threat Modeling',
-  'Security Review',
-  'Compliance Audit'
-];
-
-const COMMON_SKILLS = [
-  'TypeScript', 'React', 'Node.js', 'Python', 'Java', 'C++',
-  'AWS', 'Docker', 'Kubernetes', 'Terraform',
-  'ISO27001', 'SOC2', 'GDPR', 'NIST', 'OWASP',
-  'Threat Modeling', 'Risk Assessment', 'Security Architecture',
-  'DevOps', 'CI/CD', 'Git', 'Agile', 'Scrum',
-  'Machine Learning', 'AI/ML', 'Data Science',
-  'Blockchain', 'Web3', 'Smart Contracts',
-  'Penetration Testing', 'Vulnerability Assessment',
-  'Incident Response', 'Forensics', 'Compliance'
-];
+interface PrivilegeRecommendation {
+  recommendedLoA: number;
+  rationale: string;
+  riskLevel: 'low' | 'medium' | 'high' | 'critical';
+  requiredApprovals: string[];
+  suggestedControls: string[];
+  complianceRequirements: string[];
+}
 
 export default function TeamCompositionPage() {
-  const [compositions, setCompositions] = useState<TeamComposition[]>([]);
-  const [phases, setPhases] = useState<ProjectPhase[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [suggesting, setSuggesting] = useState(false);
+  const [phaseName, setPhaseName] = useState("");
+  const [requiredSkills, setRequiredSkills] = useState("");
+  const [trustMin, setTrustMin] = useState(3);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [teamSuggestion, setTeamSuggestion] = useState<TeamSuggestion | null>(null);
+  const [privilegeRecommendation, setPrivilegeRecommendation] = useState<PrivilegeRecommendation | null>(null);
+  const [activeTab, setActiveTab] = useState<'team' | 'privileges' | 'gaps'>('team');
 
-  // Form state
-  const [selectedPhase, setSelectedPhase] = useState('');
-  const [requiredSkills, setRequiredSkills] = useState<string[]>([]);
-  const [newSkill, setNewSkill] = useState('');
-  const [trustMinLevel, setTrustMinLevel] = useState(3);
-  const [teamSize, setTeamSize] = useState(5);
-
-  useEffect(() => {
-    fetchCompositions();
-    fetchPhases();
-  }, []);
-
-  const fetchCompositions = async () => {
-    try {
-      const response = await fetch('/api/v1/team-composition?organizationId=default-org');
-      const data = await response.json();
-      setCompositions(data.compositions || []);
-    } catch (error) {
-      console.error('Error fetching compositions:', error);
-    }
-  };
-
-  const fetchPhases = async () => {
-    try {
-      const response = await fetch('/api/v1/project-phases?organizationId=default-org');
-      const data = await response.json();
-      setPhases(data.phases || []);
-    } catch (error) {
-      console.error('Error fetching phases:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim() && !requiredSkills.includes(newSkill.trim())) {
-      setRequiredSkills([...requiredSkills, newSkill.trim()]);
-      setNewSkill('');
-    }
-  };
-
-  const removeSkill = (skill: string) => {
-    setRequiredSkills(requiredSkills.filter(s => s !== skill));
-  };
-
-  const suggestTeam = async () => {
-    if (!selectedPhase || requiredSkills.length === 0) {
-      alert('Please select a project phase and add required skills');
+  const generateTeam = async () => {
+    if (!phaseName || !requiredSkills) {
+      alert("Please fill in all required fields");
       return;
     }
 
-    setSuggesting(true);
+    setIsGenerating(true);
     try {
-      const response = await fetch('/api/v1/team-composition/suggest', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const skills = requiredSkills.split(',').map(s => s.trim()).filter(Boolean);
+      
+      const response = await fetch("/api/v1/teams/suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          organizationId: 'default-org',
-          projectPhase: selectedPhase,
-          requiredSkills,
-          trustMinLevel,
-          teamSize
-        })
+          requirements: {
+            phaseName,
+            skills,
+            trustMin,
+            maxTeamSize: 5
+          }
+        }),
       });
 
       const data = await response.json();
-      if (data.composition) {
-        setCompositions([data.composition, ...compositions]);
+      
+      if (data.success) {
+        setTeamSuggestion(data);
+        
+        // Get privilege recommendations
+        const privilegeResponse = await fetch("/api/v1/privileges/recommend", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            teamMembers: data.suggestions,
+            projectSensitivity: 'medium'
+          }),
+        });
+        
+        const privilegeData = await privilegeResponse.json();
+        if (privilegeData.success) {
+          setPrivilegeRecommendation(privilegeData.recommendations);
+        }
+      } else {
+        alert(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error('Error suggesting team:', error);
-      alert('Failed to suggest team composition');
+      console.error("Error generating team:", error);
+      alert("Failed to generate team suggestion");
     } finally {
-      setSuggesting(false);
+      setIsGenerating(false);
     }
   };
 
-  const getTrustLevelColor = (score: number) => {
-    if (score >= 900) return 'text-green-600 bg-green-100';
-    if (score >= 750) return 'text-blue-600 bg-blue-100';
-    if (score >= 500) return 'text-yellow-600 bg-yellow-100';
-    if (score >= 250) return 'text-orange-600 bg-orange-100';
-    return 'text-red-600 bg-red-100';
+  const getTrustColor = (score: number) => {
+    if (score >= 4) return "text-green-600";
+    if (score >= 3) return "text-yellow-600";
+    if (score >= 2) return "text-orange-600";
+    return "text-red-600";
   };
 
-  const getSkillMatchColor = (score: number) => {
-    if (score >= 0.8) return 'text-green-600 bg-green-100';
-    if (score >= 0.6) return 'text-blue-600 bg-blue-100';
-    if (score >= 0.4) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
+  const getRiskColor = (risk: string) => {
+    switch (risk) {
+      case 'low': return "bg-green-100 text-green-800";
+      case 'medium': return "bg-yellow-100 text-yellow-800";
+      case 'high': return "bg-orange-100 text-orange-800";
+      case 'critical': return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
+    }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading Team Composition Engine...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Team Composition Engine</h1>
-          <p className="text-gray-600 mt-2">
-            AI-powered team staffing based on skills, trust scores, and project requirements
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
+      <div className="max-w-7xl mx-auto space-y-8">
+        {/* Hero Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="text-center space-y-6"
+        >
+          <div className="flex items-center justify-center space-x-3">
+            <motion.div
+              animate={{ rotate: [0, 10, -10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <Sparkles className="h-8 w-8 text-blue-600" />
+            </motion.div>
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Build Trust-Driven Teams
+            </h1>
+            <motion.div
+              animate={{ rotate: [0, -10, 10, 0] }}
+              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+            >
+              <Users className="h-8 w-8 text-purple-600" />
+            </motion.div>
+          </div>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            AI-powered team composition that matches skills, trust scores, and compliance requirements 
+            to build the perfect team for your project.
           </p>
-        </div>
-        <div className="flex items-center space-x-2">
-          <Users className="h-8 w-8 text-blue-600" />
-          <span className="text-sm text-gray-500">
-            {compositions.length} compositions
-          </span>
-        </div>
-      </div>
+        </motion.div>
 
-      <Tabs defaultValue="suggest" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="suggest">Suggest Team</TabsTrigger>
-          <TabsTrigger value="compositions">Team Compositions</TabsTrigger>
-          <TabsTrigger value="phases">Project Phases</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="suggest" className="space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center space-x-2 mb-6">
-              <Target className="h-6 w-6 text-blue-600" />
-              <h2 className="text-xl font-semibold">Suggest Team Composition</h2>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="phase">Project Phase</Label>
-                  <Select value={selectedPhase} onValueChange={setSelectedPhase}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select project phase" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SDLC_PHASES.map(phase => (
-                        <SelectItem key={phase} value={phase}>{phase}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="trustLevel">Minimum Trust Level</Label>
-                  <Select value={trustMinLevel.toString()} onValueChange={(v) => setTrustMinLevel(parseInt(v))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">L1 - Entry (0-249)</SelectItem>
-                      <SelectItem value="2">L2 - Basic (250-499)</SelectItem>
-                      <SelectItem value="3">L3 - Intermediate (500-749)</SelectItem>
-                      <SelectItem value="4">L4 - Advanced (750-899)</SelectItem>
-                      <SelectItem value="5">L5 - Expert (900-1000)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="teamSize">Team Size</Label>
-                  <Input
-                    id="teamSize"
-                    type="number"
-                    min="1"
-                    max="20"
-                    value={teamSize}
-                    onChange={(e) => setTeamSize(parseInt(e.target.value) || 5)}
+        {/* Input Form */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+        >
+          <Card className="max-w-4xl mx-auto">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Target className="h-6 w-6 text-blue-600" />
+                <span>Project Requirements</span>
+              </CardTitle>
+              <CardDescription>
+                Define your project phase and required skills to generate the optimal team composition.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Project Phase</label>
+                  <input
+                    type="text"
+                    placeholder="e.g., Design, Implementation, Security Audit"
+                    value={phaseName}
+                    onChange={(e) => setPhaseName(e.target.value)}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-4">
-                <div>
-                  <Label>Required Skills</Label>
-                  <div className="flex space-x-2 mb-2">
-                    <Input
-                      placeholder="Add skill..."
-                      value={newSkill}
-                      onChange={(e) => setNewSkill(e.target.value)}
-                      onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                    />
-                    <Button onClick={addSkill} size="sm">
-                      <Plus className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-sm text-gray-600">Common skills:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {COMMON_SKILLS.slice(0, 10).map(skill => (
-                        <Button
-                          key={skill}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            if (!requiredSkills.includes(skill)) {
-                              setRequiredSkills([...requiredSkills, skill]);
-                            }
-                          }}
-                          disabled={requiredSkills.includes(skill)}
-                        >
-                          {skill}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div className="mt-3">
-                    <p className="text-sm text-gray-600 mb-2">Selected skills:</p>
-                    <div className="flex flex-wrap gap-2">
-                      {requiredSkills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="flex items-center space-x-1">
-                          <span>{skill}</span>
-                          <button
-                            onClick={() => removeSkill(skill)}
-                            className="ml-1 hover:text-red-600"
-                          >
-                            ×
-                          </button>
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Minimum Trust Score</label>
+                  <select
+                    value={trustMin}
+                    onChange={(e) => setTrustMin(Number(e.target.value))}
+                    className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  >
+                    <option value={1}>1 - Basic</option>
+                    <option value={2}>2 - Developing</option>
+                    <option value={3}>3 - Proficient</option>
+                    <option value={4}>4 - Advanced</option>
+                    <option value={5}>5 - Expert</option>
+                  </select>
                 </div>
               </div>
-            </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Required Skills (comma-separated)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., TypeScript, React, Security, Compliance, Project Management"
+                  value={requiredSkills}
+                  onChange={(e) => setRequiredSkills(e.target.value)}
+                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+              </div>
 
-            <div className="mt-6">
-              <Button
-                onClick={suggestTeam}
-                disabled={suggesting || !selectedPhase || requiredSkills.length === 0}
-                className="w-full"
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
               >
-                {suggesting ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                    Analyzing Team Composition...
-                  </>
-                ) : (
-                  <>
-                    <Search className="h-4 w-4 mr-2" />
-                    Suggest Team Composition
-                  </>
-                )}
-              </Button>
-            </div>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="compositions" className="space-y-6">
-          <div className="grid gap-6">
-            {compositions.length === 0 ? (
-              <Card className="p-8 text-center">
-                <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Team Compositions Yet</h3>
-                <p className="text-gray-600 mb-4">
-                  Create your first team composition by suggesting a team for a project phase.
-                </p>
-                <Button onClick={() => (document.querySelector('[value="suggest"]') as HTMLElement)?.click()}>
-                  Suggest Team Composition
+                <Button
+                  onClick={generateTeam}
+                  disabled={isGenerating}
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white py-4 text-lg font-semibold"
+                >
+                  {isGenerating ? (
+                    <motion.div
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      className="flex items-center space-x-2"
+                    >
+                      <Clock className="h-5 w-5" />
+                      <span>Generating Team...</span>
+                    </motion.div>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <Zap className="h-5 w-5" />
+                      <span>Generate Team Composition</span>
+                    </div>
+                  )}
                 </Button>
-              </Card>
-            ) : (
-              compositions.map(composition => (
-                <Card key={composition.id} className="p-6">
-                  <div className="flex items-start justify-between mb-4">
+              </motion.div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Results Section */}
+        <AnimatePresence>
+          {teamSuggestion && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.6 }}
+              className="space-y-6"
+            >
+              {/* Confidence Banner */}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="bg-gradient-to-r from-green-50 to-blue-50 border border-green-200 rounded-lg p-6"
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="p-2 bg-green-100 rounded-full">
+                      <CheckCircle className="h-6 w-6 text-green-600" />
+                    </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {composition.projectPhase} Team
+                      <h3 className="text-lg font-semibold text-green-800">
+                        Team Composition Generated
                       </h3>
-                      <p className="text-sm text-gray-600">
-                        Created {new Date(composition.createdAt).toLocaleDateString()}
+                      <p className="text-green-600">
+                        Confidence: {(teamSuggestion.confidence * 100).toFixed(1)}%
                       </p>
                     </div>
-                    <Badge variant="outline">
-                      {composition.suggestedTeam.length} members
-                    </Badge>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3">Suggested Team</h4>
-                      <div className="space-y-3">
-                        {composition.suggestedTeam.map(member => (
-                          <div key={member.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900">{member.name}</p>
-                              <p className="text-sm text-gray-600">{member.role}</p>
-                              <div className="flex items-center space-x-2 mt-1">
-                                <Badge className={getTrustLevelColor(member.trustScore)}>
-                                  Trust: {member.trustScore}
-                                </Badge>
-                                <Badge className={getSkillMatchColor(member.skillMatchScore)}>
-                                  Match: {Math.round(member.skillMatchScore * 100)}%
-                                </Badge>
-                              </div>
-                            </div>
-                            <div className="text-right text-sm text-gray-500">
-                              <div className="flex items-center space-x-1">
-                                <Star className="h-3 w-3" />
-                                <span>{member.certifications}</span>
-                              </div>
-                              <div className="flex items-center space-x-1">
-                                <TrendingUp className="h-3 w-3" />
-                                <span>{member.signals}</span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-800">
+                      {teamSuggestion.suggestions.length}
                     </div>
+                    <div className="text-sm text-green-600">Team Members</div>
+                  </div>
+                </div>
+              </motion.div>
 
-                    <div>
-                      <h4 className="font-medium text-gray-900 mb-3">Requirements & Gaps</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <p className="text-sm font-medium text-gray-700">Required Skills:</p>
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {composition.requirements.skills.map(skill => (
-                              <Badge key={skill} variant="outline" className="text-xs">
-                                {skill}
+              {/* Tabs */}
+              <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg max-w-md">
+                {[
+                  { id: 'team', label: 'Team', icon: Users },
+                  { id: 'privileges', label: 'Privileges', icon: Shield },
+                  { id: 'gaps', label: 'Gaps', icon: AlertTriangle }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id as any)}
+                    className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-all ${
+                      activeTab === tab.id
+                        ? 'bg-white shadow-sm text-blue-600'
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    <span className="font-medium">{tab.label}</span>
+                  </button>
+                ))}
+              </div>
+
+              {/* Tab Content */}
+              <AnimatePresence mode="wait">
+                {activeTab === 'team' && (
+                  <motion.div
+                    key="team"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+                  >
+                    {teamSuggestion.suggestions.map((member, index) => (
+                      <motion.div
+                        key={member.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        whileHover={{ scale: 1.02, y: -5 }}
+                        className="group"
+                      >
+                        <Card className="h-full border-2 hover:border-blue-300 transition-all duration-300">
+                          <CardHeader className="pb-3">
+                            <div className="flex items-start justify-between">
+                              <div className="space-y-1">
+                                <CardTitle className="text-lg">{member.name}</CardTitle>
+                                <CardDescription>{member.title}</CardDescription>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Star className="h-4 w-4 text-yellow-500" />
+                                <span className={`font-semibold ${getTrustColor(member.trustScore)}`}>
+                                  {member.trustScore}/5
+                                </span>
+                              </div>
+                            </div>
+                          </CardHeader>
+                          <CardContent className="space-y-4">
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-700 mb-2">Skills Match</h4>
+                              <div className="w-full bg-gray-200 rounded-full h-2">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${member.skillMatchScore * 100}%` }}
+                                  transition={{ duration: 1, delay: index * 0.1 }}
+                                  className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
+                                />
+                              </div>
+                              <p className="text-xs text-gray-600 mt-1">
+                                {(member.skillMatchScore * 100).toFixed(0)}% match
+                              </p>
+                            </div>
+
+                            <div>
+                              <h4 className="text-sm font-medium text-gray-700 mb-2">Key Skills</h4>
+                              <div className="flex flex-wrap gap-1">
+                                {member.skills.slice(0, 3).map((skill, skillIndex) => (
+                                  <Badge key={skillIndex} variant="secondary" className="text-xs">
+                                    {skill}
+                                  </Badge>
+                                ))}
+                                {member.skills.length > 3 && (
+                                  <Badge variant="outline" className="text-xs">
+                                    +{member.skills.length - 3} more
+                                  </Badge>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex items-center justify-between text-sm">
+                              <span className="text-gray-600">Availability</span>
+                              <Badge 
+                                variant={member.availability === 'available' ? 'default' : 'secondary'}
+                                className={member.availability === 'available' ? 'bg-green-100 text-green-800' : ''}
+                              >
+                                {member.availability}
                               </Badge>
-                            ))}
+                            </div>
+                          </CardContent>
+                        </Card>
+                      </motion.div>
+                    ))}
+                  </motion.div>
+                )}
+
+                {activeTab === 'privileges' && privilegeRecommendation && (
+                  <motion.div
+                    key="privileges"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2">
+                          <Shield className="h-6 w-6 text-blue-600" />
+                          <span>Privilege Recommendations</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                          <div className="text-center p-4 bg-blue-50 rounded-lg">
+                            <div className="text-3xl font-bold text-blue-600">
+                              LoA {privilegeRecommendation.recommendedLoA}
+                            </div>
+                            <div className="text-sm text-blue-600">Recommended Level</div>
+                          </div>
+                          <div className="text-center p-4 bg-orange-50 rounded-lg">
+                            <Badge className={`${getRiskColor(privilegeRecommendation.riskLevel)} text-lg px-4 py-2`}>
+                              {privilegeRecommendation.riskLevel.toUpperCase()}
+                            </Badge>
+                            <div className="text-sm text-orange-600 mt-2">Risk Level</div>
+                          </div>
+                          <div className="text-center p-4 bg-green-50 rounded-lg">
+                            <div className="text-3xl font-bold text-green-600">
+                              {privilegeRecommendation.requiredApprovals.length}
+                            </div>
+                            <div className="text-sm text-green-600">Required Approvals</div>
                           </div>
                         </div>
 
                         <div>
-                          <p className="text-sm font-medium text-gray-700">Trust Level:</p>
-                          <Badge variant="outline">
-                            L{composition.requirements.trustMinLevel}+
-                          </Badge>
+                          <h4 className="font-semibold mb-2">Rationale</h4>
+                          <p className="text-gray-600">{privilegeRecommendation.rationale}</p>
                         </div>
 
-                        {composition.gaps && composition.gaps.missingSkills.length > 0 && (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div>
-                            <p className="text-sm font-medium text-red-700 flex items-center">
-                              <AlertTriangle className="h-4 w-4 mr-1" />
-                              Skill Gaps:
-                            </p>
-                            <div className="flex flex-wrap gap-1 mt-1">
-                              {composition.gaps.missingSkills.map(skill => (
-                                <Badge key={skill} variant="destructive" className="text-xs">
-                                  {skill}
-                                </Badge>
+                            <h4 className="font-semibold mb-2">Required Approvals</h4>
+                            <div className="space-y-1">
+                              {privilegeRecommendation.requiredApprovals.map((approval, index) => (
+                                <div key={index} className="flex items-center space-x-2">
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                  <span className="text-sm">{approval}</span>
+                                </div>
                               ))}
                             </div>
                           </div>
-                        )}
+                          <div>
+                            <h4 className="font-semibold mb-2">Suggested Controls</h4>
+                            <div className="space-y-1">
+                              {privilegeRecommendation.suggestedControls.slice(0, 5).map((control, index) => (
+                                <div key={index} className="flex items-center space-x-2">
+                                  <Shield className="h-4 w-4 text-blue-500" />
+                                  <span className="text-sm">{control}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
 
-                        {(!composition.gaps || composition.gaps.missingSkills.length === 0) && (
-                          <div className="flex items-center text-green-600">
-                            <CheckCircle className="h-4 w-4 mr-1" />
-                            <span className="text-sm">All skills covered</span>
+                {activeTab === 'gaps' && (
+                  <motion.div
+                    key="gaps"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center space-x-2">
+                          <AlertTriangle className="h-6 w-6 text-orange-600" />
+                          <span>Skill Gap Analysis</span>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        {teamSuggestion.gaps.length === 0 ? (
+                          <div className="text-center py-8">
+                            <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
+                            <h3 className="text-lg font-semibold text-green-800 mb-2">
+                              All Skills Covered!
+                            </h3>
+                            <p className="text-green-600">
+                              Your team has all the required skills for this project phase.
+                            </p>
+                          </div>
+                        ) : (
+                          <div className="space-y-4">
+                            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+                              <h4 className="font-semibold text-orange-800 mb-2">
+                                Missing Skills ({teamSuggestion.gaps.length})
+                              </h4>
+                              <div className="flex flex-wrap gap-2">
+                                {teamSuggestion.gaps.map((gap, index) => (
+                                  <Badge key={index} variant="destructive" className="text-sm">
+                                    {gap}
+                                  </Badge>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                              <h4 className="font-semibold text-blue-800 mb-2">Recommendations</h4>
+                              <ul className="text-sm text-blue-700 space-y-1">
+                                <li>• Consider hiring additional team members with these skills</li>
+                                <li>• Provide training for existing team members</li>
+                                <li>• Engage external consultants for specialized skills</li>
+                                <li>• Adjust project timeline to allow for skill development</li>
+                              </ul>
+                            </div>
                           </div>
                         )}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              ))
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="phases" className="space-y-6">
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-2">
-                <Clock className="h-6 w-6 text-blue-600" />
-                <h2 className="text-xl font-semibold">Project Phases</h2>
-              </div>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Phase
-              </Button>
-            </div>
-
-            {phases.length === 0 ? (
-              <div className="text-center py-8">
-                <Clock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Project Phases</h3>
-                <p className="text-gray-600">
-                  Define project phases to better organize team composition requirements.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {phases.map(phase => (
-                  <div key={phase.id} className="border rounded-lg p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{phase.phaseName}</h3>
-                        <p className="text-sm text-gray-600">Project: {phase.projectId}</p>
-                        {phase.startDate && (
-                          <p className="text-sm text-gray-500">
-                            {new Date(phase.startDate).toLocaleDateString()} -
-                            {phase.endDate ? new Date(phase.endDate).toLocaleDateString() : 'Ongoing'}
-                          </p>
-                        )}
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm text-gray-600">
-                          {Array.isArray(phase.requiredSkills) ? phase.requiredSkills.length : 0} skills
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </Card>
-        </TabsContent>
-      </Tabs>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

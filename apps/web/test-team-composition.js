@@ -226,3 +226,5 @@ if (complianceResult.gaps.length > 0) {
 
 console.log('\n🎉 Team Composition Engine Test Complete!');
 console.log('The algorithm successfully matches skills, trust levels, and identifies gaps.');
+
+
