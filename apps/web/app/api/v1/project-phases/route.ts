@@ -1,72 +1,67 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 
 export const dynamic = 'force-dynamic';
 
-const prisma = new PrismaClient();
-
-export async function GET(request: NextRequest) {
+export async function GET(req: Request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const organizationId = searchParams.get('organizationId');
+    const { searchParams } = new URL(req.url);
+    const organizationId = searchParams.get('organizationId') || 'default-org';
     const projectId = searchParams.get('projectId');
 
-    if (!organizationId) {
-      return NextResponse.json({ error: 'Organization ID is required' }, { status: 400 });
-    }
-
-    let whereClause: any = { organizationId };
+    const where: any = { organizationId };
     if (projectId) {
-      whereClause.projectId = projectId;
+      where.projectId = projectId;
     }
 
     const phases = await prisma.projectPhase.findMany({
-      where: whereClause,
-      include: {
-        organization: {
-          select: { name: true, domain: true }
-        }
-      },
-      orderBy: { startDate: 'asc' }
+      where,
+      orderBy: { createdAt: 'desc' }
     });
 
-    return NextResponse.json({ phases });
+    return NextResponse.json({
+      success: true,
+      phases
+    });
   } catch (error) {
-    console.error('Error fetching project phases:', error);
-    return NextResponse.json({ error: 'Failed to fetch project phases' }, { status: 500 });
+    console.error("Failed to fetch project phases:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch project phases" },
+      { status: 500 }
+    );
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json();
-    const { organizationId, projectId, phaseName, startDate, endDate, requiredSkills } = body;
+    const { projectId, phaseName, startDate, endDate, requiredSkills, organizationId = 'default-org' } = await req.json();
 
-    if (!organizationId || !projectId || !phaseName || !requiredSkills) {
+    if (!projectId || !phaseName || !requiredSkills) {
       return NextResponse.json({
-        error: 'Organization ID, project ID, phase name, and required skills are required'
+        error: "projectId, phaseName, and requiredSkills are required"
       }, { status: 400 });
     }
 
     const phase = await prisma.projectPhase.create({
       data: {
-        organizationId,
         projectId,
         phaseName,
         startDate: startDate ? new Date(startDate) : null,
         endDate: endDate ? new Date(endDate) : null,
-        requiredSkills
-      },
-      include: {
-        organization: {
-          select: { name: true, domain: true }
-        }
+        requiredSkills,
+        organizationId
       }
     });
 
-    return NextResponse.json({ phase }, { status: 201 });
+    return NextResponse.json({
+      success: true,
+      phase
+    });
   } catch (error) {
-    console.error('Error creating project phase:', error);
-    return NextResponse.json({ error: 'Failed to create project phase' }, { status: 500 });
+    console.error("Failed to create project phase:", error);
+    return NextResponse.json(
+      { error: "Failed to create project phase" },
+      { status: 500 }
+    );
   }
 }

@@ -116,17 +116,17 @@ export class SmartPolicyCorrelationEngine {
 
   private analyzeRoleAlignment(policyContent: string, roleTemplate: RoleTemplate): number {
     const content = policyContent.toLowerCase();
-    const roleTitle = roleTemplate.title.toLowerCase();
-    const roleCategory = roleTemplate.category.toLowerCase();
+    const roleTitle = roleTemplate.title?.toLowerCase() || '';
+    const roleCategory = roleTemplate.category?.toLowerCase() || '';
     let score = 0.5; // Base score
 
     // Role title alignment
-    if (content.includes(roleTitle)) score += 0.2;
-    if (content.includes(roleCategory)) score += 0.15;
+    if (roleTitle && content.includes(roleTitle)) score += 0.2;
+    if (roleCategory && content.includes(roleCategory)) score += 0.15;
 
     // Role-specific content alignment
-    if (roleTemplate.responsibilities.some(resp => content.includes(resp.toLowerCase()))) score += 0.1;
-    if (roleTemplate.securityContributions.some(sec => content.includes(sec.title.toLowerCase()))) score += 0.05;
+    if (roleTemplate.responsibilities?.some(resp => content.includes(resp.toLowerCase()))) score += 0.1;
+    if (roleTemplate.securityContributions?.some(sec => content.includes(sec.title.toLowerCase()))) score += 0.05;
 
     return Math.min(score, 1.0);
   }

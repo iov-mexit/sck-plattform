@@ -53,3 +53,5 @@ ALTER TABLE "team_compositions" ADD CONSTRAINT "team_compositions_organizationId
 
 -- AddForeignKey
 ALTER TABLE "project_phases" ADD CONSTRAINT "project_phases_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+
