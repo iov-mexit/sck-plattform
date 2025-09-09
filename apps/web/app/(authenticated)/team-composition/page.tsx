@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Users, 
-  Sparkles, 
-  Shield, 
-  Target, 
-  CheckCircle, 
+import {
+  Users,
+  Sparkles,
+  Shield,
+  Target,
+  CheckCircle,
   AlertTriangle,
   Star,
   Zap,
@@ -64,7 +64,7 @@ export default function TeamCompositionPage() {
     setIsGenerating(true);
     try {
       const skills = requiredSkills.split(',').map(s => s.trim()).filter(Boolean);
-      
+
       const response = await fetch("/api/v1/teams/suggest", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -79,10 +79,10 @@ export default function TeamCompositionPage() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         setTeamSuggestion(data);
-        
+
         // Get privilege recommendations
         const privilegeResponse = await fetch("/api/v1/privileges/recommend", {
           method: "POST",
@@ -92,7 +92,7 @@ export default function TeamCompositionPage() {
             projectSensitivity: 'medium'
           }),
         });
-        
+
         const privilegeData = await privilegeResponse.json();
         if (privilegeData.success) {
           setPrivilegeRecommendation(privilegeData.recommendations);
@@ -153,7 +153,7 @@ export default function TeamCompositionPage() {
             </motion.div>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            AI-powered team composition that matches skills, trust scores, and compliance requirements 
+            AI-powered team composition that matches skills, trust scores, and compliance requirements
             to build the perfect team for your project.
           </p>
         </motion.div>
@@ -201,7 +201,7 @@ export default function TeamCompositionPage() {
                   </select>
                 </div>
               </div>
-              
+
               <div className="space-y-2">
                 <label className="text-sm font-medium">Required Skills (comma-separated)</label>
                 <input
@@ -293,11 +293,10 @@ export default function TeamCompositionPage() {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
-                    className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-all ${
-                      activeTab === tab.id
+                    className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-all ${activeTab === tab.id
                         ? 'bg-white shadow-sm text-blue-600'
                         : 'text-gray-600 hover:text-gray-800'
-                    }`}
+                      }`}
                   >
                     <tab.icon className="h-4 w-4" />
                     <span className="font-medium">{tab.label}</span>
@@ -374,7 +373,7 @@ export default function TeamCompositionPage() {
 
                             <div className="flex items-center justify-between text-sm">
                               <span className="text-gray-600">Availability</span>
-                              <Badge 
+                              <Badge
                                 variant={member.availability === 'available' ? 'default' : 'secondary'}
                                 className={member.availability === 'available' ? 'bg-green-100 text-green-800' : ''}
                               >

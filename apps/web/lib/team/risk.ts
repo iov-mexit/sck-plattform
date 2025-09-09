@@ -145,7 +145,7 @@ function generatePrivilegeRationale(
   projectSensitivity: string
 ): string {
   let rationale = `Recommended LoA ${recommendedLoA} based on `;
-  
+
   rationale += `${projectSensitivity} sensitivity project with `;
   rationale += `average trust score ${avgTrustScore.toFixed(1)}/5 and team size ${teamSize}. `;
 
@@ -215,8 +215,8 @@ function suggestSecurityControls(
 
   // Team-specific controls
   const hasSecuritySkills = teamMembers.some(member =>
-    member.skills.some(skill => 
-      skill.toLowerCase().includes('security') || 
+    member.skills.some(skill =>
+      skill.toLowerCase().includes('security') ||
       skill.toLowerCase().includes('compliance')
     )
   );

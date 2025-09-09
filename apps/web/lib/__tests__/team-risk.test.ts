@@ -123,7 +123,7 @@ describe('Team Risk Assessment', () => {
 
       expect(highSensitivityResult.complianceRequirements).toContain('SOC 2 Type II');
       expect(highSensitivityResult.complianceRequirements).toContain('ISO 27001');
-      
+
       expect(criticalSensitivityResult.complianceRequirements).toContain('FedRAMP (if applicable)');
       expect(criticalSensitivityResult.complianceRequirements).toContain('NIST Cybersecurity Framework');
     });

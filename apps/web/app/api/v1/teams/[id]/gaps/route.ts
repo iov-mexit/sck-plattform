@@ -4,14 +4,14 @@ import { prisma } from "@/lib/prisma";
 export const dynamic = 'force-dynamic';
 
 export async function GET(
-  _: Request, 
+  _: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const record = await prisma.teamComposition.findUnique({
       where: { id: params.id },
     });
-    
+
     if (!record) {
       return NextResponse.json({ error: "Team composition not found" }, { status: 404 });
     }

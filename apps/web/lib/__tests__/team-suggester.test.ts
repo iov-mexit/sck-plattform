@@ -233,7 +233,7 @@ describe('Team Suggester', () => {
       const result = await suggestTeam(phase);
 
       expect(result.suggestions).toHaveLength(1);
-      expect(result.suggestions[0].skillMatchScore).toBe(2/3); // 2 out of 3 skills matched
+      expect(result.suggestions[0].skillMatchScore).toBe(2 / 3); // 2 out of 3 skills matched
       expect(result.gaps).toContain('GoLang');
     });
 

@@ -7,13 +7,13 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { projectPhaseId, requirements } = await req.json();
-    
+
     let phase;
     if (projectPhaseId) {
       phase = await prisma.projectPhase.findUnique({
         where: { id: projectPhaseId },
       });
-      
+
       if (!phase) {
         return NextResponse.json({ error: "Phase not found" }, { status: 404 });
       }

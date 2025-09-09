@@ -21,8 +21,8 @@ export interface TeamSuggestionResult {
 
 export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
   try {
-    const requirements = phase.requiredSkills as { 
-      skills: string[]; 
+    const requirements = phase.requiredSkills as {
+      skills: string[];
       trustMin: number;
       maxTeamSize?: number;
       preferredRoles?: string[];
@@ -30,7 +30,7 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
 
     // Get all active role agents with their templates and certifications
     const agents = await prisma.roleAgent.findMany({
-      where: { 
+      where: {
         isActive: true,
         organizationId: 'default-org' // TODO: Get from auth context
       },
@@ -84,7 +84,7 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
     });
 
     // Filter agents that meet minimum requirements
-    const eligibleAgents = scoredAgents.filter(agent => 
+    const eligibleAgents = scoredAgents.filter(agent =>
       agent.skillMatchScore > 0 && agent.meetsTrustRequirement
     );
 
@@ -109,10 +109,10 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
     const gaps = requirements.skills.filter(skill => !coveredSkills.has(skill));
 
     // Calculate overall confidence
-    const avgSkillMatch = selectedAgents.length > 0 
+    const avgSkillMatch = selectedAgents.length > 0
       ? selectedAgents.reduce((sum, agent) => sum + agent.skillMatchScore, 0) / selectedAgents.length
       : 0;
-    
+
     const avgTrustScore = selectedAgents.length > 0
       ? selectedAgents.reduce((sum, agent) => sum + agent.trustScore, 0) / selectedAgents.length
       : 0;
@@ -135,18 +135,18 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
 }
 
 function generateRationale(
-  agents: any[], 
-  gaps: string[], 
-  confidence: number, 
+  agents: any[],
+  gaps: string[],
+  confidence: number,
   requirements: any
 ): string {
   const teamSize = agents.length;
-  const avgTrust = agents.length > 0 
-    ? agents.reduce((sum, agent) => sum + agent.trustScore, 0) / agents.length 
+  const avgTrust = agents.length > 0
+    ? agents.reduce((sum, agent) => sum + agent.trustScore, 0) / agents.length
     : 0;
 
   let rationale = `Suggested team of ${teamSize} members with average trust score ${avgTrust.toFixed(1)}/5. `;
-  
+
   if (gaps.length === 0) {
     rationale += "All required skills are covered by the team.";
   } else {

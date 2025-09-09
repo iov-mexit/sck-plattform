@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { teamId, projectPhaseId, teamMembers, projectSensitivity } = await req.json();
-    
+
     if (!teamId && !teamMembers) {
-      return NextResponse.json({ 
-        error: "Either teamId or teamMembers required" 
+      return NextResponse.json({
+        error: "Either teamId or teamMembers required"
       }, { status: 400 });
     }
 

@@ -43,18 +43,18 @@ export async function GET(req: Request) {
     });
 
     // Filter by skills if provided
-    const filteredResources = skills.length > 0 
+    const filteredResources = skills.length > 0
       ? resources.filter(agent => {
-          const agentSkills = [
-            ...(agent.roleTemplate?.skills || []),
-            ...(agent.certifications?.map(c => c.name) || [])
-          ];
-          return skills.some(skill => 
-            agentSkills.some(agentSkill => 
-              agentSkill.toLowerCase().includes(skill.toLowerCase())
-            )
-          );
-        })
+        const agentSkills = [
+          ...(agent.roleTemplate?.skills || []),
+          ...(agent.certifications?.map(c => c.name) || [])
+        ];
+        return skills.some(skill =>
+          agentSkills.some(agentSkill =>
+            agentSkill.toLowerCase().includes(skill.toLowerCase())
+          )
+        );
+      })
       : resources;
 
     return NextResponse.json({

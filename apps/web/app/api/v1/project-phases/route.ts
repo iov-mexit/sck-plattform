@@ -37,8 +37,8 @@ export async function POST(req: Request) {
     const { projectId, phaseName, startDate, endDate, requiredSkills, organizationId = 'default-org' } = await req.json();
 
     if (!projectId || !phaseName || !requiredSkills) {
-      return NextResponse.json({ 
-        error: "projectId, phaseName, and requiredSkills are required" 
+      return NextResponse.json({
+        error: "projectId, phaseName, and requiredSkills are required"
       }, { status: 400 });
     }
 
