@@ -35,12 +35,7 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
         organizationId: 'default-org' // TODO: Get from auth context
       },
       include: {
-        roleTemplate: {
-          select: {
-            title: true,
-            category: true
-          }
-        },
+        roleTemplate: true,
         certifications: {
           select: {
             name: true,
@@ -53,6 +48,7 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
     // Calculate skill match scores for each agent
     const scoredAgents = agents.map(agent => {
       const agentSkills: string[] = [
+        ...((agent.roleTemplate as any)?.skills || []),
         ...(agent.roleTemplate?.title ? [agent.roleTemplate.title] : []),
         ...(agent.roleTemplate?.category ? [agent.roleTemplate.category] : []),
         ...((agent as any).certifications?.map((c: any) => c.name) || [])
