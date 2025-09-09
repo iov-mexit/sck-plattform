@@ -153,15 +153,34 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard</h1>
-        <p className="text-gray-600">Welcome to your PAM + Trust-Gated MCP platform</p>
+    <div className="space-y-12">
+      {/* Hero Section */}
+      <div className="relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            {/* Left Side */}
+            <div>
+              <div className="mb-4">
+                <span className="text-sm text-gray-500">• Dashboard Overview</span>
+              </div>
+              <h1 className="text-5xl font-bold text-black leading-tight mb-6">
+                <span className="block">Welcome to</span>
+                <span className="block">SCK Platform</span>
+              </h1>
+            </div>
+
+            {/* Right Side */}
+            <div>
+              <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+                Your comprehensive compliance and role management dashboard. Monitor agents, track trust scores, and manage your organization's compliance strategy.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Stats Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center space-x-3">

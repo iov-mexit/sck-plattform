@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { PageLayout, PageHeader } from "@/components/page-layout";
 import {
   Users,
   Sparkles,
@@ -126,37 +127,17 @@ export default function TeamCompositionPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <PageLayout showPattern={true} patternHeight="h-64">
+      <div className="max-w-7xl mx-auto space-y-12">
         {/* Hero Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center space-y-6"
-        >
-          <div className="flex items-center justify-center space-x-3">
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <Sparkles className="h-8 w-8 text-blue-600" />
-            </motion.div>
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Build Trust-Driven Teams
-            </h1>
-            <motion.div
-              animate={{ rotate: [0, -10, 10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <Users className="h-8 w-8 text-purple-600" />
-            </motion.div>
-          </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            AI-powered team composition that matches skills, trust scores, and compliance requirements
-            to build the perfect team for your project.
-          </p>
-        </motion.div>
+        <PageHeader
+          category="AI-Powered Team Building"
+          title={[
+            "Build Trust-Driven",
+            "Teams"
+          ]}
+          description="AI-powered team composition that matches skills, trust scores, and compliance requirements to build the perfect team for your project."
+        />
 
         {/* Input Form */}
         <motion.div
