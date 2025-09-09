@@ -275,8 +275,8 @@ export default function TeamCompositionPage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`flex-1 flex items-center justify-center space-x-2 px-4 py-2 rounded-md transition-all ${activeTab === tab.id
-                        ? 'bg-white shadow-sm text-blue-600'
-                        : 'text-gray-600 hover:text-gray-800'
+                      ? 'bg-white shadow-sm text-blue-600'
+                      : 'text-gray-600 hover:text-gray-800'
                       }`}
                   >
                     <tab.icon className="h-4 w-4" />
@@ -500,6 +500,6 @@ export default function TeamCompositionPage() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </PageLayout>
   );
 }
