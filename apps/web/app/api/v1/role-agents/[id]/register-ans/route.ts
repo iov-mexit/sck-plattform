@@ -60,7 +60,7 @@ export async function POST(
         where: { id },
         data: {
           ansIdentifier,
-          ansRegistrationStatus: 'registered',
+          ansRegistrationStatus: 'SYNCED',
           ansVerificationUrl: `https://knaight.site/api/v1/verify/${ansIdentifier}`,
         },
       });
@@ -80,7 +80,7 @@ export async function POST(
         where: { id },
         data: {
           ansIdentifier,
-          ansRegistrationStatus: 'failed',
+          ansRegistrationStatus: 'ERROR',
           ansRegistrationError: ansResult.error || 'Unknown error',
         },
       });

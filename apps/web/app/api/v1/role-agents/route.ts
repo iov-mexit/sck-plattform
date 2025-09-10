@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
+import { AnsService } from '@/lib/ans/service';
 import { z } from 'zod';
 
 const CreateRoleAgentSchema = z.object({
@@ -129,6 +130,11 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('Role agent created successfully:', roleAgent);
+
+    // Trigger ANS auto-registration (non-blocking)
+    AnsService.registerAgent(roleAgent.id).catch((error) => {
+      console.error(`❌ ANS auto-registration failed for role agent ${roleAgent.id}:`, error);
+    });
 
     // Handle NFT minting options
     const nftMinted = false; // Default value since field doesn't exist in schema

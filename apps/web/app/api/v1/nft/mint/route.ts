@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/database';
 import { ethers } from 'ethers';
+import { getFlareConfig, getFlareProvider, getFlareSigner } from '@/lib/blockchain/flare';
 
 interface MintNFTRequest {
   roleAgentId: string;
@@ -58,193 +59,41 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // If this is a frontend-initiated real minting request, perform blockchain minting
-    if (body.transactionHash && body.tokenId) {
-      // This is a confirmation from frontend real minting - just update database
-      await prisma.roleAgent.update({
-        where: { id: body.roleAgentId },
-        data: {
-          soulboundTokenId: body.tokenId,
-          blockchainAddress: body.contractAddress,
-          blockchainNetwork: 'sepolia',
-        },
-      });
-
-      // Create blockchain transaction record
-      try {
-        await prisma.blockchainTransaction.create({
-          data: {
-            id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            roleAgentId: body.roleAgentId,
-            transactionHash: body.transactionHash,
-            network: 'sepolia',
-            status: 'confirmed',
-            gasUsed: body.gasUsed || '180000',
-            gasPrice: '20000000000',
-            blockNumber: body.blockNumber,
-            updatedAt: new Date(),
-          },
-        });
-        console.log('✅ Blockchain transaction record created successfully');
-      } catch (txError) {
-        console.log('❌ Transaction record creation failed:', txError);
-      }
-
+    // If no FLARE private key is available, return dry-run data (no writes)
+    if (!process.env.FLARE_PRIVATE_KEY || process.env.FLARE_PRIVATE_KEY === '0x...') {
+      const cfg = getFlareConfig();
       return NextResponse.json({
         success: true,
         data: {
-          tokenId: body.tokenId,
-          transactionHash: body.transactionHash,
+          dryRun: true,
+          network: cfg.name,
           contractAddress: body.contractAddress,
-          network: 'sepolia',
-          explorerUrl: `https://sepolia.etherscan.io/tx/${body.transactionHash}`,
-          message: 'NFT minting confirmed and database updated',
-          status: 'confirmed'
+          recipientAddress: body.recipientAddress,
+          message: 'Dry-run: provide FLARE_PRIVATE_KEY to enable on-chain minting.'
         }
       });
     }
 
-    // If no private key is available, return data for frontend minting
-    if (!process.env.ETHEREUM_PRIVATE_KEY || process.env.ETHEREUM_PRIVATE_KEY === '0x...') {
-      console.log('🔍 No valid private key found - providing simulation data');
-
-      // Generate a realistic token ID and transaction hash
-      const tokenId = (999800 + Math.floor(Math.random() * 200)).toString();
-      const transactionHash = `0x${Date.now().toString(16)}${Math.random().toString(16).substring(2, 14)}`;
-
-      // Update database to mark as minted (simulation)
-      await prisma.roleAgent.update({
-        where: { id: body.roleAgentId },
-        data: {
-          soulboundTokenId: tokenId,
-          blockchainAddress: body.contractAddress,
-          blockchainNetwork: 'sepolia',
-        },
-      });
-
-      // Create blockchain transaction record (simulation)
-      try {
-        await prisma.blockchainTransaction.create({
-          data: {
-            id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            roleAgentId: body.roleAgentId,
-            transactionHash: transactionHash,
-            network: 'sepolia',
-            status: 'confirmed',
-            gasUsed: '180000',
-            gasPrice: '20000000000',
-            updatedAt: new Date(),
-          },
-        });
-        console.log('✅ Simulation transaction record created successfully');
-      } catch (txError) {
-        console.log('❌ Transaction record creation failed:', txError);
-      }
-
-      return NextResponse.json({
-        success: true,
-        data: {
-          tokenId,
-          transactionHash,
-          contractAddress: body.contractAddress,
-          network: 'sepolia',
-          explorerUrl: `https://sepolia.etherscan.io/tx/${transactionHash}`,
-          roleAgentId: body.roleAgentId,
-          achievementType: body.achievementType || 'Achievement',
-          simulation: true,
-          metadata: {
-            name: `${body.achievementType || 'Achievement'} - ${role_agent.name}`,
-            description: `Achievement NFT for ${role_agent.assignedToDid}`,
-            image: `https://api.securecodeknight.com/achievements/${(body.achievementType || 'achievement').toLowerCase().replace(/\s+/g, '-')}.png`,
-            external_url: `https://sepolia.etherscan.io/tx/${transactionHash}`,
-            attributes: [
-              {
-                trait_type: "Achievement Type",
-                value: body.achievementType || 'Achievement'
-              },
-              {
-                trait_type: "Role Agent",
-                value: role_agent.name
-              },
-              {
-                trait_type: "Role",
-                value: role_agent.roleTemplate?.title || 'Unknown'
-              },
-              {
-                trait_type: "Organization",
-                value: role_agent.organization?.name || 'Unknown Organization'
-              },
-              {
-                trait_type: "Trust Score",
-                value: role_agent.trustScore || 750
-              },
-              {
-                trait_type: "DID",
-                value: role_agent.assignedToDid
-              },
-              {
-                trait_type: "Token ID",
-                value: tokenId
-              },
-              {
-                trait_type: "Network",
-                value: "Sepolia Testnet (Simulated)"
-              },
-              {
-                trait_type: "Contract",
-                value: body.contractAddress
-              }
-            ]
-          },
-          message: "NFT successfully minted via simulation! For real blockchain minting, configure ETHEREUM_PRIVATE_KEY.",
-          status: "completed"
-        }
-      });
-    }
-
-    // Backend minting with private key (if available)
+    // Backend minting on Flare with private key
     try {
-      console.log('🚀 Starting backend NFT minting...');
+      console.log('🚀 Starting backend NFT minting on Flare...');
 
-      // Use the correct environment variable name
-      const rpcUrl = process.env.ETHEREUM_RPC_URL || process.env.NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC || 'https://sepolia.drpc.org';
+      const cfg = getFlareConfig();
+      const provider = getFlareProvider();
+      const wallet = getFlareSigner();
 
-      if (!rpcUrl || rpcUrl.includes('YOUR_INFURA_KEY')) {
-        throw new Error('RPC URL not properly configured');
-      }
-
-      // Connect to Sepolia
-      const provider = new ethers.JsonRpcProvider(rpcUrl);
-
-      // Test the connection
-      try {
-        const network = await provider.getNetwork();
-        console.log('✅ Connected to network:', network.name, 'Chain ID:', network.chainId.toString());
-
-        if (network.chainId !== 11155111n) {
-          throw new Error(`Wrong network. Expected Sepolia (11155111), got ${network.chainId}`);
-        }
-      } catch (networkError) {
-        console.error('❌ Network connection failed:', networkError);
-        throw new Error(`Failed to connect to Sepolia: ${networkError}`);
-      }
-
-      const wallet = new ethers.Wallet(process.env.ETHEREUM_PRIVATE_KEY!, provider);
-
-      // Check wallet balance
-      const balance = await provider.getBalance(wallet.address);
-      console.log('💰 Wallet balance:', ethers.formatEther(balance), 'ETH');
-
+      // Basic balance check
+      const balance = await provider.getBalance(wallet!.address);
       if (balance === 0n) {
-        throw new Error(`Wallet ${wallet.address} has no ETH for gas fees`);
+        throw new Error(`Wallet ${wallet!.address} has no native balance for gas fees on ${cfg.name}`);
       }
 
       // Create contract instance
-      const contract = new ethers.Contract(body.contractAddress, NFT_CONTRACT_ABI, wallet);
+      const contract = new ethers.Contract(body.contractAddress, NFT_CONTRACT_ABI, wallet!);
 
       console.log('📋 Minting parameters:', {
         contract: body.contractAddress,
-        wallet: wallet.address,
+        wallet: wallet!.address,
         to: body.recipientAddress,
         did: role_agent.assignedToDid,
         name: role_agent.name,
@@ -294,7 +143,7 @@ export async function POST(request: NextRequest) {
         data: {
           soulboundTokenId: tokenId,
           blockchainAddress: body.contractAddress,
-          blockchainNetwork: 'sepolia',
+          blockchainNetwork: cfg.name,
         },
       });
 
@@ -305,7 +154,7 @@ export async function POST(request: NextRequest) {
             id: `tx-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             roleAgentId: body.roleAgentId,
             transactionHash: tx.hash,
-            network: 'sepolia',
+            network: cfg.name,
             status: 'confirmed',
             gasUsed: receipt.gasUsed.toString(),
             gasPrice: receipt.gasPrice?.toString() || '20000000000',
@@ -324,60 +173,16 @@ export async function POST(request: NextRequest) {
           tokenId,
           transactionHash: tx.hash,
           contractAddress: body.contractAddress,
-          network: 'sepolia',
-          explorerUrl: `https://sepolia.etherscan.io/tx/${tx.hash}`,
+          network: cfg.name,
+          explorerUrl: `${cfg.explorer}${tx.hash}`,
           roleAgentId: body.roleAgentId,
           achievementType: body.achievementType || 'Achievement',
           realBlockchain: true,
-          walletUsed: wallet.address,
+          walletUsed: wallet!.address,
           gasUsed: receipt.gasUsed.toString(),
           gasPrice: receipt.gasPrice?.toString(),
-          metadata: {
-            name: `${body.achievementType || 'Achievement'} - ${role_agent.name}`,
-            description: `Achievement NFT for ${role_agent.assignedToDid}`,
-            image: `https://api.securecodeknight.com/achievements/${(body.achievementType || 'achievement').toLowerCase().replace(/\s+/g, '-')}.png`,
-            external_url: `https://sepolia.etherscan.io/tx/${tx.hash}`,
-            attributes: [
-              {
-                trait_type: "Achievement Type",
-                value: body.achievementType || 'Achievement'
-              },
-              {
-                trait_type: "Role Agent",
-                value: role_agent.name
-              },
-              {
-                trait_type: "Role",
-                value: role_agent.roleTemplate?.title || 'Unknown'
-              },
-              {
-                trait_type: "Organization",
-                value: role_agent.organization?.name || 'Unknown Organization'
-              },
-              {
-                trait_type: "Trust Score",
-                value: role_agent.trustScore || 750
-              },
-              {
-                trait_type: "DID",
-                value: role_agent.assignedToDid
-              },
-              {
-                trait_type: "Token ID",
-                value: tokenId
-              },
-              {
-                trait_type: "Network",
-                value: "Sepolia Testnet"
-              },
-              {
-                trait_type: "Contract",
-                value: body.contractAddress
-              }
-            ]
-          },
-          message: "NFT successfully minted on Sepolia blockchain!",
-          status: "completed"
+          message: `NFT successfully minted on ${cfg.name}!`,
+          status: 'completed'
         }
       });
 
@@ -388,8 +193,8 @@ export async function POST(request: NextRequest) {
         error: `Backend minting failed: ${mintError.message}`,
         details: mintError.reason || 'Unknown error',
         troubleshooting: {
-          privateKey: process.env.ETHEREUM_PRIVATE_KEY ? 'Configured' : 'Missing',
-          rpcUrl: process.env.ETHEREUM_RPC_URL || process.env.NEXT_PUBLIC_ETHEREUM_SEPOLIA_RPC || 'Missing',
+          privateKey: process.env.FLARE_PRIVATE_KEY ? 'Configured' : 'Missing',
+          rpcUrl: getFlareConfig().rpcUrl,
           contractAddress: body.contractAddress
         }
       }, { status: 500 });
@@ -403,4 +208,4 @@ export async function POST(request: NextRequest) {
       details: error.message
     }, { status: 500 });
   }
-} 
+}

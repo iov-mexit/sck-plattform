@@ -6,7 +6,7 @@ export default defineConfig({
     environment: 'node',
     setupFiles: ['./tests/setup-vitest.ts'],
     // Restore default excludes and skip our API/E2E tests directory
-    exclude: [...configDefaults.exclude, 'tests/**', 'rag-ingestion/node_modules/**'],
+    exclude: [...configDefaults.exclude, 'rag-ingestion/node_modules/**'],
   },
 });
 

@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-export type FlareNetwork = "coston2" | "songbird" | "flare";
+export type FlareNetwork = "coston" | "coston2" | "songbird" | "flare";
 
 type NetworkConfig = {
   name: FlareNetwork;
@@ -10,6 +10,13 @@ type NetworkConfig = {
 };
 
 const DEFAULTS: Record<FlareNetwork, NetworkConfig> = {
+  // Coston Testnet (legacy)
+  coston: {
+    name: "coston",
+    chainId: 16,
+    rpcUrl: process.env.FLARE_RPC_URL || "https://coston-api.flare.network/ext/C/rpc",
+    explorer: "https://coston-explorer.flare.network/tx/",
+  },
   // Coston2 Testnet
   coston2: {
     name: "coston2",

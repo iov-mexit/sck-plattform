@@ -15,7 +15,7 @@ import {
   Search,
   FileCheck
 } from 'lucide-react';
-import { ConnectWallet } from '@/components/ConnectWallet';
+// Wallet connection UI removed for backend-only blockchain operations
 
 const simplifiedNavigation = [
   { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -53,9 +53,8 @@ export function NavBar() {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className={`flex items-center space-x-2 hover:text-black transition-colors ${
-                    isActive ? 'text-black font-medium' : ''
-                  }`}
+                  className={`flex items-center space-x-2 hover:text-black transition-colors ${isActive ? 'text-black font-medium' : ''
+                    }`}
                 >
                   <Icon className="h-4 w-4" />
                   <span className="hidden lg:inline">{item.name}</span>
@@ -71,8 +70,7 @@ export function NavBar() {
               <Bell className="h-5 w-5" />
             </button>
 
-            {/* Wallet Connection - Compact Version */}
-            <ConnectWallet compact />
+            {/* Wallet Connection removed */}
 
             {/* Mobile menu button */}
             <button className="md:hidden p-2 text-gray-600 hover:text-black transition-colors">

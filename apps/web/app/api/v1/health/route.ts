@@ -27,7 +27,7 @@ export async function GET() {
     const certificationsCount = await prisma.certification.count();
     const blockchainTransactionsCount = await prisma.blockchainTransaction.count();
     const ansRegisteredCount = await prisma.roleAgent.count({
-      where: { ansRegistrationStatus: 'registered' }
+      where: { ansRegistrationStatus: 'SYNCED' }
     });
 
     const healthStatus = {
