@@ -66,7 +66,7 @@ function extractSourceUrl(id: string, metadata: any): string {
   // Generate URL based on framework and ID
   const framework = extractFrameworkFromId(id) || extractFrameworkFromMetadata(metadata);
 
-  const urlMap: { [key: string]: string } = {
+  const urlMap: Record<string, string> = {
     'ISO 27001': 'https://www.iso.org/standard/27001',
     'ISO 42001': 'https://www.iso.org/standard/42001',
     'OWASP': 'https://owasp.org/Top10/',
@@ -79,7 +79,10 @@ function extractSourceUrl(id: string, metadata: any): string {
     'CRA': 'https://eur-lex.europa.eu/eli/reg/2024/2847/oj/eng'
   };
 
-  return urlMap[framework] || '#';
+  if (!framework) return '#';
+  const key: string = framework as string;
+  const url = urlMap[key];
+  return url ? url : '#';
 }
 
 // Helper function to calculate lexical similarity score
@@ -207,7 +210,7 @@ export async function POST(req: NextRequest) {
       console.log(`🏛️ Attempting framework-specific search: ${processed.frameworks.join(', ')}`);
 
       // Map framework names to IDs for better matching
-      const frameworkIdMap: { [key: string]: string[] } = {
+      const frameworkIdMap: Record<string, string[]> = {
         'GDPR': ['gdpr', 'eu_gdpr'],
         'ISO 27001': ['iso27001', 'iso_27001'],
         'ISO 42001': ['iso42001', 'iso_42001'],
@@ -220,7 +223,7 @@ export async function POST(req: NextRequest) {
         'CRA': ['cra']
       };
 
-      const frameworkIds = processed.frameworks.flatMap(fw => frameworkIdMap[fw] || [fw]);
+      const frameworkIds = processed.frameworks.flatMap((fw: string) => (frameworkIdMap[fw] || [fw]));
 
       const { data: frameworkResults, error: frameworkError } = await supabase
         .from('knowledge_chunks')
