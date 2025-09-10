@@ -1,0 +1,118 @@
+
+> dev
+> yarn workspace @sck/web dev
+
+  ▲ Next.js 14.2.32
+  - Local:        http://localhost:3000
+  - Environments: .env.local, .env
+
+ ✓ Starting...
+ ✓ Ready in 1951ms
+ ○ Compiling /api/rag/search ...
+ ✓ Compiled /api/rag/search in 736ms (129 modules)
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+⚠️ Vector search failed, falling back to lexical search
+🔍 Attempting lexical search...
+🏛️ Attempting framework-specific search: GDPR
+🌐 Attempting generic content search...
+✅ Generic search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (generic mode)
+ POST /api/rag/search 200 in 2412ms
+ ✓ Compiled /api/v1/deploy/test-db in 296ms (57 modules)
+ POST /api/v1/deploy/test-db 405 in 387ms
+ ✓ Compiled /api/rag/search in 270ms (129 modules)
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+⚠️ Vector search failed, falling back to lexical search
+🔍 Attempting lexical search...
+🏛️ Attempting framework-specific search: GDPR
+🌐 Attempting generic content search...
+✅ Generic search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (generic mode)
+ POST /api/rag/search 200 in 2043ms
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+⚠️ Vector search failed, falling back to lexical search
+🔍 Attempting lexical search...
+🏛️ Attempting framework-specific search: GDPR
+🌐 Attempting generic content search...
+✅ Generic search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (generic mode)
+ POST /api/rag/search 200 in 1468ms
+ ✓ Compiled in 800ms (129 modules)
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+⚠️ Vector search failed, falling back to lexical search
+🔍 Attempting lexical search...
+🏛️ Attempting framework-specific search: GDPR
+🌐 Attempting generic content search...
+✅ Generic search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (generic mode)
+ POST /api/rag/search 200 in 624ms
+ ✓ Compiled in 56ms
+ ✓ Compiled /api/rag/search in 277ms (129 modules)
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+📊 Generated embedding with 384 dimensions
+🔍 Vector search response: { hasData: true, dataLength: 0, hasError: false, error: 'none' }
+⚠️ Vector search failed, falling back to lexical search
+Vector error details: null
+🔍 Attempting lexical search...
+🏛️ Attempting framework-specific search: GDPR
+🌐 Attempting generic content search...
+✅ Generic search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (generic mode)
+ POST /api/rag/search 200 in 1178ms
+ ✓ Compiled in 322ms (129 modules)
+ ✓ Compiled in 82ms (129 modules)
+ ✓ Compiled in 122ms (129 modules)
+🔍 RAG Query: "GDPR data protection"
+📝 Preprocessed: {
+  frameworks: [ 'GDPR' ],
+  intent: 'explain',
+  keywords: [ 'gdpr', 'data', 'protection' ]
+}
+🔤 Attempting vector search...
+📊 Generated embedding with 384 dimensions
+🔍 Vector search response: { hasData: true, dataLength: 0, hasError: false, error: 'none' }
+⚠️ Vector search failed, falling back to lexical search
+Vector error details: null
+🔍 Attempting enhanced lexical search...
+🏛️ Attempting framework-specific search: GDPR
+✅ Framework search found 20 results
+📊 Scoring and ranking 20 results...
+✅ RAG search completed with 20 results (framework mode)
+ POST /api/rag/search 200 in 1752ms
+ ✓ Compiled in 442ms (129 modules)
+ ✓ Compiled in 3.8s (202 modules)
