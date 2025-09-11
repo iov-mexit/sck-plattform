@@ -84,8 +84,16 @@ jobs:
             yarn dlx vercel env pull .env.prod --yes --environment=production --token "$VERCEL_TOKEN"
             while IFS= read -r line; do
               key="${line%%=*}"
+              # If key missing or present with empty value, write/overwrite from prod
               if ! grep -qE "^${key}=" .env.ci; then
                 echo "$line" >> .env.ci
+              else
+                cur=$(grep -E "^${key}=" .env.ci | head -n1)
+                curv=${cur#*=}
+                if [ -z "$curv" ]; then
+                  # overwrite empty value with prod value
+                  sed -i.bak -E "s#^${key}=.*#${line//\//\\/}#" .env.ci && rm -f .env.ci.bak
+                fi
               fi
             done < .env.prod
             echo "✅ Merged prod env into .env.ci"
@@ -105,7 +113,7 @@ jobs:
           . ./.env.ci || true
           set +a
 
-          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-}}}"
+          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-${SUPABASE_PRISMA_URL:-${SUPABASE_DATABASE_URL:-}}}}}"
           DB=${DB%\"}; DB=${DB#\"}
 
           if ! echo "$DB" | grep -Eq '^postgres(ql)?://'; then
