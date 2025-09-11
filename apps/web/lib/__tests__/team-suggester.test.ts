@@ -66,7 +66,7 @@ describe('Team Suggester', () => {
         }
       ];
 
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents as any);
 
       const phase = {
         phaseName: 'Implementation',
@@ -105,7 +105,7 @@ describe('Team Suggester', () => {
         }
       ];
 
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents as any);
 
       const phase = {
         phaseName: 'Security Audit',
@@ -153,7 +153,7 @@ describe('Team Suggester', () => {
         }
       ];
 
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents as any);
 
       const phase = {
         phaseName: 'Critical Implementation',
@@ -186,7 +186,7 @@ describe('Team Suggester', () => {
         certifications: []
       }));
 
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents as any);
 
       const phase = {
         phaseName: 'Implementation',
@@ -219,7 +219,7 @@ describe('Team Suggester', () => {
         }
       ];
 
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue(mockAgents as any);
 
       const phase = {
         phaseName: 'Implementation',
@@ -238,7 +238,7 @@ describe('Team Suggester', () => {
     });
 
     it('should handle empty agent list gracefully', async () => {
-      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue([]);
+      vi.mocked(prisma.roleAgent.findMany).mockResolvedValue([] as any);
 
       const phase = {
         phaseName: 'Implementation',

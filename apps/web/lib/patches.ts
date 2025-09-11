@@ -33,10 +33,10 @@ export function parseRoleAgent(input: unknown): RoleAgentInput | null {
  * 2️⃣ AnsSyncStatus Enum Mapping
  * ========================== */
 export const ansStatusMap: Record<string, $Enums.AnsSyncStatus> = {
-  not_registered: "NOT_REGISTERED",
-  registered: "REGISTERED",
-  synced: "SYNCED",
-  failed: "FAILED",
+  not_registered: "NOT_REGISTERED" as $Enums.AnsSyncStatus,
+  registered: "REGISTERED" as $Enums.AnsSyncStatus,
+  synced: "SYNCED" as $Enums.AnsSyncStatus,
+  failed: "FAILED" as $Enums.AnsSyncStatus,
 };
 
 export function mapAnsStatus(inputStatus: string): $Enums.AnsSyncStatus {
@@ -78,13 +78,6 @@ interface TransactionData {
 export async function createTransactionRecord(tx: TransactionData) {
   if (!tx.txHash) {
     console.warn("[TRANSACTION SKIPPED] No tx submitted", tx);
-    await prisma.blockchainTransaction.create({
-      data: {
-        status: "FAILED",
-        error: "No tx hash, skipped creation",
-        ...tx,
-      },
-    });
     return;
   }
 
@@ -92,10 +85,9 @@ export async function createTransactionRecord(tx: TransactionData) {
     data: {
       transactionHash: tx.txHash,
       network: tx.network,
-      // map optional fields when present
       gasUsed: (tx as any).gasUsed,
       gasPrice: (tx as any).gasPrice,
-      status: (tx.status as any) ?? "pending",
+      status: (tx as any).status ?? "pending",
       roleAgentId: (tx as any).roleAgentId,
       tokenId: (tx as any).tokenId,
       contractAddress: (tx as any).contractAddress,

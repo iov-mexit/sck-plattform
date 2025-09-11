@@ -256,7 +256,7 @@ describe('Signal Collection System', () => {
       };
 
       // Should not throw when skipRateLimit is true
-      await expect(signalCollection.createSignal(signalData, { skipRateLimit: true })).resolves.toBeDefined();
+      await expect((signalCollection.createSignal as any)(signalData, { skipRateLimit: true })).resolves.toBeDefined();
     });
 
     it('should verify signal with metadata preservation', async () => {
@@ -310,7 +310,7 @@ describe('Signal Collection System', () => {
         .mockResolvedValueOnce(mockDigitalTwin) // First call succeeds
         .mockResolvedValueOnce(null); // Second call fails
 
-      const result = await signalCollection.bulkImportSignals(signals);
+      const result = await (signalCollection.bulkImportSignals as any)(signals);
 
       expect(result.success).toBe(1);
       expect(result.failed).toBe(1);
