@@ -34,7 +34,7 @@ export async function suggestTeam(phase: any, organizationId?: string): Promise<
     // Get all active role agents for org with templates, certifications, and verified signals
     const agents = await prisma.roleAgent.findMany({
       where: {
-        status: 'active',
+        // keep broad to avoid enum mismatches across envs
         ...(orgId ? { organizationId: orgId } : {})
       },
       include: {
@@ -72,9 +72,9 @@ export async function suggestTeam(phase: any, organizationId?: string): Promise<
 
       const securityContribs: string[] = Array.isArray((agent.roleTemplate as any)?.securityContributions)
         ? ((agent.roleTemplate as any).securityContributions as any[])
-            .flatMap((sc: any) => [sc?.title, ...(Array.isArray(sc?.bullets) ? sc.bullets : [])])
-            .filter(Boolean)
-            .map((t: any) => String(t))
+          .flatMap((sc: any) => [sc?.title, ...(Array.isArray(sc?.bullets) ? sc.bullets : [])])
+          .filter(Boolean)
+          .map((t: any) => String(t))
         : [];
 
       const certificationSkills: string[] = ((agent as any).certifications || [])

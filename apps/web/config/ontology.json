@@ -5,12 +5,1169 @@
     "notes": "Competencies intentionally exhaustive and normalized; roles reference competency ids."
   },
   "competencies": [
-    {"id":"secure_coding_basics","label":"Secure Coding Fundamentals","description":"Core secure coding patterns, secure-by-default development, input/output handling, defensive programming.","trustLevels":{"L1":"Understands common secure coding pitfalls and OWASP top 10 at high level.","L2":"Can write code following secure patterns and basic sanitation.","L3":"Designs and enforces secure coding practices across modules.","L4":"Leads secure coding reviews and integrates secure frameworks.","L5":"Defines org-wide secure coding standards and training."},"certifications":["SCW-Secure-Coding","OWASP-Top10"]},
-    {"id":"authentication_session","label":"Authentication & Session Management","description":"Secure authentication flows, session handling, token lifecycle, brute-force protection, MFA.","trustLevels":{"L1":"Recognizes weak authentication and session problems.","L2":"Implements secure login, session expiration, and basic MFA.","L3":"Designs robust auth solutions (SSO, OAuth2/OIDC) and session protections.","L4":"Audits auth systems org-wide and approves designs.","L5":"Defines enterprise identity standards and governance."},"certifications":["SCW-Auth-Lab","OAuth2/OIDC-Training"]},
-    {"id":"access_control","label":"Access Control & Authorization","description":"Role-based and attribute-based access control, preventing IDOR and BOLA, function-level authorization.","trustLevels":{"L1":"Understands RBAC/ABAC basics and IDOR concepts.","L2":"Can implement function-level authorization and RBAC policies.","L3":"Designs and reviews fine-grained access controls across systems.","L4":"Performs comprehensive access control audits and threat models.","L5":"Sets enterprise authorization strategy and governance."},"certifications":["SCW-AccessControl","CISSP"]}
+    {
+      "id": "secure_coding_basics",
+      "label": "Secure Coding Fundamentals",
+      "description": "Core secure coding patterns, secure-by-default development, input/output handling, defensive programming.",
+      "trustLevels": {
+        "L1": "Understands common secure coding pitfalls and OWASP top 10 at high level.",
+        "L2": "Can write code following secure patterns and basic sanitation.",
+        "L3": "Designs and enforces secure coding practices across modules.",
+        "L4": "Leads secure coding reviews and integrates secure frameworks.",
+        "L5": "Defines org-wide secure coding standards and training."
+      },
+      "certifications": [
+        "SCW-Secure-Coding",
+        "OWASP-Top10"
+      ]
+    },
+    {
+      "id": "authentication_session",
+      "label": "Authentication & Session Management",
+      "description": "Secure authentication flows, session handling, token lifecycle, brute-force protection, MFA.",
+      "trustLevels": {
+        "L1": "Recognizes weak authentication and session problems.",
+        "L2": "Implements secure login, session expiration, and basic MFA.",
+        "L3": "Designs robust auth solutions (SSO, OAuth2/OIDC) and session protections.",
+        "L4": "Audits auth systems org-wide and approves designs.",
+        "L5": "Defines enterprise identity standards and governance."
+      },
+      "certifications": [
+        "SCW-Auth-Lab",
+        "OAuth2/OIDC-Training"
+      ]
+    },
+    {
+      "id": "access_control",
+      "label": "Access Control & Authorization",
+      "description": "Role-based and attribute-based access control, preventing IDOR and BOLA, function-level authorization.",
+      "trustLevels": {
+        "L1": "Understands RBAC/ABAC basics and IDOR concepts.",
+        "L2": "Can implement function-level authorization and RBAC policies.",
+        "L3": "Designs and reviews fine-grained access controls across systems.",
+        "L4": "Performs comprehensive access control audits and threat models.",
+        "L5": "Sets enterprise authorization strategy and governance."
+      },
+      "certifications": [
+        "SCW-AccessControl",
+        "CISSP"
+      ]
+    },
+    {
+      "id": "injection_attacks",
+      "label": "Injection Prevention (SQL/NoSQL/OS/Deserialization)",
+      "description": "Prevent SQLi, NoSQLi, OS command, XML/XXE and unsafe deserialization vulnerabilities.",
+      "trustLevels": {
+        "L1": "Identifies injection patterns and understands escapes.",
+        "L2": "Writes parameterized queries and validation for common injection vectors.",
+        "L3": "Designs systems and libraries that mitigate injection at scale.",
+        "L4": "Runs and validates org-wide protections against injection.",
+        "L5": "Defines policy and code standards to prevent injection classes."
+      },
+      "certifications": [
+        "SCW-Injection",
+        "OWASP"
+      ]
+    },
+    {
+      "id": "xss_csrf",
+      "label": "Cross-Site Scripting (XSS) & CSRF",
+      "description": "DOM, reflected, stored XSS remediation and CSRF protections (tokens, SameSite, CORS controls).",
+      "trustLevels": {
+        "L1": "Recognizes XSS/CSRF scenarios.",
+        "L2": "Implements context-aware output encoding and CSRF tokens.",
+        "L3": "Designs frameworks and templates that are XSS/CSRF-resistant.",
+        "L4": "Audits frontends and APIs for these classes.",
+        "L5": "Defines secure UI controls policy and training."
+      },
+      "certifications": [
+        "SCW-Frontend-Security",
+        "OWASP-XSS"
+      ]
+    },
+    {
+      "id": "api_security",
+      "label": "API Security & Gateway Controls",
+      "description": "Secure API design, rate limiting, schema validation, API gateway, authorization for APIs and microservices.",
+      "trustLevels": {
+        "L1": "Understands API attack surface.",
+        "L2": "Implements input validation, rate limiting, and proper HTTP status handling.",
+        "L3": "Designs secure microservice-to-microservice authentication and API gating.",
+        "L4": "Defines org API security posture and gateway rules.",
+        "L5": "Sets enterprise API governance and cross-team standards."
+      },
+      "certifications": [
+        "SCW-API-Security",
+        "OWASP-API"
+      ]
+    },
+    {
+      "id": "crypto_key_mgmt",
+      "label": "Cryptography & Key Management",
+      "description": "Proper use of crypto libraries, key rotation, storage, algorithm selection, KMS integration.",
+      "trustLevels": {
+        "L1": "Understands symmetric vs asymmetric and basic crypto misuse.",
+        "L2": "Implements crypto best-practices using libraries and KMS.",
+        "L3": "Designs secure key lifecycle and rotation patterns.",
+        "L4": "Audits crypto usage and approves enterprise-wide controls.",
+        "L5": "Defines cryptographic governance and enterprise policies."
+      },
+      "certifications": [
+        "SCW-Crypto",
+        "CISSP",
+        "CISM"
+      ]
+    },
+    {
+      "id": "secure_architecture",
+      "label": "Secure Architecture & Threat Modeling",
+      "description": "Threat modeling, secure design patterns, defense-in-depth, architectural review.",
+      "trustLevels": {
+        "L1": "Can read and understand threat models basics.",
+        "L2": "Participates in threat modeling sessions.",
+        "L3": "Leads threat models and architecture hardening.",
+        "L4": "Approves cross-system architecture for security.",
+        "L5": "Defines org-level architecture governance & patterns."
+      },
+      "certifications": [
+        "SCW-Architecture",
+        "TOGAF-Security"
+      ]
+    },
+    {
+      "id": "cloud_devops_security",
+      "label": "Cloud & DevOps Security",
+      "description": "Kubernetes, Docker, IaC security (Terraform), CI/CD hardening, secrets management.",
+      "trustLevels": {
+        "L1": "Understands cloud shared responsibility and basic IaC risks.",
+        "L2": "Applies secure CI/CD, secrets handling and container best practices.",
+        "L3": "Designs secure pipelines and hardened cloud deployments.",
+        "L4": "Performs infra security reviews and pipeline audits.",
+        "L5": "Defines cloud security strategy and compliance."
+      },
+      "certifications": [
+        "SCW-Cloud",
+        "AWS-Security",
+        "CIS-Kubernetes"
+      ]
+    },
+    {
+      "id": "supply_chain_security",
+      "label": "Software Supply Chain Security",
+      "description": "Dependency scanning, SBOM, signed artifacts, secure builds, reproducible builds.",
+      "trustLevels": {
+        "L1": "Recognizes dependency and supply chain risks.",
+        "L2": "Uses dependency scanning and basic SBOM practice.",
+        "L3": "Implements signed artifacts and secure build pipelines.",
+        "L4": "Designs org-wide supply chain controls and verification steps.",
+        "L5": "Defines enterprise supply chain governance and vendor controls."
+      },
+      "certifications": [
+        "SCW-SupplyChain",
+        "SLSA"
+      ]
+    },
+    {
+      "id": "container_k8s_security",
+      "label": "Container & Kubernetes Security",
+      "description": "Secure container images, runtime security, K8s RBAC, network policies, pod security.",
+      "trustLevels": {
+        "L1": "Understands container isolation concepts.",
+        "L2": "Builds secure images and uses runtime scanning.",
+        "L3": "Designs network policies, K8s RBAC and secure manifests.",
+        "L4": "Audits cluster security and policies.",
+        "L5": "Defines platform security for container orchestration."
+      },
+      "certifications": [
+        "SCW-K8s",
+        "CIS-Kubernetes"
+      ]
+    },
+    {
+      "id": "secrets_management",
+      "label": "Secrets & Credentials Management",
+      "description": "Proper storage and rotation of secrets (vaults, KMS), avoiding secrets in code.",
+      "trustLevels": {
+        "L1": "Knows why secrets in code are dangerous.",
+        "L2": "Uses vault/KMS and rotates credentials.",
+        "L3": "Designs secret lifecycle with least-privilege access.",
+        "L4": "Audits secret access and implements detection controls.",
+        "L5": "Creates enterprise secrets policies and tooling."
+      },
+      "certifications": [
+        "SCW-Secrets",
+        "HashiCorp-Vault"
+      ]
+    },
+    {
+      "id": "logging_monitoring_ir",
+      "label": "Logging, Monitoring & Incident Response",
+      "description": "Structured logging, monitoring, SIEM integration, alerting, incident runbooks.",
+      "trustLevels": {
+        "L1": "Understands importance of logging and basic alerts.",
+        "L2": "Implements structured logs and basic alerting.",
+        "L3": "Designs SIEM integration and incident response playbooks.",
+        "L4": "Leads org incident response and post-mortems.",
+        "L5": "Defines enterprise IR policies and tabletop exercises."
+      },
+      "certifications": [
+        "SCW-IR",
+        "SANS-IR"
+      ]
+    },
+    {
+      "id": "logging_privacy",
+      "label": "Secure Logging & Privacy-Aware Telemetry",
+      "description": "Logging without leaking PII, GDPR-aware telemetry, retention controls.",
+      "trustLevels": {
+        "L1": "Recognizes PII leakage in logs.",
+        "L2": "Implements masked logging and retention policies.",
+        "L3": "Designs privacy-aware telemetry pipelines.",
+        "L4": "Audits logging for privacy and compliance.",
+        "L5": "Defines enterprise telemetry & privacy governance."
+      },
+      "certifications": [
+        "SCW-Privacy",
+        "CIPP/E"
+      ]
+    },
+    {
+      "id": "data_privacy_compliance",
+      "label": "Data Privacy & Compliance",
+      "description": "GDPR, HIPAA basics, DPIAs, DSAR handling and data minimization.",
+      "trustLevels": {
+        "L1": "Understands data privacy basic principles.",
+        "L2": "Implements privacy-by-design elements in services.",
+        "L3": "Designs compliant data flows and DPIAs.",
+        "L4": "Leads privacy audits and compliance mapping.",
+        "L5": "Defines enterprise privacy strategy and legal alignment."
+      },
+      "certifications": [
+        "SCW-Privacy",
+        "CIPP/E"
+      ]
+    },
+    {
+      "id": "mobile_security",
+      "label": "Mobile App Security",
+      "description": "Secure storage, session handling, platform APIs, reverse-engineering resistance.",
+      "trustLevels": {
+        "L1": "Understands common mobile threats.",
+        "L2": "Implements secure storage and transport on mobile.",
+        "L3": "Designs tamper-resistant mobile architecture.",
+        "L4": "Audits mobile apps for security and privacy.",
+        "L5": "Defines mobile security policy and build pipelines."
+      },
+      "certifications": [
+        "SCW-Mobile",
+        "OWASP-MASVS"
+      ]
+    },
+    {
+      "id": "reverse_engineering_protection",
+      "label": "Reverse Engineering & Anti-Tamper",
+      "description": "Obfuscation, runtime integrity, anti-debug techniques for mobile and native apps.",
+      "trustLevels": {
+        "L1": "Aware of reverse engineering risks.",
+        "L2": "Implements basic obfuscation and runtime checks.",
+        "L3": "Designs robust anti-tamper strategies.",
+        "L4": "Reviews and validates hardening effectiveness.",
+        "L5": "Sets enterprise standards for app hardening."
+      },
+      "certifications": [
+        "SCW-Mobile-Advanced"
+      ]
+    },
+    {
+      "id": "webfrontend_security",
+      "label": "Frontend Security (React/Angular/Vue)",
+      "description": "CSP, secure component patterns, input sanitization, safe client-side storage.",
+      "trustLevels": {
+        "L1": "Knows common frontend security issues.",
+        "L2": "Follows secure component patterns and CSP basics.",
+        "L3": "Designs frameworks and component libraries with secure defaults.",
+        "L4": "Performs frontend security audits and code reviews.",
+        "L5": "Defines enterprise frontend security frameworks."
+      },
+      "certifications": [
+        "SCW-Frontend",
+        "CSP-Training"
+      ]
+    },
+    {
+      "id": "sast_dast_iact",
+      "label": "Static & Dynamic Analysis (SAST/DAST/IAST/Fuzzing)",
+      "description": "Tooling and workflows for automated code scanning, runtime testing and fuzzing.",
+      "trustLevels": {
+        "L1": "Understands scanning basics and report interpretation.",
+        "L2": "Integrates SAST/DAST into CI pipelines.",
+        "L3": "Automates triage and remediation workflows.",
+        "L4": "Designs org-wide testing strategy including fuzzing.",
+        "L5": "Defines enterprise scanning policy and SLAs."
+      },
+      "certifications": [
+        "SCW-Testing",
+        "SAST-DAST-Cert"
+      ]
+    },
+    {
+      "id": "business_logic_flaws",
+      "label": "Business Logic Security",
+      "description": "Finding and defending against business logic abuse and authorization bypasses.",
+      "trustLevels": {
+        "L1": "Can detect obvious logic flaws in user flows.",
+        "L2": "Designs controls to reduce business logic abuse.",
+        "L3": "Performs complex business logic threat modeling.",
+        "L4": "Audits products for logic-related attack paths.",
+        "L5": "Defines enterprise-level process controls and checks."
+      },
+      "certifications": [
+        "SCW-BusinessLogic"
+      ]
+    },
+    {
+      "id": "ssrf_open_redirect",
+      "label": "SSRF & Open Redirect Prevention",
+      "description": "Detect and mitigate server-side request forgery and open redirect issues.",
+      "trustLevels": {
+        "L1": "Recognizes SSRF/open redirect vectors.",
+        "L2": "Implements allowlists, DNS protections and safe redirect patterns.",
+        "L3": "Designs services with safe outbound request policies.",
+        "L4": "Audits network-facing services and proxies.",
+        "L5": "Defines enterprise edge and proxy security policy."
+      },
+      "certifications": [
+        "SCW-Web-Advanced"
+      ]
+    },
+    {
+      "id": "jwt_token_misuse",
+      "label": "JWT & Token Security",
+      "description": "Proper use and pitfalls of JWTs, token expiry, revocation, token binding.",
+      "trustLevels": {
+        "L1": "Understands JWT basics and common misuse.",
+        "L2": "Implements secure token lifecycles and rotation.",
+        "L3": "Designs revocation and introspection patterns.",
+        "L4": "Audits token systems across services.",
+        "L5": "Sets token and session governance org-wide."
+      },
+      "certifications": [
+        "SCW-Auth-Advanced"
+      ]
+    },
+    {
+      "id": "rate_limiting_throttling",
+      "label": "Rate Limiting & Abuse Prevention",
+      "description": "Design and implement rate limiting and throttling to prevent abuse and DoS.",
+      "trustLevels": {
+        "L1": "Understands brute-force and abuse patterns.",
+        "L2": "Implements basic rate limits and captchas.",
+        "L3": "Designs distributed abuse mitigation and backpressure.",
+        "L4": "Validates org policies for abuse protection.",
+        "L5": "Defines global abuse prevention strategy."
+      },
+      "certifications": [
+        "SCW-Protection"
+      ]
+    },
+    {
+      "id": "secure_defaults_hardening",
+      "label": "Secure Defaults & Configuration Hardening",
+      "description": "Secure-by-default app configuration, safe defaults, principle of least privilege.",
+      "trustLevels": {
+        "L1": "Uses secure defaults when obvious.",
+        "L2": "Implements config hardening and tuning.",
+        "L3": "Designs systems with hardened baselines.",
+        "L4": "Ensures org-level baseline hardening standards.",
+        "L5": "Defines enterprise configuration & hardening frameworks."
+      },
+      "certifications": [
+        "SCW-Hardening"
+      ]
+    },
+    {
+      "id": "dependency_vuln_mgmt",
+      "label": "Dependency & Vulnerability Management",
+      "description": "Automated scanning, patching workflows, semver/backport planning and SBOM usage.",
+      "trustLevels": {
+        "L1": "Recognizes vulnerable dependency signs.",
+        "L2": "Uses scanning tools and updates dependencies.",
+        "L3": "Manages patch orchestration and incompatible updates.",
+        "L4": "Runs org vulnerability/risk-based patch programs.",
+        "L5": "Defines enterprise vulnerability & SBOM governance."
+      },
+      "certifications": [
+        "SCW-Dependencies"
+      ]
+    },
+    {
+      "id": "container_image_scanning",
+      "label": "Container Image & Registry Security",
+      "description": "Image signing, scanning, minimal base images and registry policies.",
+      "trustLevels": {
+        "L1": "Understands image vulnerabilities.",
+        "L2": "Scans images and uses minimal base images.",
+        "L3": "Designs secure registry and image promotion pipelines.",
+        "L4": "Implements enterprise image trust and signing.",
+        "L5": "Defines container image governance."
+      },
+      "certifications": [
+        "SCW-Container"
+      ]
+    },
+    {
+      "id": "network_security_segmentation",
+      "label": "Network Security & Segmentation",
+      "description": "Network zones, segmentation, firewall rules, Zero Trust principles.",
+      "trustLevels": {
+        "L1": "Understands segmentation basics.",
+        "L2": "Applies network controls and isolation.",
+        "L3": "Designs network segmentation for least privilege.",
+        "L4": "Audits network topology for security.",
+        "L5": "Defines enterprise Zero Trust and segmentation policies."
+      },
+      "certifications": [
+        "SCW-Network"
+      ]
+    },
+    {
+      "id": "identity_and_access_mgmt",
+      "label": "Identity & Access Management (IAM)",
+      "description": "Service accounts, role-based access, privileged access management and SSO integrations.",
+      "trustLevels": {
+        "L1": "Understands IAM core concepts.",
+        "L2": "Configures IAM roles and policies correctly.",
+        "L3": "Designs least-privilege access models for services.",
+        "L4": "Performs IAM governance and credential audits.",
+        "L5": "Defines org IAM strategy and cross-system identity."
+      },
+      "certifications": [
+        "SCW-IAM",
+        "AWS-IAM"
+      ]
+    },
+    {
+      "id": "observability_metrics",
+      "label": "Observability & Metrics",
+      "description": "Instrumenting applications for metrics and SLO-based alerting supporting security signals.",
+      "trustLevels": {
+        "L1": "Can instrument basic metrics and logs.",
+        "L2": "Defines meaningful security-related metrics.",
+        "L3": "Designs SLO/alerting for security-critical flows.",
+        "L4": "Monitors org-level telemetry and responds.",
+        "L5": "Defines observability governance for security telemetry."
+      },
+      "certifications": [
+        "SCW-Observability"
+      ]
+    },
+    {
+      "id": "forensics_blr",
+      "label": "Forensics & Post-Incident Analysis",
+      "description": "Evidence collection, chain of custody, root cause analysis, lessons learned.",
+      "trustLevels": {
+        "L1": "Understands basic incident evidence needs.",
+        "L2": "Collects and preserves incident artifacts.",
+        "L3": "Performs RCA and post-mortem recommendations.",
+        "L4": "Leads forensics coordination and legal interplay.",
+        "L5": "Defines forensics policies and enterprise playbooks."
+      },
+      "certifications": [
+        "SCW-IR",
+        "SANS-Forensics"
+      ]
+    },
+    {
+      "id": "threat_intel",
+      "label": "Threat Intelligence & Vulnerability Research",
+      "description": "Understanding adversary tactics, vulnerability research and CVE lifecycle.",
+      "trustLevels": {
+        "L1": "Recognizes common attack patterns.",
+        "L2": "Uses threat intel feeds and maps to assets.",
+        "L3": "Performs vulnerability research and proactive scans.",
+        "L4": "Defines intel-to-remediation pipelines.",
+        "L5": "Sets enterprise threat research and intel programs."
+      },
+      "certifications": [
+        "SCW-ThreatIntel"
+      ]
+    },
+    {
+      "id": "privacy_by_design",
+      "label": "Privacy-First Design",
+      "description": "Minimization, DPIAs, consent, pseudonymization, data residency concepts.",
+      "trustLevels": {
+        "L1": "Understands privacy principles.",
+        "L2": "Implements privacy-by-design measures.",
+        "L3": "Performs DPIAs and privacy architecture reviews.",
+        "L4": "Leads privacy compliance programs.",
+        "L5": "Defines enterprise privacy strategy."
+      },
+      "certifications": [
+        "SCW-Privacy",
+        "CIPP/E"
+      ]
+    },
+    {
+      "id": "compliance_frameworks",
+      "label": "Compliance Frameworks & Mapping",
+      "description": "SOC2, ISO27001, NIST CSF, PCI-DSS, EU AI Act basics and mapping to product controls.",
+      "trustLevels": {
+        "L1": "Has basic awareness of major frameworks.",
+        "L2": "Maps controls to product features.",
+        "L3": "Leads compliance implementation for projects.",
+        "L4": "Performs audits and gap analyses.",
+        "L5": "Sets enterprise compliance strategy."
+      },
+      "certifications": [
+        "SOC2-Training",
+        "ISO-27001"
+      ]
+    },
+    {
+      "id": "secure_api_design",
+      "label": "Secure API & Microservice Design",
+      "description": "Service mesh, mutual TLS, circuit breakers and resilient secure design.",
+      "trustLevels": {
+        "L1": "Understands secure API design trade-offs.",
+        "L2": "Implements secure service-to-service auth.",
+        "L3": "Designs resilient, secure microservice architectures.",
+        "L4": "Validates microservice security at scale.",
+        "L5": "Defines enterprise microservices security patterns."
+      },
+      "certifications": [
+        "SCW-Microservices"
+      ]
+    },
+    {
+      "id": "secure_ui_ux",
+      "label": "Secure UI/UX Design",
+      "description": "Designing permission prompts, secure defaults without dark patterns, clear security prompts.",
+      "trustLevels": {
+        "L1": "Recognizes bad UX that leads to insecure behaviors.",
+        "L2": "Designs secure-by-default flows and prompts.",
+        "L3": "Integrates security into design systems.",
+        "L4": "Audits UX for security-induced misuse.",
+        "L5": "Defines org-wide secure UX guidelines."
+      },
+      "certifications": [
+        "SCW-UX"
+      ]
+    },
+    {
+      "id": "sre_reliability",
+      "label": "SRE & Reliability for Security",
+      "description": "Runbooks, incident SLAs, chaos testing and resilience.",
+      "trustLevels": {
+        "L1": "Understands reliability basics.",
+        "L2": "Implements runbooks and basic chaos checks.",
+        "L3": "Designs resilient systems that maintain security during incidents.",
+        "L4": "Leads org resilience and chaos engineering programs.",
+        "L5": "Defines enterprise reliability & security synergy policies."
+      },
+      "certifications": [
+        "SCW-SRE"
+      ]
+    },
+    {
+      "id": "audit_logging",
+      "label": "Audit Logging & Tamper Evident Trails",
+      "description": "Immutable audit trails, hashing ledgering, chain-of-custody and tamper detection.",
+      "trustLevels": {
+        "L1": "Understands audit logging importance.",
+        "L2": "Implements structured immutable logs for critical actions.",
+        "L3": "Designs tamper-evident logging and ledgering.",
+        "L4": "Validates audit integrity across systems.",
+        "L5": "Defines enterprise audit trail standards and archiving."
+      },
+      "certifications": [
+        "SCW-Audit"
+      ]
+    },
+    {
+      "id": "secure_file_handling",
+      "label": "Secure File Uploads & Storage",
+      "description": "Safe handling of uploaded files, virus scanning, content type validation and isolation.",
+      "trustLevels": {
+        "L1": "Identifies file upload risks.",
+        "L2": "Implements content-type validation and scanning.",
+        "L3": "Designs secure file processing pipelines with isolation.",
+        "L4": "Audits file handling and sandboxing practices.",
+        "L5": "Creates enterprise safe-file handling policies."
+      },
+      "certifications": [
+        "SCW-FileSecurity"
+      ]
+    },
+    {
+      "id": "time_side_channel",
+      "label": "Timing & Side-Channel Protections",
+      "description": "Protecting against timing attacks, side-channel leakage and constant-time implementations.",
+      "trustLevels": {
+        "L1": "Understands concept of timing leaks.",
+        "L2": "Applies constant-time patterns in critical code.",
+        "L3": "Designs cryptographic operations resistant to side-channels.",
+        "L4": "Performs side-channel analysis and mitigation.",
+        "L5": "Defines enterprise cryptographic hardening policies."
+      },
+      "certifications": [
+        "SCW-Crypto-Advanced"
+      ]
+    },
+    {
+      "id": "concurrency_race",
+      "label": "Concurrency, Race Conditions & Atomicity",
+      "description": "Race conditions, locking, transaction atomicity and safe concurrent design.",
+      "trustLevels": {
+        "L1": "Recognizes basic race condition scenarios.",
+        "L2": "Applies locking and transactional patterns.",
+        "L3": "Designs concurrency-safe architectures.",
+        "L4": "Audits code for concurrent safety at scale.",
+        "L5": "Defines concurrency and transactional governance."
+      },
+      "certifications": [
+        "SCW-Concurrency"
+      ]
+    },
+    {
+      "id": "logging_secure_storage",
+      "label": "Secure Data Storage & DB Security",
+      "description": "SQL/NoSQL hardening, parameterization, encryption at rest, RBAC at DB level.",
+      "trustLevels": {
+        "L1": "Understands DB injection and misconfig risks.",
+        "L2": "Implements secure queries and encryption at rest.",
+        "L3": "Designs DB access control and separation.",
+        "L4": "Performs DB security audits and hardening.",
+        "L5": "Defines enterprise DB security governance."
+      },
+      "certifications": [
+        "SCW-DBSecurity"
+      ]
+    },
+    {
+      "id": "configuration_management",
+      "label": "Configuration & Secret Management",
+      "description": "Secure configuration distribution, feature flags, and safe defaults.",
+      "trustLevels": {
+        "L1": "Knows configuration risks and secrets leakage.",
+        "L2": "Implements secure config and flagging patterns.",
+        "L3": "Designs safe config distribution and secrets rotation.",
+        "L4": "Audits config and secrets at scale.",
+        "L5": "Defines configuration governance and policy."
+      },
+      "certifications": [
+        "SCW-Config"
+      ]
+    },
+    {
+      "id": "scripting_injection",
+      "label": "Client-Side & Server-Side Scripting Risks",
+      "description": "Risks of template injection, client templates and server-driven UI risks.",
+      "trustLevels": {
+        "L1": "Identifies template/scripting injection patterns.",
+        "L2": "Implements templating safely and contexts encoding.",
+        "L3": "Designs templates to reduce injection surface.",
+        "L4": "Performs org-wide template risk audits.",
+        "L5": "Establishes template and scripting governance."
+      },
+      "certifications": [
+        "SCW-Templates"
+      ]
+    },
+    {
+      "id": "oss_legal_licensing",
+      "label": "Open Source Licensing & Legal Risk",
+      "description": "License compliance, vulnerable licenses, and legal risk of dependencies.",
+      "trustLevels": {
+        "L1": "Understands license basics.",
+        "L2": "Performs license scanning and vetting.",
+        "L3": "Designs dependency acceptance policies.",
+        "L4": "Maintains org-level OSS policies.",
+        "L5": "Defines enterprise IP and license governance."
+      },
+      "certifications": [
+        "SCW-OSS"
+      ]
+    },
+    {
+      "id": "test_automation_security",
+      "label": "Security-Focused Test Automation",
+      "description": "Integrating security tests into CI, automated regression, and challenge tests.",
+      "trustLevels": {
+        "L1": "Can write basic security test cases.",
+        "L2": "Automates security checks in CI.",
+        "L3": "Designs comprehensive automated security pipelines.",
+        "L4": "Validates automation effectiveness org-wide.",
+        "L5": "Defines enterprise security testing strategy."
+      },
+      "certifications": [
+        "SCW-TestAutomation"
+      ]
+    },
+    {
+      "id": "red_team_blue_team",
+      "label": "Adversary Emulation & Defensive Exercises",
+      "description": "Purple team exercises, tabletop, red-team engagements and mitigation validation.",
+      "trustLevels": {
+        "L1": "Understands offensive-defensive basics.",
+        "L2": "Participates in purple/red team exercises.",
+        "L3": "Leads threat emulation and validates mitigations.",
+        "L4": "Coordinates enterprise exercises and readiness.",
+        "L5": "Defines org-level offensive-defensive programs."
+      },
+      "certifications": [
+        "SCW-RedTeam"
+      ]
+    },
+    {
+      "id": "qa_security",
+      "label": "QA Security",
+      "description": "Security-focused QA practices, negative testing, and regression of fixes.",
+      "trustLevels": {
+        "L1": "Understands basic security test cases.",
+        "L2": "Writes and runs security-focused QA tests.",
+        "L3": "Designs regression suites for security fixes.",
+        "L4": "Leads security QA strategy and automation.",
+        "L5": "Defines org-wide security QA frameworks."
+      },
+      "certifications": [
+        "SCW-TestAutomation"
+      ]
+    },
+    {
+      "id": "governance_risk_compliance",
+      "label": "GRC: Governance, Risk & Compliance",
+      "description": "Risk frameworks, control mapping, audit readiness and policy lifecycle.",
+      "trustLevels": {
+        "L1": "Understands GRC terminology and basics.",
+        "L2": "Maps controls to product features and produces evidence.",
+        "L3": "Leads risk assessments and remediation planning.",
+        "L4": "Coordinates compliance audits and enterprise risk posture.",
+        "L5": "Defines enterprise GRC strategy and board reporting."
+      },
+      "certifications": [
+        "SCW-GRC"
+      ]
+    },
+    {
+      "id": "incident_response",
+      "label": "Incident Response",
+      "description": "Runbooks, response coordination, and post-incident improvement.",
+      "trustLevels": {
+        "L1": "Knows basic incident steps.",
+        "L2": "Participates in response and logging.",
+        "L3": "Leads incident triage and communications.",
+        "L4": "Coordinates multi-team response and RCA.",
+        "L5": "Defines enterprise IR policy and training."
+      },
+      "certifications": [
+        "SANS-IR"
+      ]
+    },
+    {
+      "id": "mfa_advanced",
+      "label": "Advanced Multi-Factor Authentication (MFA)",
+      "description": "Adaptive auth, device posture, hardware tokens, and fallback security.",
+      "trustLevels": {
+        "L1": "Understands MFA benefit and common flows.",
+        "L2": "Implements TOTP and push-based MFA.",
+        "L3": "Designs adaptive/auth posture-based MFA and phishing-resistant MFA.",
+        "L4": "Validates MFA at enterprise scale and SSO integration.",
+        "L5": "Defines enterprise MFA roadmaps and policy."
+      },
+      "certifications": [
+        "SCW-Auth-Advanced"
+      ]
+    },
+    {
+      "id": "edge_proxy_waf",
+      "label": "Edge, Proxies & WAF Configuration",
+      "description": "Edge security, WAF tuning, CDN-level protections and request filtering.",
+      "trustLevels": {
+        "L1": "Understands WAF/edge concept.",
+        "L2": "Configures basic WAF rules and protections.",
+        "L3": "Designs edge defense layers and tuning.",
+        "L4": "Operates WAF at enterprise scale and fine-tunes false positives.",
+        "L5": "Defines edge protection strategy & SLAs."
+      },
+      "certifications": [
+        "SCW-Edge"
+      ]
+    },
+    {
+      "id": "api_rate_threat",
+      "label": "API Abuse & Threat Modeling",
+      "description": "Modeling API misuse, automating detection for abuse patterns and protecting business logic.",
+      "trustLevels": {
+        "L1": "Can identify common API misuse vectors.",
+        "L2": "Implements heuristics and mitigation patterns.",
+        "L3": "Builds tailored detection & protective measures.",
+        "L4": "Monitors and adjusts protective measures org-wide.",
+        "L5": "Defines API abuse management policy and response."
+      },
+      "certifications": [
+        "SCW-API-Abuse"
+      ]
+    },
+    {
+      "id": "secure_infrastructure_as_code",
+      "label": "Secure Infrastructure as Code (IaC)",
+      "description": "Hardened IaC templates, scanning, drift detection, and policy as code.",
+      "trustLevels": {
+        "L1": "Understands IaC risk and drift.",
+        "L2": "Implements scanning and safe IaC patterns.",
+        "L3": "Designs policy-as-code and drift detection.",
+        "L4": "Validates infra pipelines and enforces policies.",
+        "L5": "Defines enterprise IaC governance and compliance."
+      },
+      "certifications": [
+        "SCW-IaC",
+        "Terrraform-Security"
+      ]
+    },
+    {
+      "id": "ml_and_data_security",
+      "label": "ML / Data Security & Privacy",
+      "description": "Secure ML pipelines, data anonymization, model governance and poison/attack protection.",
+      "trustLevels": {
+        "L1": "Understands ML privacy and data risks.",
+        "L2": "Implements secure data handling in pipelines.",
+        "L3": "Designs model governance and robustness checks.",
+        "L4": "Audits ML pipelines for security and compliance.",
+        "L5": "Defines enterprise ML security and governance."
+      },
+      "certifications": [
+        "SCW-MLSecurity"
+      ]
+    },
+    {
+      "id": "scripting_and_automation",
+      "label": "Scripting & Automation Security",
+      "description": "Secure automation scripts, safe API keys handling in automation, and CI runner hardening.",
+      "trustLevels": {
+        "L1": "Understands risks of automation scripts.",
+        "L2": "Implements safe automation with least-privilege keys.",
+        "L3": "Designs CI runner isolation and secure pipelines.",
+        "L4": "Audits automation for secret leakage and abuse.",
+        "L5": "Defines enterprise automation governance and policy."
+      },
+      "certifications": [
+        "SCW-Automation"
+      ]
+    },
+    {
+      "id": "opa_policies_policy_as_code",
+      "label": "Policy-as-Code & OPA/Rego",
+      "description": "Authoring, testing and deploying OPA/Rego policies for runtime enforcement.",
+      "trustLevels": {
+        "L1": "Understands concept of policy-as-code.",
+        "L2": "Writes basic Rego rules and tests.",
+        "L3": "Integrates OPA into pipelines and runtime guards.",
+        "L4": "Validates policy correctness and coverage at scale.",
+        "L5": "Defines org policy catalog and lifecycle for governance."
+      },
+      "certifications": [
+        "SCW-OPA"
+      ]
+    },
+    {
+      "id": "artifact_provenance",
+      "label": "Artifact Provenance & Signing",
+      "description": "Binary signing, attestation, provenance metadata and secure promotion pipelines.",
+      "trustLevels": {
+        "L1": "Understands signing and provenance importance.",
+        "L2": "Implements basic signing and promotion gates.",
+        "L3": "Designs end-to-end provenance pipelines.",
+        "L4": "Validates provenance and attestation at enterprise scale.",
+        "L5": "Defines enterprise artifact trust & signing policy."
+      },
+      "certifications": [
+        "SCW-Provenance"
+      ]
+    },
+    {
+      "id": "policy_design_and_review",
+      "label": "Policy Design & Review",
+      "description": "Writing LOA/mcp policies, approval workflows, and decision logging.",
+      "trustLevels": {
+        "L1": "Can read and apply policies.",
+        "L2": "Writes clear policy drafts and reviews.",
+        "L3": "Designs approval workflows and LoA mapping.",
+        "L4": "Validates policy efficacy and audits decisions.",
+        "L5": "Defines enterprise policy frameworks and governance."
+      },
+      "certifications": [
+        "SCW-Policy"
+      ]
+    },
+    {
+      "id": "explainability_and_auditability",
+      "label": "Explainability & Audit Trail",
+      "description": "Producing human- and machine-readable rationale for decisions, provenance, and evidence citation.",
+      "trustLevels": {
+        "L1": "Provides minimal reasoning for decisions.",
+        "L2": "Attaches citations and metadata to approvals.",
+        "L3": "Generates structured explainability artifacts and links to evidence.",
+        "L4": "Evaluates explainability coverage and audit readiness.",
+        "L5": "Defines enterprise explainability requirements and SLAs."
+      },
+      "certifications": [
+        "SCW-Explainability"
+      ]
+    },
+    {
+      "id": "ans_integration",
+      "label": "Agent Name Service (ANS) Integration",
+      "description": "Registering, resolving and verifying DID/ANS entries and public verification endpoints.",
+      "trustLevels": {
+        "L1": "Understands ANS/DID basics.",
+        "L2": "Registers and resolves agents programmatically.",
+        "L3": "Integrates ANS with verification endpoints and metadata.",
+        "L4": "Operates ANS registry and linkage to trust records.",
+        "L5": "Defines ANS governance and public verification policies."
+      },
+      "certifications": [
+        "SCW-ANS"
+      ]
+    },
+    {
+      "id": "nft_and_onchain_anchor",
+      "label": "On-Chain Anchoring & NFT Credentials",
+      "description": "Minting, metadata design, soulbound token considerations and on-chain verification.",
+      "trustLevels": {
+        "L1": "Understands on-chain anchoring conceptually.",
+        "L2": "Triggers minting flows and produces metadata.",
+        "L3": "Designs robust metadata and anchor lifecycle.",
+        "L4": "Operates minting governance, revocation/idle flows.",
+        "L5": "Defines enterprise on-chain credential strategy and legal compliance."
+      },
+      "certifications": [
+        "SCW-Blockchain"
+      ]
+    },
+    {
+      "id": "microservices_security",
+      "label": "Microservice Security Patterns",
+      "description": "Secure inter-service communication, service mesh, mTLS, and circuit breaker strategies.",
+      "trustLevels": {
+        "L1": "Understands microservice attack patterns.",
+        "L2": "Implements secure service auth and mTLS.",
+        "L3": "Designs secure inter-service patterns and resilience.",
+        "L4": "Performs cross-service security validation.",
+        "L5": "Defines enterprise microservice security architecture."
+      },
+      "certifications": [
+        "SCW-Microservice"
+      ]
+    },
+    {
+      "id": "developer_toolchain_security",
+      "label": "Developer Toolchain & Pipeline Security",
+      "description": "Protecting developer tooling, git hooks, CI tokens, and developer workstations.",
+      "trustLevels": {
+        "L1": "Understands workstation and toolchain risk.",
+        "L2": "Implements protected secrets and safe developer workflows.",
+        "L3": "Designs secure developer environments and tooling policies.",
+        "L4": "Audits toolchain security and enforces policies.",
+        "L5": "Defines enterprise developer tooling governance."
+      },
+      "certifications": [
+        "SCW-Toolchain"
+      ]
+    }
   ],
   "roles": [
-    {"id":"frontend_developer","label":"Frontend Developer","description":"Builds user-facing web applications, UI, and web components.","requiredCompetencies":["webfrontend_security","xss_csrf","secure_ui_ux","authentication_session","api_security","logging_privacy","secure_defaults_hardening","secure_coding_basics"]},
-    {"id":"backend_developer","label":"Backend Developer","description":"Builds APIs, services, and backend logic.","requiredCompetencies":["secure_coding_basics","injection_attacks","api_security","access_control","jwt_token_misuse","crypto_key_mgmt","logging_monitoring_ir","secure_file_handling","business_logic_flaws"]}
+    {
+      "id": "frontend_developer",
+      "label": "Frontend Developer",
+      "description": "Builds user-facing web applications, UI, and web components.",
+      "requiredCompetencies": [
+        "webfrontend_security",
+        "xss_csrf",
+        "secure_ui_ux",
+        "authentication_session",
+        "api_security",
+        "logging_privacy",
+        "secure_defaults_hardening",
+        "secure_coding_basics"
+      ]
+    },
+    {
+      "id": "backend_developer",
+      "label": "Backend Developer",
+      "description": "Builds APIs, services, and backend logic.",
+      "requiredCompetencies": [
+        "secure_coding_basics",
+        "injection_attacks",
+        "api_security",
+        "access_control",
+        "jwt_token_misuse",
+        "crypto_key_mgmt",
+        "logging_monitoring_ir",
+        "secure_file_handling",
+        "business_logic_flaws"
+      ]
+    },
+    {
+      "id": "fullstack_developer",
+      "label": "Full-Stack Developer",
+      "description": "Handles both frontend and backend responsibilities.",
+      "requiredCompetencies": [
+        "webfrontend_security",
+        "secure_coding_basics",
+        "api_security",
+        "authentication_session",
+        "injection_attacks",
+        "secure_defaults_hardening",
+        "sast_dast_iact"
+      ]
+    },
+    {
+      "id": "devops_cloud_engineer",
+      "label": "DevOps / Cloud Engineer",
+      "description": "Infrastructure, CI/CD, IaC and cloud operations.",
+      "requiredCompetencies": [
+        "cloud_devops_security",
+        "secure_infrastructure_as_code",
+        "secrets_management",
+        "container_k8s_security",
+        "container_image_scanning",
+        "supply_chain_security",
+        "observability_metrics",
+        "configuration_management"
+      ]
+    },
+    {
+      "id": "security_engineer",
+      "label": "Security Engineer",
+      "description": "Hands-on security engineering, tool integration and remediation.",
+      "requiredCompetencies": [
+        "sast_dast_iact",
+        "threat_intel",
+        "logging_monitoring_ir",
+        "incident_response",
+        "supply_chain_security",
+        "red_team_blue_team",
+        "audit_logging",
+        "dependency_vuln_mgmt"
+      ]
+    },
+    {
+      "id": "security_test_engineer",
+      "label": "Security Test Engineer",
+      "description": "Automated and manual security testing and validation.",
+      "requiredCompetencies": [
+        "qa_security",
+        "sast_dast_iact",
+        "test_automation_security",
+        "business_logic_flaws",
+        "logging_monitoring_ir",
+        "red_team_blue_team"
+      ]
+    },
+    {
+      "id": "mobile_engineer",
+      "label": "Mobile Engineer",
+      "description": "Native mobile app development and hardening.",
+      "requiredCompetencies": [
+        "mobile_security",
+        "reverse_engineering_protection",
+        "authentication_session",
+        "secure_file_handling",
+        "secure_defaults_hardening",
+        "crypto_key_mgmt"
+      ]
+    },
+    {
+      "id": "qa_tester",
+      "label": "QA / Tester",
+      "description": "Quality assurance and test execution including security test cases.",
+      "requiredCompetencies": [
+        "qa_security",
+        "test_automation_security",
+        "sast_dast_iact",
+        "business_logic_flaws",
+        "logging_monitoring_ir"
+      ]
+    },
+    {
+      "id": "architect",
+      "label": "Architect / Engineering Manager",
+      "description": "Technical leadership, system design and governance.",
+      "requiredCompetencies": [
+        "secure_architecture",
+        "compliance_frameworks",
+        "crypto_key_mgmt",
+        "data_privacy_compliance",
+        "supply_chain_security",
+        "policy_design_and_review"
+      ]
+    },
+    {
+      "id": "product_manager",
+      "label": "Product Manager",
+      "description": "Defines product features and ensures compliance and usability.",
+      "requiredCompetencies": [
+        "secure_ui_ux",
+        "policy_design_and_review",
+        "data_privacy_compliance",
+        "business_logic_flaws",
+        "governance_risk_compliance"
+      ]
+    },
+    {
+      "id": "data_scientist",
+      "label": "Data Scientist / Analyst",
+      "description": "Data modelling, analytics and ML model development.",
+      "requiredCompetencies": [
+        "ml_and_data_security",
+        "data_privacy_compliance",
+        "logging_monitoring_ir",
+        "secure_infrastructure_as_code",
+        "governance_risk_compliance"
+      ]
+    },
+    {
+      "id": "product_owner",
+      "label": "Product Owner",
+      "description": "Owns product backlog and ensures delivery fit with security needs.",
+      "requiredCompetencies": [
+        "policy_design_and_review",
+        "governance_risk_compliance",
+        "secure_ui_ux",
+        "secure_defaults_hardening"
+      ]
+    },
+    {
+      "id": "general_security",
+      "label": "General Security Practitioner",
+      "description": "Covers cross-cutting security responsibilities across teams.",
+      "requiredCompetencies": [
+        "governance_risk_compliance",
+        "threat_intel",
+        "logging_monitoring_ir",
+        "audit_logging",
+        "incident_response"
+      ]
+    },
+    {
+      "id": "ai_engineer",
+      "label": "AI Engineer",
+      "description": "Designs, builds and operates AI-powered systems from prompts to distributed serving.",
+      "requiredCompetencies": [
+        "ai_prompt_engineering",
+        "ai_api_integration",
+        "rag_systems",
+        "embeddings_similarity",
+        "agents_tool_use",
+        "ai_systems_engineering",
+        "ai_guardrails_safety",
+        "ai_evaluation",
+        "distributed_inference",
+        "context_memory_management",
+        "cost_performance_tradeoffs",
+        "ai_privacy_compliance_governance"
+      ]
+    }
   ]
 }
