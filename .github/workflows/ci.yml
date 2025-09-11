@@ -61,8 +61,12 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
-          yarn dlx vercel link --project "sck-plattform" --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
-          echo "✅ Linked apps/web to Vercel project: sck-plattform"
+          mkdir -p .vercel
+          printf '{"projectId":"%s","orgId":"%s"}' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
+          echo "📄 Wrote apps/web/.vercel/project.json"
+          # Best-effort CLI link (not required once project.json exists)
+          yarn dlx vercel link --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" || true
+          test -f .vercel/project.json && echo "✅ Vercel project linked (project.json present)" || (echo "❌ Missing .vercel/project.json" && exit 1)
 
       - name: 🌐 Pull environment from Vercel (preview)
         working-directory: apps/web
