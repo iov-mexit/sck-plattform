@@ -54,19 +54,22 @@ jobs:
           echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_ENVIRONMENT=development" >> $GITHUB_ENV
 
-      - name: 🌐 Pull environment from Vercel (preview)
+      - name: 🔗 Link Vercel project (apps/web)
         working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
-          yarn dlx vercel env pull .env.ci \
-            --yes \
-            --environment=preview \
-            --token "$VERCEL_TOKEN" \
-            --project "$VERCEL_PROJECT_ID" \
-            --scope "$VERCEL_ORG_ID"
+          yarn dlx vercel link --project "$VERCEL_PROJECT_ID" --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+          echo "✅ Linked apps/web to Vercel project: $VERCEL_PROJECT_ID"
+
+      - name: 🌐 Pull environment from Vercel (preview)
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
       - name: 🔐 Export DATABASE_URL from pulled env
@@ -83,6 +86,7 @@ jobs:
             fi
             echo "DATABASE_URL=$DB" >> $GITHUB_ENV
             echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
+            echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ' | sed 's/.$//')
           else
             echo "❌ .env.ci not found after vercel env pull" >&2
             exit 1
