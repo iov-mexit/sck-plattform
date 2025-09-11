@@ -53,6 +53,17 @@ jobs:
         run: |
           echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_ENVIRONMENT=development" >> $GITHUB_ENV
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> $GITHUB_ENV
+
+      - name: 🗄️ Run Prisma Migrations (Supabase)
+        run: yarn workspace @sck/web dlx prisma migrate deploy
+
+      - name: 🚀 Start Next.js Dev Server
+        env:
+          NODE_ENV: development
+        run: |
+          nohup yarn workspace @sck/web dev > /dev/null 2>&1 &
+          npx wait-on http://localhost:3000
 
       - name: 🔍 Type Check
         run: yarn workspace @sck/web type-check
@@ -62,6 +73,11 @@ jobs:
 
       - name: 🧪 Run Tests
         run: CI=true yarn workspace @sck/web test
+
+      - name: 🛑 Stop Dev Server
+        if: always()
+        run: |
+          pkill -f "next dev" || true
 
   build-and-deploy:
     runs-on: ubuntu-latest
