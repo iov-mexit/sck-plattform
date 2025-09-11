@@ -22,7 +22,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Enable Corepack FIRST (fixes the Yarn 1.x cache issue)
       - name: 🔧 Enable Corepack & Yarn 4.0.2
         run: |
           corepack enable
@@ -64,9 +63,8 @@ jobs:
           mkdir -p .vercel
           printf '{"projectId":"%s","orgId":"%s"}' "$VERCEL_PROJECT_ID" "$VERCEL_ORG_ID" > .vercel/project.json
           echo "📄 Wrote apps/web/.vercel/project.json"
-          # Best-effort CLI link (not required once project.json exists)
           yarn dlx vercel link --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID" || true
-          test -f .vercel/project.json && echo "✅ Vercel project linked (project.json present)" || (echo "❌ Missing .vercel/project.json" && exit 1)
+          test -f .vercel/project.json && echo "✅ Vercel project linked" || (echo "❌ Missing .vercel/project.json" && exit 1)
 
       - name: 🌐 Pull environment from Vercel (preview)
         working-directory: apps/web
@@ -76,113 +74,62 @@ jobs:
           yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
-      - name: "🌐 Fallback: Pull environment from Vercel (production) if DB missing"
+      - name: "🌐 Fallback: Pull production env if DB missing"
         working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
           if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
-            echo "ℹ️ DATABASE_URL not found in preview env; pulling production env as fallback"
+            echo "ℹ️ No DB vars in preview env; pulling prod env"
             yarn dlx vercel env pull .env.prod --yes --environment=production --token "$VERCEL_TOKEN"
-            # Merge prod into ci for missing keys
             while IFS= read -r line; do
               key="${line%%=*}"
               if ! grep -qE "^${key}=" .env.ci; then
                 echo "$line" >> .env.ci
               fi
             done < .env.prod
-            echo "✅ Merged production env into .env.ci for missing keys"
+            echo "✅ Merged prod env into .env.ci"
           fi
 
-      - name: "🌐 Fallback: Fetch env via Vercel API if CLI lacks DB vars"
-        working-directory: apps/web
-        env:
-          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-        run: |
-          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
-            echo "ℹ️ Attempting Vercel API env fetch (preview)..."
-            curl -fsSL -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?decrypt=true&environment=preview" \
-              | jq -r '.envs[] | "\(.key)=\(.value)"' > .env.api || true
-            if [ -s .env.api ]; then
-              while IFS= read -r line; do
-                key="${line%%=*}"
-                if ! grep -qE "^${key}=" .env.ci; then
-                  echo "$line" >> .env.ci
-                fi
-              done < .env.api
-              echo "✅ Merged Vercel API preview env into .env.ci"
-            fi
-          fi
-          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
-            echo "ℹ️ Attempting Vercel API env fetch (production)..."
-            curl -fsSL -H "Authorization: Bearer $VERCEL_TOKEN" \
-              "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?decrypt=true&environment=production" \
-              | jq -r '.envs[] | "\(.key)=\(.value)"' > .env.api.prod || true
-            if [ -s .env.api.prod ]; then
-              while IFS= read -r line; do
-                key="${line%%=*}"
-                if ! grep -qE "^${key}=" .env.ci; then
-                  echo "$line" >> .env.ci
-                fi
-              done < .env.api.prod
-              echo "✅ Merged Vercel API production env into .env.ci"
-            fi
-          fi
-
-      - name: 🔐 Normalize DATABASE_URL (safe port + protocol fix)
+      - name: 🔐 Normalize DATABASE_URL
         working-directory: apps/web
         run: |
           if [ ! -f .env.ci ]; then
-            echo "❌ .env.ci not found after env pulls" >&2
+            echo "❌ .env.ci missing" >&2
             exit 1
           fi
 
-          echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ' | sed 's/.$//')
+          echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ')
+
           set -a
           . ./.env.ci || true
           set +a
 
-          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-${SUPABASE_PRISMA_URL:-${SUPABASE_DATABASE_URL:-}}}}}"
-
-          # Strip quotes if present
+          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-}}}"
           DB=${DB%\"}; DB=${DB#\"}
 
-          # Sanitize port (digits only, fallback 5432)
-          RAW_PORT="${POSTGRES_PORT:-5432}"
-          PORT=$(echo "$RAW_PORT" | sed -E 's/[^0-9]//g')
-          [ -z "$PORT" ] && PORT=5432
-
-          # Reconstruct if missing/invalid
           if ! echo "$DB" | grep -Eq '^postgres(ql)?://'; then
-            echo "⚠️ Invalid DATABASE_URL, reconstructing..."
+            echo "⚠️ Invalid/missing DATABASE_URL, reconstructing..."
             USER="${POSTGRES_USER:-postgres}"
             PASS="${POSTGRES_PASSWORD:-postgres}"
             HOST="${POSTGRES_HOST:-localhost}"
+            PORT="${POSTGRES_PORT:-5432}"
             NAME="${POSTGRES_DATABASE:-postgres}"
             DB="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${NAME}?sslmode=require"
           fi
 
-          # If scheme missing sslmode, add it
-          if ! echo "$DB" | grep -q 'sslmode='; then
-            SEP='?'; echo "$DB" | grep -q '?' && SEP='&'
-            DB="${DB}${SEP}sslmode=require"
+          # Ensure a numeric port
+          HOSTPART=$(echo "$DB" | sed -E 's#^postgres(ql)?://[^@]*@([^/:]+).*#\2#')
+          PORTPART=$(echo "$DB" | sed -E 's#.*:([0-9]+)/.*#\1#;t;d')
+          if [ -z "$PORTPART" ] || ! echo "$PORTPART" | grep -Eq '^[0-9]+$'; then
+            DB=$(echo "$DB" | sed -E 's#(postgres(ql)?://[^@]*@[^/:]+)(:[^/]+)?#\1:5432#')
           fi
 
-          # Always enforce sanitized numeric port
-          DB=$(echo "$DB" | sed -E "s#(:)[0-9]+(/|\\?|$)#:\\${PORT}\\2#")
-
-          # Shadow DB: prefer non-pooled
-          SHADOW="${POSTGRES_URL_NON_POOLING:-}"; SHADOW=${SHADOW%\"}; SHADOW=${SHADOW#\"}
-          [ -z "$SHADOW" ] && SHADOW="$DB"
-
-          # Sanity print (mask password)
-          echo "DB proto+host: $(echo "$DB" | sed -E 's#^(postgres(ql)?://)[^:]+:[^@]+@([^/?]+).*#\1***:***@\3#')"
+          echo "DB proto+host: $(echo "$DB" | sed -E 's#^(postgres(ql)?://)[^@]*@([^/?]+).*#\1\3#')"
           echo "DATABASE_URL=$DB" >> $GITHUB_ENV
-          echo "SHADOW_DATABASE_URL=$SHADOW" >> $GITHUB_ENV
+          echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
 
-      - name: 🗄️ Run Prisma Migrations (Supabase)
+      - name: 🗄️ Run Prisma Migrations
         run: yarn workspace @sck/web dlx prisma migrate deploy
 
       - name: 🚀 Start Next.js Dev Server
@@ -203,8 +150,7 @@ jobs:
 
       - name: 🛑 Stop Dev Server
         if: always()
-        run: |
-          pkill -f "next dev" || true
+        run: pkill -f "next dev" || true
 
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -217,7 +163,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ Enable Corepack FIRST (fixes the Yarn 1.x cache issue)
       - name: 🔧 Enable Corepack & Yarn 4.0.2
         run: |
           corepack enable
@@ -255,6 +200,6 @@ jobs:
 
       - name: 🏥 Health Check
         run: |
-          echo "Waiting for deployment to complete..."
+          echo "Waiting for deployment..."
           sleep 30
-          curl -f https://sck-plattform.vercel.app/api/v1/health || echo "⚠️ Health check failed - deployment may still be in progress"
+          curl -f https://sck-plattform.vercel.app/api/v1/health || echo "⚠️ Health check failed"
