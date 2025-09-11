@@ -44,6 +44,29 @@ const config: HardhatUserConfig = {
       gas: "auto",
     },
 
+    // Flare networks
+    coston2: {
+      url: process.env.FLARE_RPC_URL || "https://coston2-api.flare.network/ext/C/rpc",
+      accounts: process.env.FLARE_PRIVATE_KEY ? [process.env.FLARE_PRIVATE_KEY] : [],
+      chainId: 114,
+      gasPrice: "auto",
+      gas: "auto",
+    },
+    songbird: {
+      url: process.env.FLARE_RPC_URL || "https://songbird-api.flare.network/ext/C/rpc",
+      accounts: process.env.FLARE_PRIVATE_KEY ? [process.env.FLARE_PRIVATE_KEY] : [],
+      chainId: 19,
+      gasPrice: "auto",
+      gas: "auto",
+    },
+    coston: {
+      url: process.env.FLARE_RPC_URL || "https://coston-api.flare.network/ext/C/rpc",
+      accounts: process.env.FLARE_PRIVATE_KEY ? [process.env.FLARE_PRIVATE_KEY] : [],
+      chainId: 16,
+      gasPrice: "auto",
+      gas: "auto",
+    },
+
     mainnet: {
       url: process.env.MAINNET_RPC_URL || "https://mainnet.infura.io/v3/YOUR-PROJECT-ID",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
