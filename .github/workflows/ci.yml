@@ -94,6 +94,43 @@ jobs:
             echo "✅ Merged production env into .env.ci for missing keys"
           fi
 
+      - name: "🌐 Fallback: Fetch env via Vercel API if CLI lacks DB vars"
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
+            echo "ℹ️ Attempting Vercel API env fetch (preview)..."
+            curl -fsSL -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?decrypt=true&environment=preview" \
+              | jq -r '.envs[] | "\(.key)=\(.value)"' > .env.api || true
+            if [ -s .env.api ]; then
+              while IFS= read -r line; do
+                key="${line%%=*}"
+                if ! grep -qE "^${key}=" .env.ci; then
+                  echo "$line" >> .env.ci
+                fi
+              done < .env.api
+              echo "✅ Merged Vercel API preview env into .env.ci"
+            fi
+          fi
+          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
+            echo "ℹ️ Attempting Vercel API env fetch (production)..."
+            curl -fsSL -H "Authorization: Bearer $VERCEL_TOKEN" \
+              "https://api.vercel.com/v9/projects/$VERCEL_PROJECT_ID/env?decrypt=true&environment=production" \
+              | jq -r '.envs[] | "\(.key)=\(.value)"' > .env.api.prod || true
+            if [ -s .env.api.prod ]; then
+              while IFS= read -r line; do
+                key="${line%%=*}"
+                if ! grep -qE "^${key}=" .env.ci; then
+                  echo "$line" >> .env.ci
+                fi
+              done < .env.api.prod
+              echo "✅ Merged Vercel API production env into .env.ci"
+            fi
+          fi
+
       - name: 🔐 Export DATABASE_URL from pulled env (with fallbacks)
         working-directory: apps/web
         run: |
