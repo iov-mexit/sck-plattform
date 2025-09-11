@@ -131,58 +131,54 @@ jobs:
             fi
           fi
 
-      - name: 🔐 Normalize DATABASE_URL (load .env.ci, trim quotes, validate protocol, reconstruct if needed)
+      - name: 🔐 Normalize DATABASE_URL (safe port + protocol fix)
         working-directory: apps/web
         run: |
           if [ ! -f .env.ci ]; then
             echo "❌ .env.ci not found after env pulls" >&2
             exit 1
           fi
+
           echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ' | sed 's/.$//')
           set -a
           . ./.env.ci || true
           set +a
-          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-}}}"
-          # Strip surrounding quotes if any
-          DB=${DB%\"}
-          DB=${DB#\"}
-          # If empty or invalid scheme, reconstruct from discrete vars
+
+          DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-${SUPABASE_PRISMA_URL:-${SUPABASE_DATABASE_URL:-}}}}}"
+
+          # Strip quotes if present
+          DB=${DB%\"}; DB=${DB#\"}
+
+          # Sanitize port (digits only, fallback 5432)
+          RAW_PORT="${POSTGRES_PORT:-5432}"
+          PORT=$(echo "$RAW_PORT" | sed -E 's/[^0-9]//g')
+          [ -z "$PORT" ] && PORT=5432
+
+          # Reconstruct if missing/invalid
           if ! echo "$DB" | grep -Eq '^postgres(ql)?://'; then
-            echo "⚠️ DATABASE_URL invalid or missing, reconstructing from discrete vars..."
+            echo "⚠️ Invalid DATABASE_URL, reconstructing..."
             USER="${POSTGRES_USER:-postgres}"
             PASS="${POSTGRES_PASSWORD:-postgres}"
             HOST="${POSTGRES_HOST:-localhost}"
-            PORT="${POSTGRES_PORT:-5432}"
             NAME="${POSTGRES_DATABASE:-postgres}"
             DB="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${NAME}?sslmode=require"
           fi
-          # Ensure sslmode=require present
+
+          # If scheme missing sslmode, add it
           if ! echo "$DB" | grep -q 'sslmode='; then
-            SEP='?'
-            echo "$DB" | grep -q '?' && SEP='&'
+            SEP='?'; echo "$DB" | grep -q '?' && SEP='&'
             DB="${DB}${SEP}sslmode=require"
           fi
-          # Fix invalid or non-numeric port in host portion
-          HOSTPORT=$(echo "$DB" | sed -E 's#^postgres(ql)?://[^@]*@([^/]+).*#\2#')
-          FALLBACK_PORT=$(echo "${POSTGRES_PORT:-5432}" | sed -E 's/[^0-9]//g')
-          [ -z "$FALLBACK_PORT" ] && FALLBACK_PORT=5432
-          if echo "$HOSTPORT" | grep -q ':'; then
-            CAND_PORT=${HOSTPORT##*:}
-            if ! echo "$CAND_PORT" | grep -Eq '^[0-9]+$'; then
-              # strip existing :port and insert fallback numeric port
-              DB=$(echo "$DB" | sed -E "s#^(postgres(ql)?://[^@]*@[^/:]+)(:[0-9]+)?#\\1:${FALLBACK_PORT}#")
-            fi
-          else
-            # no port present, add fallback
-            DB=$(echo "$DB" | sed -E "s#^(postgres(ql)?://[^@]*@[^/]+)#\\1:${FALLBACK_PORT}#")
-          fi
-          # Shadow DB: prefer non-pooled if available
+
+          # Always enforce sanitized numeric port
+          DB=$(echo "$DB" | sed -E "s#(:)[0-9]+(/|\\?|$)#:\\${PORT}\\2#")
+
+          # Shadow DB: prefer non-pooled
           SHADOW="${POSTGRES_URL_NON_POOLING:-}"; SHADOW=${SHADOW%\"}; SHADOW=${SHADOW#\"}
-          if [ -z "$SHADOW" ]; then
-            SHADOW="$DB"
-          fi
-          # Sanity print (protocol + host only)
-          echo "DB proto+host: $(echo "$DB" | sed -E 's#^(postgres(ql)?://)[^@]*@([^/?]+).*#\1\3#')"
+          [ -z "$SHADOW" ] && SHADOW="$DB"
+
+          # Sanity print (mask password)
+          echo "DB proto+host: $(echo "$DB" | sed -E 's#^(postgres(ql)?://)[^:]+:[^@]+@([^/?]+).*#\1***:***@\3#')"
           echo "DATABASE_URL=$DB" >> $GITHUB_ENV
           echo "SHADOW_DATABASE_URL=$SHADOW" >> $GITHUB_ENV
 
