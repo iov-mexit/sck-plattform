@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "version": "2025-08-23",
+    "source": "Secure Code KnAIght (SCK) - expanded SCW catalog mapping (authoritative mapping)",
+    "notes": "Competencies intentionally exhaustive and normalized; roles reference competency ids."
+  },
+  "competencies": [
+    {"id":"secure_coding_basics","label":"Secure Coding Fundamentals","description":"Core secure coding patterns, secure-by-default development, input/output handling, defensive programming.","trustLevels":{"L1":"Understands common secure coding pitfalls and OWASP top 10 at high level.","L2":"Can write code following secure patterns and basic sanitation.","L3":"Designs and enforces secure coding practices across modules.","L4":"Leads secure coding reviews and integrates secure frameworks.","L5":"Defines org-wide secure coding standards and training."},"certifications":["SCW-Secure-Coding","OWASP-Top10"]},
+    {"id":"authentication_session","label":"Authentication & Session Management","description":"Secure authentication flows, session handling, token lifecycle, brute-force protection, MFA.","trustLevels":{"L1":"Recognizes weak authentication and session problems.","L2":"Implements secure login, session expiration, and basic MFA.","L3":"Designs robust auth solutions (SSO, OAuth2/OIDC) and session protections.","L4":"Audits auth systems org-wide and approves designs.","L5":"Defines enterprise identity standards and governance."},"certifications":["SCW-Auth-Lab","OAuth2/OIDC-Training"]},
+    {"id":"access_control","label":"Access Control & Authorization","description":"Role-based and attribute-based access control, preventing IDOR and BOLA, function-level authorization.","trustLevels":{"L1":"Understands RBAC/ABAC basics and IDOR concepts.","L2":"Can implement function-level authorization and RBAC policies.","L3":"Designs and reviews fine-grained access controls across systems.","L4":"Performs comprehensive access control audits and threat models.","L5":"Sets enterprise authorization strategy and governance."},"certifications":["SCW-AccessControl","CISSP"]}
+  ],
+  "roles": [
+    {"id":"frontend_developer","label":"Frontend Developer","description":"Builds user-facing web applications, UI, and web components.","requiredCompetencies":["webfrontend_security","xss_csrf","secure_ui_ux","authentication_session","api_security","logging_privacy","secure_defaults_hardening","secure_coding_basics"]},
+    {"id":"backend_developer","label":"Backend Developer","description":"Builds APIs, services, and backend logic.","requiredCompetencies":["secure_coding_basics","injection_attacks","api_security","access_control","jwt_token_misuse","crypto_key_mgmt","logging_monitoring_ir","secure_file_handling","business_logic_flaws"]}
+  ]
+}
