@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PrismaClient, AnsSyncStatus } from "@prisma/client";
+import { PrismaClient, $Enums } from "@prisma/client";
 import { ethers } from "ethers";
 
 const prisma = new PrismaClient();
@@ -32,14 +32,14 @@ export function parseRoleAgent(input: unknown): RoleAgentInput | null {
 /** =========================
  * 2️⃣ AnsSyncStatus Enum Mapping
  * ========================== */
-export const ansStatusMap: Record<string, AnsSyncStatus> = {
+export const ansStatusMap: Record<string, $Enums.AnsSyncStatus> = {
   not_registered: "NOT_REGISTERED",
   registered: "REGISTERED",
   synced: "SYNCED",
   failed: "FAILED",
 };
 
-export function mapAnsStatus(inputStatus: string): AnsSyncStatus {
+export function mapAnsStatus(inputStatus: string): $Enums.AnsSyncStatus {
   return ansStatusMap[inputStatus.toLowerCase()] ?? "NOT_REGISTERED";
 }
 
@@ -47,14 +47,15 @@ export function mapAnsStatus(inputStatus: string): AnsSyncStatus {
  * 3️⃣ Blockchain Mint Preflight Check
  * ========================== */
 export async function preflightMintCheck(
+  provider: ethers.Provider,
   wallet: ethers.Wallet,
-  gasLimit: ethers.BigNumber,
-  gasPrice: ethers.BigNumber,
-  value: ethers.BigNumber
+  gasLimit: bigint,
+  gasPrice: bigint,
+  value: bigint
 ): Promise<boolean> {
-  const balance = await wallet.getBalance();
-  const cost = gasLimit.mul(gasPrice).add(value);
-  if (balance.lt(cost)) {
+  const balance = await provider.getBalance(wallet.address);
+  const cost = gasLimit * gasPrice + value;
+  if (balance < cost) {
     console.warn("[MINT BLOCKED] Insufficient funds", { balance: balance.toString(), cost: cost.toString() });
     return false;
   }
@@ -77,7 +78,7 @@ interface TransactionData {
 export async function createTransactionRecord(tx: TransactionData) {
   if (!tx.txHash) {
     console.warn("[TRANSACTION SKIPPED] No tx submitted", tx);
-    await prisma.transaction.create({
+    await prisma.blockchainTransaction.create({
       data: {
         status: "FAILED",
         error: "No tx hash, skipped creation",
@@ -87,14 +88,18 @@ export async function createTransactionRecord(tx: TransactionData) {
     return;
   }
 
-  await prisma.transaction.create({
+  await prisma.blockchainTransaction.create({
     data: {
-      txHash: tx.txHash,
+      transactionHash: tx.txHash,
       network: tx.network,
-      from: tx.from,
-      to: tx.to,
-      status: tx.status,
-      cost: tx.cost,
+      // map optional fields when present
+      gasUsed: (tx as any).gasUsed,
+      gasPrice: (tx as any).gasPrice,
+      status: (tx.status as any) ?? "pending",
+      roleAgentId: (tx as any).roleAgentId,
+      tokenId: (tx as any).tokenId,
+      contractAddress: (tx as any).contractAddress,
+      metadata: (tx as any).metadata,
     },
   });
 }
@@ -105,7 +110,7 @@ export async function createTransactionRecord(tx: TransactionData) {
 export function runVerboseDev() {
   console.log(
     "Run dev server with verbose import/trace logging:\n" +
-      "NODE_OPTIONS='--trace-warnings --trace-imports' yarn dev"
+    "NODE_OPTIONS='--trace-warnings --trace-imports' yarn dev"
   );
   console.log("Capture 'Import trace for requested module' to identify offending files.");
 }

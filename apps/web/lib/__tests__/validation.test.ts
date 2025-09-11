@@ -17,6 +17,7 @@ const mockEnv = {
   stripeKey: 'pk_test_valid_key',
   walletConnectProjectId: 'test_project_id',
   enableWeb3: true,
+  enableMagicAuth: false,
   euCompliance: false,
   cookieConsentEnabled: false,
   debugMode: false,

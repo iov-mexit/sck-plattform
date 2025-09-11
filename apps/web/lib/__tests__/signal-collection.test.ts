@@ -260,21 +260,8 @@ describe('Signal Collection System', () => {
     });
 
     it('should verify signal with metadata preservation', async () => {
-      const mockSignal = {
-        id: 'signal-123',
-        metadata: JSON.stringify({
-          type: 'certification',
-          credentialId: 'TEST-123',
-          issuerUrl: 'https://test.com',
-          verificationMethod: 'manual_review',
-          verificationNotes: 'Verified by team lead',
-          verifiedAt: new Date().toISOString() // Use actual timestamp format
-        }),
-        verified: false
-      };
-
-      prisma.signal.findUnique.mockResolvedValue(mockSignal as any);
-      prisma.signal.update.mockResolvedValue({ ...mockSignal, verified: true } as any);
+      (prisma.signal.findUnique as any).mockResolvedValue(mockSignal as any);
+      (prisma.signal.update as any).mockResolvedValue({ ...mockSignal, verified: true } as any);
 
       const result = await signalCollection.verifySignal('signal-123', {
         verified: true,

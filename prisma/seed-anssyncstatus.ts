@@ -1,9 +1,9 @@
-import { PrismaClient, AnsSyncStatus } from "@prisma/client";
+import { PrismaClient, $Enums } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const existingStatuses = Object.values(AnsSyncStatus);
+  const existingStatuses = Object.values($Enums.AnsSyncStatus);
   console.log("[SEED] Ensuring AnsSyncStatus values:", existingStatuses);
 
   for (const status of existingStatuses) {
