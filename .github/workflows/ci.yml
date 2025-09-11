@@ -162,6 +162,20 @@ jobs:
             echo "$DB" | grep -q '?' && SEP='&'
             DB="${DB}${SEP}sslmode=require"
           fi
+          # Fix invalid or non-numeric port in host portion
+          HOSTPORT=$(echo "$DB" | sed -E 's#^postgres(ql)?://[^@]*@([^/]+).*#\2#')
+          FALLBACK_PORT=$(echo "${POSTGRES_PORT:-5432}" | sed -E 's/[^0-9]//g')
+          [ -z "$FALLBACK_PORT" ] && FALLBACK_PORT=5432
+          if echo "$HOSTPORT" | grep -q ':'; then
+            CAND_PORT=${HOSTPORT##*:}
+            if ! echo "$CAND_PORT" | grep -Eq '^[0-9]+$'; then
+              # strip existing :port and insert fallback numeric port
+              DB=$(echo "$DB" | sed -E "s#^(postgres(ql)?://[^@]*@[^/:]+)(:[0-9]+)?#\\1:${FALLBACK_PORT}#")
+            fi
+          else
+            # no port present, add fallback
+            DB=$(echo "$DB" | sed -E "s#^(postgres(ql)?://[^@]*@[^/]+)#\\1:${FALLBACK_PORT}#")
+          fi
           # Shadow DB: prefer non-pooled if available
           SHADOW="${POSTGRES_URL_NON_POOLING:-}"; SHADOW=${SHADOW%\"}; SHADOW=${SHADOW#\"}
           if [ -z "$SHADOW" ]; then
