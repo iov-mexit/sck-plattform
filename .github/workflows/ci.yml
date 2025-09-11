@@ -73,6 +73,14 @@ jobs:
         run: |
           yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
+          
+          # Debug: show what we actually got
+          echo "📋 Preview env contents:"
+          if [ -f .env.ci ]; then
+            grep -E '^(DATABASE_URL|POSTGRES_|SUPABASE_)' .env.ci | head -10 || echo "No DB-related vars found"
+          else
+            echo "❌ .env.ci file not created"
+          fi
 
       - name: "🌐 Fallback: Pull production env if DB missing"
         working-directory: apps/web
@@ -97,6 +105,47 @@ jobs:
               fi
             done < .env.prod
             echo "✅ Merged prod env into .env.ci"
+          fi
+
+      - name: 🔑 Fallback: Use GitHub Secrets if Vercel env empty
+        working-directory: apps/web
+        run: |
+          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
+            echo "⚠️ No DB vars from Vercel, trying GitHub Secrets fallback..."
+            
+            # Create .env.ci if it doesn't exist
+            touch .env.ci
+            
+            # Add GitHub Secrets as fallback
+            if [ -n "${{ secrets.DATABASE_URL }}" ]; then
+              echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.ci
+              echo "✅ Added DATABASE_URL from GitHub Secrets"
+            fi
+            
+            if [ -n "${{ secrets.POSTGRES_PRISMA_URL }}" ]; then
+              echo "POSTGRES_PRISMA_URL=${{ secrets.POSTGRES_PRISMA_URL }}" >> .env.ci
+              echo "✅ Added POSTGRES_PRISMA_URL from GitHub Secrets"
+            fi
+            
+            if [ -n "${{ secrets.POSTGRES_URL }}" ]; then
+              echo "POSTGRES_URL=${{ secrets.POSTGRES_URL }}" >> .env.ci
+              echo "✅ Added POSTGRES_URL from GitHub Secrets"
+            fi
+            
+            if [ -n "${{ secrets.SUPABASE_PRISMA_URL }}" ]; then
+              echo "SUPABASE_PRISMA_URL=${{ secrets.SUPABASE_PRISMA_URL }}" >> .env.ci
+              echo "✅ Added SUPABASE_PRISMA_URL from GitHub Secrets"
+            fi
+            
+            if [ -n "${{ secrets.SUPABASE_DATABASE_URL }}" ]; then
+              echo "SUPABASE_DATABASE_URL=${{ secrets.SUPABASE_DATABASE_URL }}" >> .env.ci
+              echo "✅ Added SUPABASE_DATABASE_URL from GitHub Secrets"
+            fi
+            
+            echo "📋 Final env contents after GitHub Secrets fallback:"
+            grep -E '^(DATABASE_URL|POSTGRES_|SUPABASE_)' .env.ci | head -10 || echo "Still no DB-related vars found"
+          else
+            echo "✅ DB vars found in Vercel env, skipping GitHub Secrets fallback"
           fi
 
       - name: 🔐 Normalize DATABASE_URL
