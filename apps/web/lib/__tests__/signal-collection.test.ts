@@ -349,7 +349,7 @@ describe('Signal Collection System', () => {
     });
 
     it('should parse metadata when retrieving signals', async () => {
-      const signals = await signalCollection.getSignalsByRoleAgent('ra-123');
+      const signals = await signalCollection.getSignalsByRoleAgent('ra-123') as any[];
 
       expect(signals).toHaveLength(2);
       expect(signals[0].metadata).toEqual({
@@ -374,7 +374,7 @@ describe('Signal Collection System', () => {
 
       (prisma.signal.findMany as any).mockResolvedValue(signalsWithoutMetadata);
 
-      const signals = await signalCollection.getSignalsByRoleAgent('ra-123');
+      const signals = await signalCollection.getSignalsByRoleAgent('ra-123') as any[];
 
       expect(signals[0].metadata).toBeNull();
     });

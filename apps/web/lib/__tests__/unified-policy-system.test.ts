@@ -2,6 +2,7 @@
 // Milestone 4: Integration & Testing - End-to-end system validation
 
 import { UnifiedPolicySystem } from '../policy/unified-policy-system';
+const isObj = (x: any): x is { success: boolean; policies: any[]; summary: any } => x && !Array.isArray(x) && typeof x === 'object' && 'success' in x;
 
 describe('UnifiedPolicySystem', () => {
   let system: UnifiedPolicySystem;
@@ -36,12 +37,12 @@ describe('UnifiedPolicySystem', () => {
 
       const response = await system.generatePolicy(request);
 
-      expect(response.success).toBe(true);
-      expect(response.policy).toBeDefined();
-      expect(response.confidenceAssessment).toBeDefined();
-      expect(response.processingTime).toBeGreaterThan(0);
-      expect(response.metadata.roleTitle).toBe('L3 Security Engineer');
-      expect(response.metadata.regulatoryFramework).toBe('GDPR');
+      expect((response as any).success).toBe(true);
+      expect((response as any).policy).toBeDefined();
+      expect((response as any).confidenceAssessment).toBeDefined();
+      expect((response as any).processingTime).toBeGreaterThan(0);
+      expect((response as any).metadata.roleTitle).toBe('L3 Security Engineer');
+      expect((response as any).metadata.regulatoryFramework).toBe('GDPR');
     });
 
     test('should generate policy for frontend developer successfully', async () => {
@@ -88,9 +89,9 @@ describe('UnifiedPolicySystem', () => {
 
       const response = await system.generatePolicy(request);
 
-      if (response.success && response.confidenceAssessment) {
+      if ((response as any).success && (response as any).confidenceAssessment) {
         // The confidence threshold is used for filtering, not for generation
-        expect(response.confidenceAssessment.overallConfidence).toBeGreaterThan(0);
+        expect((response as any).confidenceAssessment.overallConfidence).toBeGreaterThan(0);
       }
     });
 
@@ -102,13 +103,13 @@ describe('UnifiedPolicySystem', () => {
 
       const response = await system.generatePolicy(request);
 
-      expect(response.success).toBe(true);
-      expect(response.metadata).toBeDefined();
-      expect(response.metadata.roleTitle).toBe('L4 DevOps Architect');
-      expect(response.metadata.regulatoryFramework).toBe('NIS2');
-      expect(response.metadata.confidenceScore).toBeGreaterThan(0);
-      expect(response.metadata.riskLevel).toBeDefined();
-      expect(response.metadata.qualityScore).toBeGreaterThan(0);
+      expect((response as any).success).toBe(true);
+      expect((response as any).metadata).toBeDefined();
+      expect((response as any).metadata.roleTitle).toBe('L4 DevOps Architect');
+      expect((response as any).metadata.regulatoryFramework).toBe('NIS2');
+      expect((response as any).metadata.confidenceScore).toBeGreaterThan(0);
+      expect((response as any).metadata.riskLevel).toBeDefined();
+      expect((response as any).metadata.qualityScore).toBeGreaterThan(0);
     });
   });
 
@@ -146,10 +147,10 @@ describe('UnifiedPolicySystem', () => {
 
       const response = await system.generateBatchPolicies(request);
 
-      expect(response.success).toBe(true); // At least one policy succeeded
-      expect(response.policies.length).toBe(3);
-      expect(response.summary.totalGenerated).toBeLessThan(3); // Some failed
-      expect(response.summary.totalGenerated).toBeGreaterThan(0); // Some succeeded
+      expect((response as any).success).toBe(true); // At least one policy succeeded
+      expect((response as any).policies.length).toBe(3);
+      expect((response as any).summary.totalGenerated).toBeLessThan(3); // Some failed
+      expect((response as any).summary.totalGenerated).toBeGreaterThan(0); // Some succeeded
     });
 
     test('should calculate accurate summary statistics', async () => {
@@ -159,14 +160,14 @@ describe('UnifiedPolicySystem', () => {
 
       const response = await system.generateBatchPolicies(request);
 
-      expect(response.summary.totalRequested).toBe(2);
-      expect(response.summary.totalGenerated).toBeGreaterThanOrEqual(1); // At least 1 should succeed
-      expect(response.summary.averageConfidence).toBeGreaterThan(0);
-      expect(response.summary.averageConfidence).toBeLessThanOrEqual(1);
+      expect((response as any).summary.totalRequested).toBe(2);
+      expect((response as any).summary.totalGenerated).toBeGreaterThanOrEqual(1); // At least 1 should succeed
+      expect((response as any).summary.averageConfidence).toBeGreaterThan(0);
+      expect((response as any).summary.averageConfidence).toBeLessThanOrEqual(1);
 
       // Verify auto-approval and review counts
-      const autoApproved = response.policies.filter(p => p.autoApproved).length;
-      const requiresReview = response.policies.filter(p => p.requiresReview).length;
+      const autoApproved = (response as any).policies.filter((p: any) => p.autoApproved).length;
+      const requiresReview = (response as any).policies.filter((p: any) => p.requiresReview).length;
       expect(autoApproved + requiresReview).toBe(2);
     });
   });
@@ -343,28 +344,28 @@ describe('UnifiedPolicySystem', () => {
         autoApprove: true
       });
 
-      expect(policyResponse.success).toBe(true);
-      expect(policyResponse.policy).toBeDefined();
-      expect(policyResponse.confidenceAssessment).toBeDefined();
+      expect((policyResponse as any).success).toBe(true);
+      expect((policyResponse as any).policy).toBeDefined();
+      expect((policyResponse as any).confidenceAssessment).toBeDefined();
 
       // 2. Validate the generated policy
       if (policyResponse.policy) {
-        const validation = system.validateRoleTemplate(policyResponse.policy.roleTemplateId);
+        const validation = system.validateRoleTemplate((policyResponse.policy as any).roleTemplateId || '');
         expect(validation.isValid).toBe(true);
         expect(validation.roleTitle).toBe('L3 Security Engineer');
       }
 
       // 3. Check confidence assessment
-      if (policyResponse.confidenceAssessment) {
-        expect(policyResponse.confidenceAssessment.overallConfidence).toBeGreaterThan(0);
-        expect(policyResponse.confidenceAssessment.overallConfidence).toBeLessThanOrEqual(1);
-        expect(policyResponse.confidenceAssessment.recommendations.length).toBeGreaterThan(0);
+      if ((policyResponse as any).confidenceAssessment) {
+        expect((policyResponse as any).confidenceAssessment.overallConfidence).toBeGreaterThan(0);
+        expect((policyResponse as any).confidenceAssessment.overallConfidence).toBeLessThanOrEqual(1);
+        expect((policyResponse as any).confidenceAssessment.recommendations.length).toBeGreaterThan(0);
       }
 
       // 4. Verify metadata consistency
-      expect(policyResponse.metadata.roleTitle).toBe('L3 Security Engineer');
-      expect(policyResponse.metadata.regulatoryFramework).toBe('GDPR');
-      expect(policyResponse.metadata.confidenceScore).toBeGreaterThan(0);
+      expect((policyResponse as any).metadata.roleTitle).toBe('L3 Security Engineer');
+      expect((policyResponse as any).metadata.regulatoryFramework).toBe('GDPR');
+      expect((policyResponse as any).metadata.confidenceScore).toBeGreaterThan(0);
     });
 
     test('should handle batch processing with mixed results', async () => {
@@ -373,7 +374,7 @@ describe('UnifiedPolicySystem', () => {
         regulatoryFramework: 'GDPR'
       });
 
-      expect(batchResponse.success).toBe(true);
+      expect((batchResponse as any).success).toBe(true);
       if (Array.isArray(batchResponse)) {
         expect(Array.isArray(batchResponse)).toBe(true);
       } else {
@@ -388,15 +389,15 @@ describe('UnifiedPolicySystem', () => {
       const summaries = Array.isArray(batchResponse) ? batchResponse.map((p: any) => p.summary) : batchResponse.policies.map((p: any) => p.summary);
 
       // Should have some successful and some failed policies
-      const successfulPolicies = batchResponse.policies.filter(p => p.success);
-      const failedPolicies = batchResponse.policies.filter(p => !p.success);
+      const successfulPolicies = (batchResponse as any).policies.filter((p: any) => p.success);
+      const failedPolicies = (batchResponse as any).policies.filter((p: any) => !p.success);
 
       expect(successfulPolicies.length).toBeGreaterThan(0);
       expect(failedPolicies.length).toBeGreaterThan(0);
 
       // Verify summary accuracy
-      expect(batchResponse.summary.totalGenerated).toBe(successfulPolicies.length);
-      expect(batchResponse.summary.totalRequested).toBe(3);
+      expect((batchResponse as any).summary.totalGenerated).toBe(successfulPolicies.length);
+      expect((batchResponse as any).summary.totalRequested).toBe(3);
     });
   });
 

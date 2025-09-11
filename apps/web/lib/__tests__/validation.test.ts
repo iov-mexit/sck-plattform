@@ -10,7 +10,7 @@ import { getCurrentDomain, getDomainConfig } from '../domains';
 
 // Mock environment variables
 const mockEnv = {
-  environment: 'development',
+  environment: 'development' as const,
   baseUrl: 'http://localhost:3000',
   primaryDomain: 'localhost',
   paymentStrategy: 'crypto',
@@ -32,7 +32,7 @@ describe('Environment Validation', () => {
     it('should reject localhost URLs in production', () => {
       const config = {
         ...mockEnv,
-        environment: 'production',
+        environment: 'production' as const,
         baseUrl: 'http://localhost:3000'
       };
 
@@ -45,7 +45,7 @@ describe('Environment Validation', () => {
     it('should require HTTPS in production', () => {
       const config = {
         ...mockEnv,
-        environment: 'production',
+        environment: 'production' as const,
         baseUrl: 'http://secure-knaight.io'
       };
 

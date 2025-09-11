@@ -5,20 +5,22 @@
  * with proper error handling, retry logic, and status tracking.
  */
 
-import { describe, it, expect, beforeAll, afterAll, beforeEach } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { AnsService } from '@/lib/ans/service';
 import prisma from '@/lib/database';
 import { getDomainConfig } from '@/lib/domains';
 
 // Mock the domain configuration for testing
-jest.mock('@/lib/domains', () => ({
-  ...jest.requireActual('@/lib/domains'),
-  getDomainConfig: jest.fn(() => ({
+vi.mock('@/lib/domains', async (orig) => {
+  const actual = await (orig as any)();
+  return {
+    ...actual,
+  getDomainConfig: vi.fn(() => ({
     autoRegisterANS: true,
     ansRegistry: 'https://knaight.site',
     isDevelopment: true
   })),
-  buildANSRegistrationPayload: jest.fn((agent) => ({
+  buildANSRegistrationPayload: vi.fn((agent: any) => ({
     ansId: `l${agent.level}-${agent.roleTemplate.title.toLowerCase().replace(/\s+/g, '-')}.${agent.organization.domain}.knaight`,
     did: agent.assignedToDid,
     role: agent.roleTemplate.title,
@@ -36,8 +38,9 @@ jest.mock('@/lib/domains', () => ({
       lastUpdated: new Date().toISOString()
     }
   })),
-  registerToANS: jest.fn()
-}));
+  registerToANS: vi.fn()
+};
+});
 
 describe('ANS Auto-Registration', () => {
   let testOrganization: any;
@@ -64,13 +67,10 @@ describe('ANS Auto-Registration', () => {
       data: {
         id: 'role-test-ans-123',
         title: 'Security Engineer',
-        description: 'Test security engineer role',
+        focus: 'Security',
         category: 'Security',
-        skills: ['TypeScript', 'Security'],
-        certifications: [],
-        trustThreshold: 500,
-        responsibilities: ['Security analysis'],
-        securityContributions: []
+        responsibilities: { items: ['Security analysis'] } as any,
+        securityContributions: { items: [] } as any,
       }
     });
   });
