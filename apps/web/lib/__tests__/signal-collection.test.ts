@@ -6,7 +6,6 @@ vi.mock('../database', () => {
   const mock = {
     prisma: {
       roleAgent: { findUnique: vi.fn() },
-      role_agents: { findUnique: vi.fn() },
       signal: {
         create: vi.fn(),
         findMany: vi.fn(),
@@ -185,7 +184,7 @@ describe('Signal Collection System', () => {
     };
 
     beforeEach(() => {
-      (prisma.role_agents.findUnique as any).mockResolvedValue(mockDigitalTwin);
+      (prisma.roleAgent.findUnique as any).mockResolvedValue(mockDigitalTwin);
       (prisma.signal.create as any).mockResolvedValue(mockSignal);
       (prisma.signal.count as any).mockResolvedValue(0);
       (prisma.auditLog.create as any).mockResolvedValue({});
@@ -320,7 +319,7 @@ describe('Signal Collection System', () => {
         }
       ];
 
-      (prisma.role_agents.findUnique as jest.Mock)
+      (prisma.roleAgent.findUnique as any)
         .mockResolvedValueOnce(mockDigitalTwin) // First call succeeds
         .mockResolvedValueOnce(null); // Second call fails
 

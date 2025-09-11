@@ -613,6 +613,8 @@ enum AnsSyncStatus {
   REGISTERED
   SYNCED
   FAILED
+  PENDING
+  ERROR
 }
 
 enum ArtifactType {
