@@ -107,7 +107,7 @@ jobs:
             echo "✅ Merged prod env into .env.ci"
           fi
 
-      - name: 🔑 Fallback: Use GitHub Secrets if Vercel env empty
+      - name: "🔑 Fallback: Use GitHub Secrets if Vercel env empty"
         working-directory: apps/web
         run: |
           if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
