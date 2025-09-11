@@ -8,38 +8,38 @@
 import { describe, it, expect, beforeAll, afterAll, beforeEach, vi } from 'vitest';
 import { AnsService } from '@/lib/ans/service';
 import prisma from '@/lib/database';
-import { getDomainConfig } from '@/lib/domains';
+import * as Domains from '@/lib/domains';
 
 // Mock the domain configuration for testing
 vi.mock('@/lib/domains', async (orig) => {
   const actual = await (orig as any)();
   return {
     ...actual,
-  getDomainConfig: vi.fn(() => ({
-    autoRegisterANS: true,
-    ansRegistry: 'https://knaight.site',
-    isDevelopment: true
-  })),
-  buildANSRegistrationPayload: vi.fn((agent: any) => ({
-    ansId: `l${agent.level}-${agent.roleTemplate.title.toLowerCase().replace(/\s+/g, '-')}.${agent.organization.domain}.knaight`,
-    did: agent.assignedToDid,
-    role: agent.roleTemplate.title,
-    level: agent.level,
-    qualificationLevel: 'Entry',
-    organization: agent.organization.name,
-    trustLevel: 'UNVERIFIED',
-    verificationEndpoint: `https://localhost:3000/api/v1/verify/${agent.id}`,
-    publicMetadata: {
+    getDomainConfig: vi.fn(() => ({
+      autoRegisterANS: true,
+      ansRegistry: 'https://knaight.site',
+      isDevelopment: true
+    })),
+    buildANSRegistrationPayload: vi.fn((agent: any) => ({
+      ansId: `l${agent.level}-${agent.roleTemplate.title.toLowerCase().replace(/\s+/g, '-')}.${agent.organization.domain}.knaight`,
+      did: agent.assignedToDid,
       role: agent.roleTemplate.title,
       level: agent.level,
       qualificationLevel: 'Entry',
       organization: agent.organization.name,
-      trustScore: agent.trustScore || 0,
-      lastUpdated: new Date().toISOString()
-    }
-  })),
-  registerToANS: vi.fn()
-};
+      trustLevel: 'UNVERIFIED',
+      verificationEndpoint: `https://localhost:3000/api/v1/verify/${agent.id}`,
+      publicMetadata: {
+        role: agent.roleTemplate.title,
+        level: agent.level,
+        qualificationLevel: 'Entry',
+        organization: agent.organization.name,
+        trustScore: agent.trustScore || 0,
+        lastUpdated: new Date().toISOString()
+      }
+    })),
+    registerToANS: vi.fn()
+  };
 });
 
 describe('ANS Auto-Registration', () => {
@@ -89,7 +89,7 @@ describe('ANS Auto-Registration', () => {
 
   it('should register a new role agent with ANS successfully', async () => {
     // Mock successful ANS registration
-    const mockRegisterToANS = require('@/lib/domains').registerToANS;
+    const mockRegisterToANS = vi.mocked(Domains).registerToANS as unknown as { mockResolvedValueOnce: (v: any) => void };
     mockRegisterToANS.mockResolvedValueOnce({
       success: true,
       ansId: 'l1-security-engineer.testorg.knaight',
@@ -128,7 +128,7 @@ describe('ANS Auto-Registration', () => {
 
   it('should handle ANS registration failure gracefully', async () => {
     // Mock failed ANS registration
-    const mockRegisterToANS = require('@/lib/domains').registerToANS;
+    const mockRegisterToANS = vi.mocked(Domains).registerToANS as unknown as { mockResolvedValueOnce: (v: any) => void };
     mockRegisterToANS.mockResolvedValueOnce({
       success: false,
       error: 'ANS Registry unavailable',
@@ -166,7 +166,7 @@ describe('ANS Auto-Registration', () => {
 
   it('should skip registration if ANS auto-registration is disabled', async () => {
     // Mock disabled ANS registration
-    const mockGetDomainConfig = require('@/lib/domains').getDomainConfig;
+    const mockGetDomainConfig = vi.mocked(Domains).getDomainConfig as unknown as { mockReturnValueOnce: (v: any) => void };
     mockGetDomainConfig.mockReturnValueOnce({
       autoRegisterANS: false,
       ansRegistry: 'https://knaight.site',
@@ -313,7 +313,7 @@ describe('ANS Auto-Registration', () => {
     });
 
     // Mock successful retry
-    const mockRegisterToANS = require('@/lib/domains').registerToANS;
+    const mockRegisterToANS = vi.mocked(Domains).registerToANS as unknown as { mockResolvedValue: (v: any) => void };
     mockRegisterToANS.mockResolvedValue({
       success: true,
       ansId: 'retry-success',
