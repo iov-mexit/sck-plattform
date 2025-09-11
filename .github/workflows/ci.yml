@@ -16,6 +16,20 @@ jobs:
   test:
     runs-on: ubuntu-latest
     
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -192,9 +206,11 @@ jobs:
               echo "   POSTGRES_USER: ${POSTGRES_USER:-'missing'}"
               echo "   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-'missing'}"
               echo "   POSTGRES_DATABASE: ${POSTGRES_DATABASE:-'missing'}"
-              echo "⚠️ Skipping database-dependent steps - will run tests without DB"
-              echo "SKIP_DB_STEPS=true" >> $GITHUB_ENV
-              exit 0
+              echo "⚠️ Using PostgreSQL service for CI..."
+              
+              # Use GitHub Actions PostgreSQL service
+              DB="postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+              echo "✅ Using PostgreSQL service for CI"
             fi
           fi
 
@@ -210,7 +226,6 @@ jobs:
           echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
 
       - name: 🗄️ Run Prisma Migrations
-        if: env.SKIP_DB_STEPS != 'true'
         run: yarn workspace @sck/web dlx prisma migrate deploy
 
       - name: 🚀 Start Next.js Dev Server
