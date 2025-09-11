@@ -42,6 +42,8 @@ vi.mock('@/lib/domains', async (orig) => {
   };
 });
 
+const dbIt = process.env.DATABASE_URL ? it : it.skip;
+
 describe('ANS Auto-Registration', () => {
   let testOrganization: any;
   let testRoleTemplate: any;
@@ -87,7 +89,7 @@ describe('ANS Auto-Registration', () => {
     await prisma.roleAgent.deleteMany();
   });
 
-  it('should register a new role agent with ANS successfully', async () => {
+  dbIt('should register a new role agent with ANS successfully', async () => {
     // Mock successful ANS registration
     const mockRegisterToANS = vi.mocked(Domains).registerToANS as unknown as { mockResolvedValueOnce: (v: any) => void };
     mockRegisterToANS.mockResolvedValueOnce({
@@ -126,7 +128,7 @@ describe('ANS Auto-Registration', () => {
     expect(updatedAgent?.ansVerificationUrl).toBe('https://knaight.site/api/v1/verify/l1-security-engineer.testorg.knaight');
   });
 
-  it('should handle ANS registration failure gracefully', async () => {
+  dbIt('should handle ANS registration failure gracefully', async () => {
     // Mock failed ANS registration
     const mockRegisterToANS = vi.mocked(Domains).registerToANS as unknown as { mockResolvedValueOnce: (v: any) => void };
     mockRegisterToANS.mockResolvedValueOnce({
@@ -164,7 +166,7 @@ describe('ANS Auto-Registration', () => {
     expect(updatedAgent?.ansRegistrationError).toBe('ANS Registry unavailable');
   });
 
-  it('should skip registration if ANS auto-registration is disabled', async () => {
+  dbIt('should skip registration if ANS auto-registration is disabled', async () => {
     // Mock disabled ANS registration
     const mockGetDomainConfig = vi.mocked(Domains).getDomainConfig as unknown as { mockReturnValueOnce: (v: any) => void };
     mockGetDomainConfig.mockReturnValueOnce({
@@ -201,7 +203,7 @@ describe('ANS Auto-Registration', () => {
     expect(updatedAgent?.ansIdentifier).toBeNull();
   });
 
-  it('should skip registration if role agent is already synced', async () => {
+  dbIt('should skip registration if role agent is already synced', async () => {
     // Create role agent with existing ANS registration
     const roleAgent = await prisma.roleAgent.create({
       data: {
@@ -226,7 +228,7 @@ describe('ANS Auto-Registration', () => {
     expect(result.correlationId).toContain('already-synced');
   });
 
-  it('should get ANS registration statistics', async () => {
+  dbIt('should get ANS registration statistics', async () => {
     // Create test role agents with different statuses
     await prisma.roleAgent.createMany({
       data: [
@@ -283,7 +285,7 @@ describe('ANS Auto-Registration', () => {
     expect(stats.syncRate).toBe(50); // 2/4 * 100
   });
 
-  it('should retry failed ANS registrations', async () => {
+  dbIt('should retry failed ANS registrations', async () => {
     // Create role agents with error status
     await prisma.roleAgent.createMany({
       data: [
