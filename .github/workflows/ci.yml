@@ -113,24 +113,38 @@ jobs:
           . ./.env.ci || true
           set +a
 
+          # Try all possible DB URL sources
           DB="${DATABASE_URL:-${POSTGRES_PRISMA_URL:-${POSTGRES_URL:-${SUPABASE_PRISMA_URL:-${SUPABASE_DATABASE_URL:-}}}}}"
           DB=${DB%\"}; DB=${DB#\"}
 
+          # Debug: show what we found
+          if [ -n "$DB" ]; then
+            echo "🔍 Found DB URL: $(echo "$DB" | sed -E 's#^(postgres(ql)?://)[^:]+:[^@]+@([^/?]+).*#\1***:***@\3#')"
+          else
+            echo "⚠️ No DB URL found in any source"
+          fi
+
           if ! echo "$DB" | grep -Eq '^postgres(ql)?://'; then
-            echo "⚠️ Invalid/missing DATABASE_URL, reconstructing..."
-            USER="${POSTGRES_USER:-postgres}"
-            PASS="${POSTGRES_PASSWORD:-postgres}"
-            HOST="${POSTGRES_HOST}"
-            PORT="${POSTGRES_PORT:-5432}"
-            NAME="${POSTGRES_DATABASE:-postgres}"
+            echo "⚠️ Invalid/missing DATABASE_URL, trying to reconstruct..."
             
-            if [ -z "$HOST" ]; then
-              echo "❌ POSTGRES_HOST missing - cannot reconstruct DATABASE_URL" >&2
+            # Check if we have discrete vars
+            if [ -n "$POSTGRES_HOST" ] && [ -n "$POSTGRES_USER" ] && [ -n "$POSTGRES_PASSWORD" ]; then
+              USER="${POSTGRES_USER}"
+              PASS="${POSTGRES_PASSWORD}"
+              HOST="${POSTGRES_HOST}"
+              PORT="${POSTGRES_PORT:-5432}"
+              NAME="${POSTGRES_DATABASE:-postgres}"
+              
+              DB="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${NAME}?sslmode=require"
+              echo "✅ Reconstructed DATABASE_URL with host=${HOST}, port=${PORT}, db=${NAME}"
+            else
+              echo "❌ Cannot reconstruct DATABASE_URL - missing required vars:"
+              echo "   POSTGRES_HOST: ${POSTGRES_HOST:-'missing'}"
+              echo "   POSTGRES_USER: ${POSTGRES_USER:-'missing'}"
+              echo "   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-'missing'}"
+              echo "   POSTGRES_DATABASE: ${POSTGRES_DATABASE:-'missing'}"
               exit 1
             fi
-            
-            DB="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${NAME}?sslmode=require"
-            echo "✅ Reconstructed DATABASE_URL with host=${HOST}, port=${PORT}, db=${NAME}"
           fi
 
           # Ensure a numeric port
