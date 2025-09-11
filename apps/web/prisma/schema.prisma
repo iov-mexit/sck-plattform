@@ -92,7 +92,7 @@ model RoleAgent {
   lastTrustCheck         DateTime?
   trustScore             Float?
   ansIdentifier          String?
-  ansRegistrationStatus  AnsSyncStatus           @default(PENDING)
+  ansRegistrationStatus  AnsSyncStatus           @default(NOT_REGISTERED)
   ansRegistrationError   String?
   ansVerificationUrl     String?
   approvals              Approval[]
@@ -609,9 +609,10 @@ enum RoleAgentStatus {
 }
 
 enum AnsSyncStatus {
-  PENDING
+  NOT_REGISTERED
+  REGISTERED
   SYNCED
-  ERROR
+  FAILED
 }
 
 enum ArtifactType {
