@@ -27,7 +27,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Either projectPhaseId or requirements required" }, { status: 400 });
     }
 
-    const team = await suggestTeam(phase);
+    const team = await suggestTeam(phase, requirements?.organizationId);
 
     const record = await prisma.teamComposition.create({
       data: {
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
         requirements: phase.requiredSkills as any,
         suggestedTeam: team.suggestions as any,
         gaps: team.gaps as any,
-        organizationId: "default-org" // TODO: Get from auth context
+        organizationId: requirements?.organizationId || (phase as any)?.organizationId || "default-org"
       },
     });
 

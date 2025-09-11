@@ -19,27 +19,38 @@ export interface TeamSuggestionResult {
   rationale: string;
 }
 
-export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
+export async function suggestTeam(phase: any, organizationId?: string): Promise<TeamSuggestionResult> {
   try {
     const requirements = phase.requiredSkills as {
       skills: string[];
       trustMin: number;
       maxTeamSize?: number;
       preferredRoles?: string[];
+      organizationId?: string;
     };
 
-    // Get all active role agents with their templates and certifications
+    const orgId = organizationId || requirements?.organizationId || (phase as any)?.organizationId;
+
+    // Get all active role agents for org with templates, certifications, and verified signals
     const agents = await prisma.roleAgent.findMany({
       where: {
         status: 'active',
-        organizationId: 'default-org' // TODO: Get from auth context
+        ...(orgId ? { organizationId: orgId } : {})
       },
       include: {
         roleTemplate: true,
         certifications: {
           select: {
             name: true,
-            issuer: true
+            issuer: true,
+            verified: true
+          }
+        },
+        signals: {
+          select: {
+            title: true,
+            verified: true,
+            value: true
           }
         }
       }
@@ -47,20 +58,49 @@ export async function suggestTeam(phase: any): Promise<TeamSuggestionResult> {
 
     // Calculate skill match scores for each agent
     const scoredAgents = agents.map(agent => {
-      const agentSkills: string[] = [
+      const templateSkills: string[] = [
         ...((agent.roleTemplate as any)?.skills || []),
         ...(agent.roleTemplate?.title ? [agent.roleTemplate.title] : []),
         ...(agent.roleTemplate?.category ? [agent.roleTemplate.category] : []),
-        ...((agent as any).certifications?.map((c: any) => c.name) || [])
-      ];
+        ...(((agent.roleTemplate as any)?.focus) ? [String((agent.roleTemplate as any).focus)] : [])
+      ].filter(Boolean).map(s => String(s));
 
-      const skillMatches = requirements.skills.filter(skill =>
+      // Include responsibilities and security contributions text as skills tokens
+      const responsibilities: string[] = Array.isArray((agent.roleTemplate as any)?.responsibilities)
+        ? ((agent.roleTemplate as any).responsibilities as any[]).map((r: any) => String(r))
+        : [];
+
+      const securityContribs: string[] = Array.isArray((agent.roleTemplate as any)?.securityContributions)
+        ? ((agent.roleTemplate as any).securityContributions as any[])
+            .flatMap((sc: any) => [sc?.title, ...(Array.isArray(sc?.bullets) ? sc.bullets : [])])
+            .filter(Boolean)
+            .map((t: any) => String(t))
+        : [];
+
+      const certificationSkills: string[] = ((agent as any).certifications || [])
+        .filter((c: any) => c?.verified === true)
+        .map((c: any) => c.name);
+
+      const signalSkills: string[] = ((agent as any).signals || [])
+        .filter((s: any) => s?.verified === true && (s?.value ?? 0) > 0.5)
+        .map((s: any) => s.title);
+
+      const agentSkills: string[] = Array.from(new Set([
+        ...templateSkills,
+        ...responsibilities,
+        ...securityContribs,
+        ...certificationSkills,
+        ...signalSkills
+      ]));
+
+      const skillMatches = (requirements.skills || []).filter(skill =>
         agentSkills.some(agentSkill =>
           agentSkill.toLowerCase().includes(skill.toLowerCase())
         )
       );
 
-      const skillMatchScore = skillMatches.length / requirements.skills.length;
+      const denom = Math.max((requirements.skills || []).length, 1);
+      const skillMatchScore = skillMatches.length / denom;
       const trustOk = (agent.trustScore ?? 0) >= (requirements.trustMin || 0);
 
       return {
