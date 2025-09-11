@@ -54,26 +54,32 @@ jobs:
           echo "NEXT_PUBLIC_BASE_URL=http://localhost:3000" >> $GITHUB_ENV
           echo "NEXT_PUBLIC_ENVIRONMENT=development" >> $GITHUB_ENV
 
-      - name: 🔐 Resolve Supabase DATABASE_URL
+      - name: 🌐 Pull environment from Vercel (preview)
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
         run: |
-          URL=""
-          if [ -n "${{ secrets.DATABASE_URL }}" ]; then
-            URL="${{ secrets.DATABASE_URL }}"
-          elif [ -n "${{ secrets.SUPABASE_DATABASE_URL }}" ]; then
-            URL="${{ secrets.SUPABASE_DATABASE_URL }}"
-          elif [ -n "${{ secrets.SUPABASE_PRISMA_URL }}" ]; then
-            URL="${{ secrets.SUPABASE_PRISMA_URL }}"
-          elif [ -n "${{ secrets.POSTGRES_URL }}" ]; then
-            URL="${{ secrets.POSTGRES_URL }}"
+          yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
+          echo "✅ Pulled env from Vercel into apps/web/.env.ci"
+
+      - name: 🔐 Export DATABASE_URL from pulled env
+        working-directory: apps/web
+        run: |
+          if [ -f .env.ci ]; then
+            DB=$(grep -E '^DATABASE_URL=' .env.ci | sed 's/^DATABASE_URL=//')
+            if [ -z "$DB" ]; then
+              echo "❌ DATABASE_URL missing in Vercel env" >&2
+              exit 1
+            fi
+            if [[ "$DB" != *"sslmode="* ]]; then
+              DB="${DB}?sslmode=require"
+            fi
+            echo "DATABASE_URL=$DB" >> $GITHUB_ENV
+            echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
           else
-            echo "❌ Missing DATABASE_URL secret. Please set one of: DATABASE_URL, SUPABASE_DATABASE_URL, SUPABASE_PRISMA_URL, POSTGRES_URL" >&2
+            echo "❌ .env.ci not found after vercel env pull" >&2
             exit 1
           fi
-          if [[ "$URL" != *"sslmode="* ]]; then
-            URL="${URL}?sslmode=require"
-          fi
-          echo "DATABASE_URL=$URL" >> $GITHUB_ENV
-          echo "SHADOW_DATABASE_URL=$URL" >> $GITHUB_ENV
 
       - name: 🗄️ Run Prisma Migrations (Supabase)
         run: yarn workspace @sck/web dlx prisma migrate deploy
