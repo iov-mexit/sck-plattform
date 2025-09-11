@@ -112,10 +112,17 @@ jobs:
             echo "⚠️ Invalid/missing DATABASE_URL, reconstructing..."
             USER="${POSTGRES_USER:-postgres}"
             PASS="${POSTGRES_PASSWORD:-postgres}"
-            HOST="${POSTGRES_HOST:-localhost}"
+            HOST="${POSTGRES_HOST}"
             PORT="${POSTGRES_PORT:-5432}"
             NAME="${POSTGRES_DATABASE:-postgres}"
+            
+            if [ -z "$HOST" ]; then
+              echo "❌ POSTGRES_HOST missing - cannot reconstruct DATABASE_URL" >&2
+              exit 1
+            fi
+            
             DB="postgresql://${USER}:${PASS}@${HOST}:${PORT}/${NAME}?sslmode=require"
+            echo "✅ Reconstructed DATABASE_URL with host=${HOST}, port=${PORT}, db=${NAME}"
           fi
 
           # Ensure a numeric port
