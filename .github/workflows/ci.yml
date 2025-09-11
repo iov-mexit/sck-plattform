@@ -76,13 +76,23 @@ jobs:
           yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
-      - name: 🔐 Export DATABASE_URL from pulled env
+      - name: 🔐 Export DATABASE_URL from pulled env (with fallbacks)
         working-directory: apps/web
         run: |
           if [ -f .env.ci ]; then
+            # Show available keys (masked values)
+            echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ' | sed 's/.$//')
+
+            # Try DATABASE_URL first
             DB=$(grep -E '^DATABASE_URL=' .env.ci | sed 's/^DATABASE_URL=//')
+            # Fallbacks commonly set by Vercel Postgres/Supabase integrations
+            [ -z "$DB" ] && DB=$(grep -E '^POSTGRES_PRISMA_URL=' .env.ci | sed 's/^POSTGRES_PRISMA_URL=//')
+            [ -z "$DB" ] && DB=$(grep -E '^POSTGRES_URL=' .env.ci | sed 's/^POSTGRES_URL=//')
+            [ -z "$DB" ] && DB=$(grep -E '^SUPABASE_PRISMA_URL=' .env.ci | sed 's/^SUPABASE_PRISMA_URL=//')
+            [ -z "$DB" ] && DB=$(grep -E '^SUPABASE_DATABASE_URL=' .env.ci | sed 's/^SUPABASE_DATABASE_URL=//')
+
             if [ -z "$DB" ]; then
-              echo "❌ DATABASE_URL missing in Vercel env" >&2
+              echo "❌ DATABASE_URL missing in Vercel env (tried DATABASE_URL, POSTGRES_PRISMA_URL, POSTGRES_URL, SUPABASE_PRISMA_URL, SUPABASE_DATABASE_URL)" >&2
               exit 1
             fi
             if [[ "$DB" != *"sslmode="* ]]; then
@@ -90,7 +100,6 @@ jobs:
             fi
             echo "DATABASE_URL=$DB" >> $GITHUB_ENV
             echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
-            echo "🔑 Pulled keys:" $(cut -d= -f1 .env.ci | tr '\n' ' ' | sed 's/.$//')
           else
             echo "❌ .env.ci not found after vercel env pull" >&2
             exit 1
