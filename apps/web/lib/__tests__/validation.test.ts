@@ -13,7 +13,7 @@ const mockEnv = {
   environment: 'development' as const,
   baseUrl: 'http://localhost:3000',
   primaryDomain: 'localhost',
-  paymentStrategy: 'crypto',
+  paymentStrategy: 'crypto' as const,
   stripeKey: 'pk_test_valid_key',
   walletConnectProjectId: 'test_project_id',
   enableWeb3: true,
@@ -22,7 +22,7 @@ const mockEnv = {
   cookieConsentEnabled: false,
   debugMode: false,
   validateEnvironment: false,
-  logLevel: 'info',
+  logLevel: 'info' as const,
   analytics: false,
   payments: true
 };
@@ -88,7 +88,7 @@ describe('Environment Validation', () => {
     it('should require Stripe key when strategy is stripe', () => {
       const config = {
         ...mockEnv,
-        paymentStrategy: 'stripe',
+        paymentStrategy: 'stripe' as const,
         stripeKey: ''
       };
 
@@ -101,7 +101,7 @@ describe('Environment Validation', () => {
     it('should validate Stripe key format', () => {
       const config = {
         ...mockEnv,
-        paymentStrategy: 'stripe',
+        paymentStrategy: 'stripe' as const,
         stripeKey: 'invalid_key'
       };
 
@@ -116,7 +116,7 @@ describe('Environment Validation', () => {
         ...mockEnv,
         baseUrl: 'https://secure-knaight.eu',
         primaryDomain: 'secure-knaight.eu',
-        paymentStrategy: 'crypto',
+        paymentStrategy: 'crypto' as const,
         walletConnectProjectId: 'test-project-id'
       };
 
@@ -130,7 +130,7 @@ describe('Environment Validation', () => {
         ...mockEnv,
         baseUrl: 'https://secure-knaight.eu',
         primaryDomain: 'secure-knaight.eu',
-        paymentStrategy: 'stripe',
+        paymentStrategy: 'stripe' as const,
         stripeKey: 'pk_test_valid_key'
       };
 
@@ -145,7 +145,7 @@ describe('Environment Validation', () => {
         ...mockEnv,
         baseUrl: 'https://secure-knaight.org',
         primaryDomain: 'secure-knaight.org',
-        paymentStrategy: 'stripe',
+        paymentStrategy: 'stripe' as const,
         stripeKey: 'pk_test_valid_key'
       };
 
