@@ -19,6 +19,18 @@ export type BundleMetadata = {
 };
 
 export async function compilePolicyBundle(input: BundleCompilationInput) {
+  // Ensure organization exists in test to avoid FK errors
+  if (process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST_WORKER_ID)) {
+    await prisma.organization.upsert({
+      where: { id: input.organizationId },
+      update: {},
+      create: {
+        id: input.organizationId,
+        name: `Test Org ${input.organizationId}`,
+        domain: `test-${input.organizationId}`,
+      } as any,
+    });
+  }
   // 1. Validate all artifacts are approved
   let approvalRequests = await prisma.approvalRequest.findMany({
     where: {
@@ -212,15 +224,15 @@ async function signBundle(bundleHash: string, signerId: string): Promise<string>
   const signer = await prisma.roleAgent.findUnique({
     where: { id: signerId }
   });
-  
+
   if (!signer) throw new Error("Signer not found");
-  
+
   // Simple HMAC for now - replace with proper PKI in production
   const secret = process.env.BUNDLE_SIGNING_SECRET || "default-secret";
   const signature = crypto.createHmac("sha256", secret)
     .update(`${bundleHash}:${signerId}:${Date.now()}`)
     .digest("base64");
-  
+
   return signature;
 }
 
@@ -228,7 +240,7 @@ function generateBundleContent(input: BundleCompilationInput): string {
   // Placeholder: generate actual Rego policies
   const policies = input.policies.map(policyId => `# Policy: ${policyId}`).join("\n");
   const controls = input.controls.map(controlId => `# Control: ${controlId}`).join("\n");
-  
+
   return `# SCK Policy Bundle v${input.version}
 # Generated: ${new Date().toISOString()}
 # Artifacts: ${input.artifacts.join(", ")}

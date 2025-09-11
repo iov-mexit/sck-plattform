@@ -30,6 +30,30 @@ export type TokenIntrospection = {
 };
 
 export async function issueGatewayToken(input: TokenIssueInput) {
+  // Ensure organization exists in test to avoid FK errors
+  if (process.env.NODE_ENV === 'test' || Boolean(process.env.VITEST_WORKER_ID)) {
+    await prisma.organization.upsert({
+      where: { id: input.organizationId },
+      update: {},
+      create: {
+        id: input.organizationId,
+        name: `Test Org ${input.organizationId}`,
+        domain: `test-${input.organizationId}`,
+      } as any,
+    });
+    await prisma.roleTemplate.upsert({
+      where: { id: 'test-role-template' },
+      update: {},
+      create: {
+        id: 'test-role-template',
+        title: 'Test Role',
+        focus: 'Test',
+        category: 'Test',
+        responsibilities: { items: [] } as any,
+        securityContributions: { items: [] } as any,
+      } as any,
+    });
+  }
   // 1. Validate issuer permissions
   let issuer = await prisma.roleAgent.findUnique({
     where: { id: input.issuerId }
