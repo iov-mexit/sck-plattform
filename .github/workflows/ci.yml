@@ -58,8 +58,15 @@ jobs:
         working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
-          yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
+          yarn dlx vercel env pull .env.ci \
+            --yes \
+            --environment=preview \
+            --token "$VERCEL_TOKEN" \
+            --project "$VERCEL_PROJECT_ID" \
+            --scope "$VERCEL_ORG_ID"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
       - name: 🔐 Export DATABASE_URL from pulled env
