@@ -76,7 +76,7 @@ jobs:
           yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
-      - name: 🌐 Fallback: Pull environment from Vercel (production) if DB missing
+      - name: "🌐 Fallback: Pull environment from Vercel (production) if DB missing"
         working-directory: apps/web
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
