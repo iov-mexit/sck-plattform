@@ -61,8 +61,8 @@ jobs:
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
         run: |
-          yarn dlx vercel link --project "$VERCEL_PROJECT_ID" --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
-          echo "✅ Linked apps/web to Vercel project: $VERCEL_PROJECT_ID"
+          yarn dlx vercel link --project "sck-web" --yes --token "$VERCEL_TOKEN" --scope "$VERCEL_ORG_ID"
+          echo "✅ Linked apps/web to Vercel project: sck-web"
 
       - name: 🌐 Pull environment from Vercel (preview)
         working-directory: apps/web
