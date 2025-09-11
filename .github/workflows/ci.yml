@@ -76,6 +76,24 @@ jobs:
           yarn dlx vercel env pull .env.ci --yes --environment=preview --token "$VERCEL_TOKEN"
           echo "✅ Pulled env from Vercel into apps/web/.env.ci"
 
+      - name: 🌐 Fallback: Pull environment from Vercel (production) if DB missing
+        working-directory: apps/web
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        run: |
+          if ! grep -qE '^(DATABASE_URL|POSTGRES_PRISMA_URL|POSTGRES_URL|SUPABASE_PRISMA_URL|SUPABASE_DATABASE_URL)=' .env.ci; then
+            echo "ℹ️ DATABASE_URL not found in preview env; pulling production env as fallback"
+            yarn dlx vercel env pull .env.prod --yes --environment=production --token "$VERCEL_TOKEN"
+            # Merge prod into ci for missing keys
+            while IFS= read -r line; do
+              key="${line%%=*}"
+              if ! grep -qE "^${key}=" .env.ci; then
+                echo "$line" >> .env.ci
+              fi
+            done < .env.prod
+            echo "✅ Merged production env into .env.ci for missing keys"
+          fi
+
       - name: 🔐 Export DATABASE_URL from pulled env (with fallbacks)
         working-directory: apps/web
         run: |
