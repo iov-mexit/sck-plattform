@@ -49,9 +49,9 @@ CREATE INDEX "idx_project_phases_name" ON "project_phases"("phaseName");
 CREATE INDEX "idx_project_phases_start" ON "project_phases"("startDate");
 
 -- AddForeignKey
-ALTER TABLE "team_compositions" ADD CONSTRAINT "team_compositions_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "team_compositions" ADD CONSTRAINT "team_compositions_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "project_phases" ADD CONSTRAINT "project_phases_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "project_phases" ADD CONSTRAINT "project_phases_organizationId_fkey" FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 
