@@ -199,7 +199,7 @@ describe('ANS Auto-Registration', () => {
       where: { id: roleAgent.id }
     });
 
-    expect(updatedAgent?.ansRegistrationStatus).toBe('PENDING'); // Default status
+    expect(updatedAgent?.ansRegistrationStatus).toBe('NOT_REGISTERED'); // Default status when ANS disabled
     expect(updatedAgent?.ansIdentifier).toBeNull();
   });
 
