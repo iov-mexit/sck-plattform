@@ -225,8 +225,12 @@ jobs:
           echo "DATABASE_URL=$DB" >> $GITHUB_ENV
           echo "SHADOW_DATABASE_URL=$DB" >> $GITHUB_ENV
 
-      - name: 🗄️ Run Prisma Migrations
-        run: yarn workspace @sck/web dlx prisma migrate deploy
+      - name: 🗄️ Reset and Apply Prisma Migrations
+        run: |
+          # Reset database for clean state
+          yarn workspace @sck/web dlx prisma migrate reset --force
+          # Apply all migrations
+          yarn workspace @sck/web dlx prisma migrate deploy
 
       - name: 🚀 Start Next.js Dev Server
         env:
