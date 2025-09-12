@@ -1,8 +1,7 @@
 -- Create test organization and sample data for Phase 4 & 5
 -- This script creates the necessary test data for development
 
--- Create test organization
-INSERT INTO "Organization" ("id", "name", "description", "domain", "createdAt", "updatedAt", "isActive", "onboardingComplete") VALUES
+INSERT INTO "organizations" ("id", "name", "description", "domain", "createdAt", "updatedAt", "isActive", "onboardingComplete") VALUES
 ('org_test_phase4_5', 'Test Organization Phase 4-5', 'Test organization for Phase 4 and 5 features', 'test-phase4-5.com', NOW(), NOW(), true, true)
 ON CONFLICT (id) DO NOTHING;
 
@@ -23,8 +22,7 @@ INSERT INTO "TrustToken" ("id", "symbol", "name", "totalSupply", "circulatingSup
 ('token_test_1', 'TRUST', 'Test Trust Token', '1000000', '0', '0x1234567890123456789012345678901234567890', 'ethereum', 'org_test_phase4_5', NOW(), NOW())
 ON CONFLICT (id) DO NOTHING;
 
--- Verify the data was created correctly
-SELECT 'Organization' as table_name, COUNT(*) as record_count FROM "Organization" WHERE "id" = 'org_test_phase4_5'
+SELECT 'Organization' as table_name, COUNT(*) as record_count FROM "organizations" WHERE "id" = 'org_test_phase4_5'
 UNION ALL
 SELECT 'OrganizationMember' as table_name, COUNT(*) as record_count FROM "OrganizationMember" WHERE "id" = 'member_test_phase4_5'
 UNION ALL

@@ -174,7 +174,7 @@ CREATE INDEX IF NOT EXISTS "idx_policy_performance_period" ON "PolicyPerformance
 
 -- Add foreign key constraints
 ALTER TABLE "PolicyComponent" ADD CONSTRAINT "PolicyComponent_organizationId_fkey" 
-  FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "PolicyDependency" ADD CONSTRAINT "PolicyDependency_sourceComponentId_fkey" 
   FOREIGN KEY ("sourceComponentId") REFERENCES "PolicyComponent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -183,16 +183,16 @@ ALTER TABLE "PolicyDependency" ADD CONSTRAINT "PolicyDependency_targetComponentI
   FOREIGN KEY ("targetComponentId") REFERENCES "PolicyComponent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "PolicyComposition" ADD CONSTRAINT "PolicyComposition_organizationId_fkey" 
-  FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "TrustToken" ADD CONSTRAINT "TrustToken_organizationId_fkey" 
-  FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "TrustReward" ADD CONSTRAINT "TrustReward_organizationId_fkey" 
-  FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 ALTER TABLE "TrustMarketplace" ADD CONSTRAINT "TrustMarketplace_credentialId_fkey" 
-  FOREIGN KEY ("credentialId") REFERENCES "RoleAgent"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+  FOREIGN KEY ("credentialId") REFERENCES "role_agents"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- Add unique constraints
 ALTER TABLE "PolicyComponent" ADD CONSTRAINT "PolicyComponent_org_name_version_key" 

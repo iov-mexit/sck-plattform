@@ -86,31 +86,31 @@ ALTER TABLE "EnforcementCall" ADD CONSTRAINT "EnforcementCall_result_check"
 DO $$
 BEGIN
   -- PolicyBundle foreign keys
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'Organization') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'organizations') THEN
     ALTER TABLE "PolicyBundle" ADD CONSTRAINT "PolicyBundle_organizationId_fkey" 
-      FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+      FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
   END IF;
   
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'RoleAgent') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'role_agents') THEN
     ALTER TABLE "PolicyBundle" ADD CONSTRAINT "PolicyBundle_signerId_fkey" 
-      FOREIGN KEY ("signerId") REFERENCES "RoleAgent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+      FOREIGN KEY ("signerId") REFERENCES "role_agents"("id") ON DELETE SET NULL ON UPDATE CASCADE;
   END IF;
   
   -- GatewayToken foreign keys
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'Organization') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'organizations') THEN
     ALTER TABLE "GatewayToken" ADD CONSTRAINT "GatewayToken_organizationId_fkey" 
-      FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+      FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
   END IF;
   
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'RoleAgent') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'role_agents') THEN
     ALTER TABLE "GatewayToken" ADD CONSTRAINT "GatewayToken_issuedBy_fkey" 
-      FOREIGN KEY ("issuedBy") REFERENCES "RoleAgent"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+      FOREIGN KEY ("issuedBy") REFERENCES "role_agents"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
   END IF;
   
   -- EnforcementCall foreign keys
-  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'Organization') THEN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'organizations') THEN
     ALTER TABLE "EnforcementCall" ADD CONSTRAINT "EnforcementCall_organizationId_fkey" 
-      FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+      FOREIGN KEY ("organizationId") REFERENCES "organizations"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
   END IF;
   
   IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'GatewayToken') THEN
